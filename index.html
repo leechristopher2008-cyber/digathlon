@@ -33,7 +33,7 @@
   .logo { font-family:var(--display); font-weight:700; font-size:clamp(34px, 9vw, 76px); letter-spacing:4px; margin:0; line-height:1; color:var(--cream);
     text-shadow:0 4px 0 #8a5a2b, 0 8px 0 #5b3a1f, 0 12px 0 #2e1d10, 0 0 30px #f2a93b55; }
   .sub { font-family:var(--display); letter-spacing:3px; color:var(--amber); font-size:clamp(11px, 2.4vw, 15px); margin-top:22px; }
-  #titleBtns { position:fixed; left:50%; transform:translateX(-50%); top:76vh; display:flex; flex-direction:column; gap:12px; width:min(340px, calc(100vw - 32px)); }
+  #titleBtns { position:fixed; left:50%; transform:translateX(-50%); bottom:max(20px, 4vh); display:flex; flex-direction:column; gap:12px; width:min(340px, calc(100vw - 32px)); }
   .blink { animation:blink 1.1s steps(2, start) infinite; }
   @keyframes blink { 50% { color:#ff5a36; } }
 
@@ -100,6 +100,61 @@
   #eLog li b { font-family:var(--display); font-size:12px; letter-spacing:1px; white-space:nowrap; }
   .row { display:flex; flex-wrap:wrap; gap:10px; }
   #bBack { position:fixed; left:50%; transform:translateX(-50%); bottom:24px; z-index:6; }
+  /* parte B: tamanho/fonte/contraste vindos das configurações */
+  body { --fs:18px; --qf:var(--display); --af:var(--ui); }
+  .qt { font-size:calc(var(--fs) * 1.3); font-family:var(--qf); }
+  #ans { font-size:calc(var(--fs) * 1.1); font-family:var(--af); }
+  #cSay, #cAns, #eLog li span, .qn { font-size:var(--fs); }
+  .qn { color:var(--muted); font-size:calc(var(--fs) * .75) !important; margin-top:6px; }
+  .tools { position:fixed; top:max(12px, env(safe-area-inset-top, 0px)); right:max(12px, env(safe-area-inset-right, 0px)); z-index:7; display:flex; gap:8px; align-items:center; }
+  .tools select, .tools button { background:#120c08dd; border:2px solid var(--line); padding:6px 10px; font-family:var(--ui); font-size:15px; cursor:pointer; }
+  #cfg { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:min(480px, calc(100vw - 32px)); max-height:calc(100vh - 40px); overflow:auto; z-index:20; display:grid; gap:12px; font-size:var(--fs); }
+  #cfg h2 { font-family:var(--display); letter-spacing:3px; font-size:16px; color:var(--amber); margin:0; }
+  #cfg label { display:grid; gap:4px; } #cfg .check { display:flex; gap:10px; align-items:center; }
+  #cfg input[type=range] { width:100%; accent-color:var(--amber); }
+  #cfg select { background:var(--well); border:2px solid var(--line); padding:8px; }
+  #cfg .help { color:var(--muted); font-size:.8em; margin:0; }
+  #bSurface { border-color:var(--line); margin-top:8px; }
+  body.contraste { --line:#ffe600; --amber:#ffe600; --muted:#ffffff; --cream:#ffffff; --lava:#ffe600; }
+  body.contraste #qp, body.contraste .hp, body.contraste .panel, body.contraste #ans, body.contraste .ring circle { background:#000 !important; fill:#000; }
+  body.contraste .qt, body.contraste #ans, body.contraste #cAns, body.contraste #cSay { color:#fff; }
+  body.contraste #cdown { color:#fff; background:#000; padding:6px 0; }
+  /* parte C: festa da naja */
+  #pSetup { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:min(500px, calc(100vw - 32px)); max-height:calc(100vh - 40px); overflow:auto; z-index:8; display:grid; gap:12px; font-size:var(--fs); }
+  #pSetup h2 { font-family:var(--display); letter-spacing:3px; font-size:18px; color:var(--amber); margin:0; }
+  #pSetup p { margin:0; line-height:1.4; }
+  #pSetup .help { color:var(--muted); font-size:.8em; }
+  #pNames, #pIn { min-width:0; width:100%; height:52px; background:#120c08e6; border:2px solid var(--amber); padding:0 14px; font-family:var(--af); font-size:calc(var(--fs) * 1.1); }
+  #pNames:focus, #pIn:focus { outline:none; box-shadow:0 0 12px #f2a93b55; }
+  .pmsg, #pMsg { min-height:1.2em; font-family:var(--display); font-size:11px; letter-spacing:2px; color:var(--lava); text-align:center; }
+  #pMsg.ok { color:var(--moss); }
+  #den { position:fixed; z-index:3; display:grid; place-items:center; border-radius:50%; background:radial-gradient(circle, #0c080ecc 0 52%, #0c080e66 64%, #0c080e00 71%); }
+  #den::before { content:""; position:absolute; inset:9%; border:2px dashed #f2a93b55; border-radius:50%; }
+  #najaC { width:30%; image-rendering:pixelated; transform-origin:50% 90%; transition:translate .16s ease-out; }
+  #najaC.shk { animation:cshake var(--spd, 1s) steps(2) infinite; }
+  @keyframes cshake { 50% { rotate:-7deg; } }
+  .seat { position:absolute; transform:translate(-50%,-50%); width:96px; text-align:center; font-family:var(--af); font-size:calc(var(--fs) * .8); color:var(--cream); text-shadow:0 2px 0 #000; overflow-wrap:anywhere; }
+  .seat .av { width:46px; height:46px; margin:0 auto 4px; background:var(--panel2); border:3px solid var(--line); display:grid; place-items:center; font-family:var(--display); font-size:20px; box-shadow:3px 3px 0 #000a; }
+  .seat.on { color:var(--gold); }
+  .seat.on .av { border-color:var(--gold); box-shadow:0 0 16px #ffd25799, 3px 3px 0 #000a; }
+  .seat.next .av { border-color:var(--amber); border-style:dashed; }
+  .seat .bt { color:var(--lava); font-family:var(--display); font-size:10px; letter-spacing:1px; min-height:12px; }
+  .seat.bit .av { background:#5a1810; border-color:var(--lava); animation:shake .35s 2; }
+  #pbar { position:fixed; left:50%; transform:translateX(-50%); bottom:max(14px, env(safe-area-inset-bottom)); width:min(640px, calc(100vw - 32px)); z-index:4; display:grid; gap:6px; }
+  #pTurn { text-align:center; font-size:var(--fs); text-shadow:0 2px 0 #000; } #pTurn b { color:var(--gold); }
+  .prow { display:grid; grid-template-columns:1fr auto; gap:10px; } #bPass { height:52px; padding:0 16px; }
+  #pChips { display:flex; gap:6px; justify-content:center; overflow:hidden; height:30px; }
+  .pchip { flex:none; border:2px solid; padding:2px 8px; font-size:calc(var(--fs) * .75); background:#120c08cc; white-space:nowrap; }
+  #pEnd { position:fixed; left:50%; transform:translateX(-50%); bottom:max(14px, env(safe-area-inset-bottom)); width:min(560px, calc(100vw - 32px)); z-index:6; text-align:center; display:grid; gap:12px; }
+  #pBoom { font-family:var(--display); font-size:clamp(18px, 4vw, 26px); letter-spacing:2px; color:var(--lava); }
+  #pEnd .row { justify-content:center; }
+  #flash { position:fixed; inset:0; z-index:9; pointer-events:none; background:#ff3b1f; opacity:0; }
+  #flash.go { animation:flash .7s ease-out; } @keyframes flash { 0% { opacity:.55; } 100% { opacity:0; } }
+  body.party .qh { display:none; }
+  body.contraste #den { background:#000; } body.contraste .seat .av, body.contraste .pchip, body.contraste #pNames, body.contraste #pIn { background:#000; color:#fff; }
+  body.contraste #pTurn, body.contraste #pMsg { background:#000; }
+  @media (max-height:720px) { #titleBtns { gap:8px; bottom:12px; } #titleBtns .btn { padding:8px 18px; } }
+  @media (prefers-reduced-motion:reduce) { #najaC.shk, #flash.go, .seat.bit .av { animation:none; } }
   .draft { position:fixed; left:10px; bottom:6px; z-index:3; font-family:var(--display); font-size:9px; letter-spacing:1px; color:#a8927a99; pointer-events:none; }
   @media (max-width:560px) {
     .hp { min-width:0; padding:4px 8px 2px; } .hp b { font-size:17px; }
@@ -112,31 +167,50 @@
 <canvas id="cv"></canvas>
 
 <div id="hud" class="hide">
-  <div class="hp"><small>DEPTH · <span id="hLayer">TOPSOIL</span></small><b id="hDepth">0 m</b></div>
+  <div class="hp"><small><span data-t="depth">DEPTH</span> · <span id="hLayer">TOPSOIL</span></small><b id="hDepth">0 m</b></div>
   <div class="prog"><div id="squares"></div><small id="hDig">DIG 1 OF 5</small></div>
-  <div class="hp r"><small>SCORE</small><b id="hScore">0</b></div>
+  <div class="hp r"><small data-t="score">SCORE</small><b id="hScore">0</b></div>
 </div>
 <div id="banner"></div>
 
 <div id="title">
   <h1 class="logo">DIGATHLON</h1>
-  <div class="sub">the weirder the answer, the deeper you dig</div>
+  <div class="sub" data-t="tagline">the weirder the answer, the deeper you dig</div>
 </div>
 <div id="titleBtns">
-  <button id="bStart" class="btn lava blink">▼ START DIGGING ▼</button>
-  <button id="bTour" class="btn ghost">TOUR THE LAYERS</button>
+  <button id="bStart" class="btn lava blink" data-t="daily">▼ DAILY DIG ▼</button>
+  <button id="bFree" class="btn" data-t="free">FREE DIG ∞</button>
+  <button id="bParty" class="btn" data-t="partyBtn">≈ COBRA PARTY ≈</button>
+  <button id="bTour" class="btn ghost" data-t="tour">TOUR THE LAYERS</button>
+</div>
+<div class="tools" id="tools">
+  <select id="cLang" aria-label="Language / Idioma"><option value="en">🌐 English</option><option value="pt">🌐 Português</option></select>
+  <button id="bCfg" type="button" aria-label="Settings">⚙️</button>
+</div>
+<div id="cfg" class="panel hide" role="dialog" aria-labelledby="cfgT">
+  <h2 id="cfgT" data-t="settings">SETTINGS</h2>
+  <div class="check"><input type="checkbox" id="cAcess"><label for="cAcess" data-t="accessible">Accessible mode</label></div>
+  <p class="help" data-t="accessibleHelp"></p>
+  <label><span><span data-t="fontSize">Text size</span>: <b id="vFs"></b></span><input type="range" id="cFs" min="14" max="36" step="1"></label>
+  <label><span data-t="font">Font</span>
+    <select id="cFf"><option value="pixel">Pixel (Digathlon)</option><option value="system-ui, sans-serif">System</option><option value="Verdana, sans-serif">Verdana</option><option value="Arial, sans-serif">Arial</option><option value="Georgia, serif">Georgia</option></select></label>
+  <label><span><span data-t="time">Time to answer</span>: <b id="vTempo"></b></span><input type="range" id="cTempo" min="10" max="90" step="5"></label>
+  <div class="check"><input type="checkbox" id="cContr"><label for="cContr" data-t="contrast">High contrast</label></div>
+  <p class="help" data-t="saved"></p>
+  <div class="row"><button class="btn ghost" id="cReset" type="button" data-t="reset">RESET</button><button class="btn lava" id="cClose" type="button" data-t="close">OK</button></div>
 </div>
 
 <div id="qp" class="hide">
   <div class="ql" id="qLabel">DIG 1 OF 5</div>
   <div class="qt" id="qText"></div>
-  <div class="qh">▼ weirder answers dig deeper ▼</div>
+  <div class="qh" data-t="hint">▼ weirder answers dig deeper ▼</div>
+  <div class="qn" id="qNote" hidden></div>
 </div>
 <div id="cdown" class="hide"></div>
 <form id="bar" class="hide" autocomplete="off">
   <div class="ring"><svg viewBox="0 0 56 56"><circle cx="28" cy="28" r="24" class="rb"/><circle cx="28" cy="28" r="24" id="ringFg" class="rf"/></svg><span id="ringN">25</span></div>
   <input id="ans" type="text" placeholder="type one answer…" maxlength="40" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Your answer">
-  <button class="btn lava" id="bDig" type="submit">DIG ▼</button>
+  <button class="btn lava" id="bDig" type="submit" data-t="dig">DIG ▼</button>
   <div class="tline"><i id="tFill"></i></div>
   <div id="msg" aria-live="polite"></div>
 </form>
@@ -147,23 +221,97 @@
   <div id="cAns"></div>
   <div id="cPts"></div>
   <div id="cSay"></div>
-  <button id="bNext" class="btn">▼ KEEP DIGGING</button>
+  <div class="row" style="justify-content:center"><button id="bNext" class="btn">▼ KEEP DIGGING</button>
+  <button id="bSurface" class="btn hide" data-t="surface">▲ SURFACE</button></div>
 </div>
 
 <div id="end" class="panel hide">
-  <div class="ql">DIG COMPLETE</div>
+  <div class="ql" data-t="complete">DIG COMPLETE</div>
   <div class="big" id="eScore"></div>
   <div id="eLayer"></div>
   <ol id="eLog"></ol>
   <div class="row">
-    <button id="bAgain" class="btn lava">↻ DIG AGAIN</button>
-    <button id="bTour2" class="btn ghost">TOUR THE LAYERS</button>
+    <button id="bAgain" class="btn lava" data-t="again">↻ DIG AGAIN</button>
+    <button id="bTour2" class="btn ghost" data-t="tour">TOUR THE LAYERS</button>
   </div>
 </div>
-<button id="bBack" class="btn hide">▲ BACK TO THE SURFACE</button>
-<div class="draft">DRAFT v2 · layout only · 5 demo prompts</div>
+<button id="bBack" class="btn hide" data-t="back">▲ BACK TO THE SURFACE</button>
+
+<!-- parte C: festa da naja (um aparelho só) -->
+<form id="pSetup" class="panel hide" role="dialog" aria-labelledby="pSetupT" autocomplete="off">
+  <h2 id="pSetupT" data-t="party">COBRA PARTY</h2>
+  <p data-t="partyDesc"></p>
+  <label for="pNames" class="help" data-t="namesHelp"></label>
+  <input id="pNames" type="text" maxlength="160" spellcheck="false" autocapitalize="words">
+  <div id="pSetupMsg" class="pmsg" aria-live="polite"></div>
+  <div class="row"><button class="btn ghost" id="pCancel" type="button" data-t="back2">◀ BACK</button><button class="btn lava" type="submit" data-t="start">START ▼</button></div>
+</form>
+<div id="den" class="hide" aria-hidden="true"><canvas id="najaC"></canvas></div>
+<form id="pbar" class="hide" autocomplete="off">
+  <div id="pTurn" aria-live="polite"></div>
+  <div class="prow"><input id="pIn" type="text" maxlength="40" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Answer"><button class="btn lava" id="bPass" type="submit" data-t="pass">PASS ▶</button></div>
+  <div id="pMsg" aria-live="polite"></div>
+  <div id="pChips"></div>
+</form>
+<div id="pEnd" class="panel hide" role="dialog" aria-live="assertive">
+  <div id="pBoom"></div>
+  <div class="row"><button id="pAgain" class="btn lava" data-t="newRound">↻ NEW ROUND</button><button id="pReset" class="btn ghost" data-t="changePlayers">CHANGE PLAYERS</button><button id="pUp" class="btn ghost" data-t="surface">▲ SURFACE</button></div>
+</div>
+<div id="flash"></div>
+<div class="draft">v2</div>
 
 <script>
+/* ================= IDIOMA (EN padrão / PT) ================= */
+const STR = {
+  en: { tagline:"the weirder the answer, the deeper you dig", daily:"▼ DAILY DIG ▼", free:"FREE DIG ∞", tour:"TOUR THE LAYERS",
+    depth:"DEPTH", score:"SCORE", hint:"▼ weirder answers dig deeper ▼", dig:"DIG ▼", ph:"type one answer…",
+    count:"digging in · the clock starts in <b>{n}</b>", timesUp:"TIME'S UP · <b>NEXT PROMPT</b>", wrong:"not in the burrow · try another",
+    of:"DIG {a} OF {b}", freeLbl:"FREE DIG · #{n}", tourLbl:"LAYER TOUR", keep:"▼ KEEP DIGGING", see:"▼ SEE YOUR DIG", surface:"▲ SURFACE",
+    pts:"PTS", digM:"dig {m} m", complete:"DIG COMPLETE", dugTo:"dug to {m} m · {layer}", missed:"TIME'S UP", again:"↻ DIG AGAIN",
+    back:"▲ BACK TO THE SURFACE", you:"YOU", qNote:"English questions are on the way. For now they show in Portuguese.",
+    settings:"SETTINGS", accessible:"Accessible mode", accessibleHelp:"Turns on a preset: bigger text, easy-to-read font, more time and high contrast. You can still adjust each item below.",
+    fontSize:"Text size", font:"Font", time:"Time to answer", seconds:"seconds", contrast:"High contrast (black background, white text, yellow details)",
+    reset:"RESET TO DEFAULT", close:"OK", saved:"Settings are saved in this browser.",
+    partyBtn:"≈ COBRA PARTY ≈", party:"COBRA PARTY", back2:"◀ BACK", start:"START ▼",
+    partyDesc:"One device, everyone in a circle. Whoever holds the cobra names an answer to pass it clockwise. Nobody knows when it strikes, but it shakes faster when it's close.",
+    namesHelp:"2 to 8 names, separated by commas, in clockwise order, starting with whoever starts the match. The cobra starts with the person next to them.",
+    namesPh:"what the burrow calls you · e.g. Ana, Bia, Caio", namesErr:"Enter 2 to 8 names, separated by commas.",
+    round:"COBRA PARTY · ROUND {n}", turn:"The cobra is with <b>{a}</b>! Answer to pass it to <b>{b}</b> ↻", pass:"PASS ▶", passPh:"answer to pass the cobra…",
+    passed:"{name}! cobra passed", rep2:"{name} was already said · another!", wrong2:"\"{v}\" doesn't count · quick, another!",
+    bite:"SSSNAP! THE COBRA BIT {a}!", bite1:"1 BITE", biteN:"{n} BITES", newRound:"↻ NEW ROUND", changePlayers:"CHANGE PLAYERS",
+    tiers:["COMMON","RARE","EPIC","MYTHIC","LEGENDARY","ULTRA"],
+    says:["Everyone digs here.","Not bad, little digger.","Now we're tunneling.","The burrow whispers your name.","Gold-grade dirt.","Even the bedrock is impressed."],
+    layers:["TOPSOIL","STONE LAYER","DARK CAVES","ICE LAYER","MAGMA","BEDROCK"],
+    facts:["earthworms rarely go below here","lost house keys found: 3,412","an old tree root says hi","stone layer · bring a stronger snout","a pirate buried something here. not your problem","dark caves · lamp on","the crystals hum if you keep quiet","ice layer · −12 °C","a frozen mammoth waves hello","magma · 1,100 °C · do not lick","nobody comes back with eyebrows","bedrock · the oldest stone in the game","end of the map. for now."] },
+  pt: { tagline:"quanto mais esquisita a resposta, mais fundo você cava", daily:"▼ CAVADA DO DIA ▼", free:"CAVADA LIVRE ∞", tour:"VER AS CAMADAS",
+    depth:"PROFUNDIDADE", score:"PONTOS", hint:"▼ resposta esquisita cava mais fundo ▼", dig:"CAVAR ▼", ph:"digite uma resposta…",
+    count:"cavando · o relógio começa em <b>{n}</b>", timesUp:"ACABOU O TEMPO · <b>PRÓXIMA</b>", wrong:"não tem na toca · tenta outra",
+    of:"CAVADA {a} DE {b}", freeLbl:"CAVADA LIVRE · #{n}", tourLbl:"PASSEIO PELAS CAMADAS", keep:"▼ CONTINUAR CAVANDO", see:"▼ VER RESULTADO", surface:"▲ SUBIR",
+    pts:"PTS", digM:"cavou {m} m", complete:"FIM DA CAVADA", dugTo:"chegou a {m} m · {layer}", missed:"SEM TEMPO", again:"↻ CAVAR DE NOVO",
+    back:"▲ VOLTAR PRA SUPERFÍCIE", you:"VOCÊ", qNote:"",
+    settings:"CONFIGURAÇÕES", accessible:"Modo acessível", accessibleHelp:"Liga um pacote pronto: letra maior, fonte fácil de ler, mais tempo e alto contraste. Depois dá pra ajustar cada item abaixo.",
+    fontSize:"Tamanho da letra", font:"Fonte", time:"Tempo pra responder", seconds:"segundos", contrast:"Alto contraste (fundo preto, letra branca, detalhes amarelos)",
+    reset:"VOLTAR AO PADRÃO", close:"OK", saved:"As configurações ficam salvas neste navegador.",
+    partyBtn:"≈ FESTA DA NAJA ≈", party:"FESTA DA NAJA", back2:"◀ VOLTAR", start:"COMEÇAR ▼",
+    partyDesc:"Um aparelho só, todo mundo em roda. Quem está com a naja fala uma resposta pra passar ela no sentido horário. Ninguém sabe quando ela dá o bote, mas ela balança mais rápido quando está perto.",
+    namesHelp:"De 2 a 8 nomes, separados por vírgula, no sentido horário, começando por quem inicia a partida. A naja começa com a pessoa do lado.",
+    namesPh:"como a toca te chama · ex.: Ana, Bia, Caio", namesErr:"Coloque de 2 a 8 nomes, separados por vírgula.",
+    round:"FESTA DA NAJA · RODADA {n}", turn:"A naja está com <b>{a}</b>! Responda pra passar pra <b>{b}</b> ↻", pass:"PASSAR ▶", passPh:"responda pra passar a naja…",
+    passed:"{name}! passou a naja", rep2:"{name} já foi dita · outra!", wrong2:"\"{v}\" não vale · rápido, outra!",
+    bite:"TOMOU BOTE! A NAJA PICOU {a}!", bite1:"1 BOTE", biteN:"{n} BOTES", newRound:"↻ NOVA RODADA", changePlayers:"TROCAR JOGADORES",
+    tiers:["COMUM","RARA","ÉPICA","MÍTICA","LENDÁRIA","ULTRA"],
+    says:["Todo mundo cava aqui.","Nada mal, toupeirinha.","Agora sim, um túnel.","A toca sussurra seu nome.","Terra de ouro.","Até a rocha-mãe ficou impressionada."],
+    layers:["TERRA","PEDRA","CAVERNAS ESCURAS","GELO","MAGMA","ROCHA-MÃE"],
+    facts:["minhoca quase nunca passa daqui","chaves de casa perdidas: 3.412","uma raiz velha manda um oi","camada de pedra · precisa de focinho forte","um pirata enterrou algo aqui. não é problema seu","cavernas escuras · lanterna ligada","os cristais cantarolam se você ficar quieto","camada de gelo · −12 °C","um mamute congelado dá tchau","magma · 1.100 °C · não lamba","ninguém volta com sobrancelha","rocha-mãe · a pedra mais velha do jogo","fim do mapa. por enquanto."] },
+};
+const PADRAO    = { acess:false, fs:18, ff:"pixel", tempo:25, contr:false };
+const ACESSIVEL = { acess:true,  fs:24, ff:"Verdana, sans-serif", tempo:45, contr:true };
+let CFG = { ...PADRAO, lang:"en" };
+try { const salvo = JSON.parse(localStorage.getItem("digCfg2")); if (salvo) CFG = { ...CFG, ...salvo }; } catch (e) {}
+const tr = (k, v = {}) => String(STR[CFG.lang][k] ?? STR.en[k]).replace(/\{(\w+)\}/g, (_, n) => v[n]);
+const L10 = k => STR[CFG.lang][k];
+const fmtL = n => Math.round(n).toLocaleString(CFG.lang === "pt" ? "pt-BR" : "en-US");
+
 /* ================= DADOS ================= */
 // pontuação: cada raridade vale pontos e a toupeira desce 10 m por ponto
 const TIERS = [
@@ -176,44 +324,40 @@ const TIERS = [
 ];
 TIERS.forEach(T => T.m = T.pts * 10);
 const fmt = n => Math.round(n).toLocaleString("en-US");
-// perguntas de teste (só pro rascunho). Cada lista = um nível de raridade (COMMON → ULTRA)
-const QS = [
-  { q:"Name an animal that lives underground", t:[
-    ["mole","worm","earthworm","ant","rabbit","snake","mouse"],
-    ["badger","meerkat","gopher","fox","beetle","spider"],
-    ["prairie dog","armadillo","wombat","groundhog","chipmunk","cicada"],
-    ["aardvark","naked mole rat","platypus","tarantula","scorpion"],
-    ["burrowing owl","caecilian","echidna","puffin"],
-    ["olm","tuco tuco","star nosed mole","pink fairy armadillo"]] },
-  { q:"Name a fruit with a pit inside", t:[
-    ["peach","cherry","mango","avocado","olive","plum"],
-    ["apricot","nectarine","date"],
-    ["lychee","longan","jujube"],
-    ["loquat","mamey","rambutan"],
-    ["acerola","umbu","pequi"],
-    ["cornelian cherry","marula"]] },
-  { q:"Name something you'd find in a kitchen drawer", t:[
-    ["spoon","fork","knife","scissors"],
-    ["whisk","ladle","spatula","tongs","peeler"],
-    ["corkscrew","can opener","grater","rolling pin"],
-    ["zester","garlic press","pizza cutter","melon baller"],
-    ["mandoline","apple corer","egg slicer"],
-    ["cake tester","lemon reamer","pastry blender"]] },
-  { q:"Name a gemstone", t:[
-    ["diamond","ruby","emerald","sapphire"],
-    ["amethyst","opal","pearl","topaz"],
-    ["jade","garnet","turquoise","quartz"],
-    ["aquamarine","peridot","onyx","citrine"],
-    ["tanzanite","tourmaline","morganite","alexandrite"],
-    ["benitoite","painite","taaffeite"]] },
-  { q:"Name a word that rhymes with \"dig\"", t:[
-    ["big","pig","fig","wig"],
-    ["jig","twig","rig","gig"],
-    ["swig","brig","sprig"],
-    ["whirligig","periwig"],
-    ["thingamajig"],
-    ["infra dig"]] },
+// perguntas em português (as mesmas do jogo atual). c/r/e/m/l/u = COMMON → ULTRA.
+// "~" = nome difícil (aceita erro pequeno); "|" = outros jeitos de escrever que também valem
+const PERGUNTAS = [
+  { lang:"pt", q:"Cite um cientista que ganhou o Prêmio Nobel",
+    c:["Albert Einstein|einstein","Alexander Fleming|fleming"],
+    r:["Marie Curie|curie|madame curie","Richard Feynman|feynman","Pierre Curie","Ivan Pavlov|pavlov"],
+    e:["Niels Bohr|bohr","~Ernest Rutherford|rutherford","~Werner Heisenberg|heisenberg","~Erwin Schrödinger|schrodinger|schroedinger","Paul Dirac|dirac","Enrico Fermi|fermi","Linus Pauling|pauling","Robert Koch|koch","~Wilhelm Röntgen|rontgen|roentgen","James Watson|watson","Francis Crick|crick"],
+    m:["Max Planck|planck","Frederick Sanger|sanger","Peter Higgs|higgs","Roger Penrose|penrose","~Jennifer Doudna|doudna","~Emmanuelle Charpentier|charpentier","~Katalin Karikó|kariko","~Santiago Ramón y Cajal|ramon y cajal|cajal"],
+    l:["~Dorothy Hodgkin|hodgkin","~Barbara McClintock|mcclintock","~Hideki Yukawa|yukawa","C. V. Raman|raman","~Subrahmanyan Chandrasekhar|chandrasekhar","Andrea Ghez|ghez","Tu Youyou|youyou","~Ahmed Zewail|zewail"],
+    u:["~Peter Medawar|medawar"] },
+  { lang:"pt", q:"Cite um bicho que aparece numa nota de real",
+    c:["Onça-pintada|onca|onca pintada","Mico-leão-dourado|mico leao|mico"],
+    r:["Lobo-guará|lobo guara|lobo","Arara|arara vermelha"],
+    e:["Tartaruga-marinha|tartaruga|tartaruga marinha"],
+    m:["Garça|garca"], l:["Garoupa"], u:["Beija-flor (antiga nota de R$ 1)|beija flor|beijaflor"] },
+  { lang:"pt", q:"Cite uma palavra que o português pegou do tupi",
+    c:["Abacaxi","Pipoca","Capivara","Jacaré|jacare","Mandioca"],
+    r:["Caju","Maracujá|maracuja","Tatu","Jabuti","Piranha","Tucano","Sabiá|sabia","Tamanduá|tamandua"],
+    e:["Urubu","Arara","Mingau","Capim","Cupim","Sucuri","Jararaca","Pitanga"],
+    m:["Peteca","Perereca","Catapora","Pororoca","Caatinga","Oca","Cuia","Araponga"],
+    l:["Cumbuca","Pereba","Carioca","Xará|xara"], u:["Cutucar","Pindaíba|pindaiba","Mutirão|mutirao"] },
+  { lang:"pt", q:"Cite uma palavra que se lê igual de trás pra frente",
+    c:["Ovo","Osso","Arara","Ana"], r:["Asa","Oco","Esse","Rir","Ama"], e:["Radar","Salas"],
+    m:["Mirim","Matam","Metem"], l:["Reviver","Aia","Rotor"], u:["Sopapos"] },
+  { lang:"pt", q:"Cite um bicho que vive debaixo da terra",
+    c:["Minhoca","Formiga","Toupeira"], r:["Tatu","Cupim","Coelho"], e:["Suricato","Escorpião|escorpiao","Caranguejo"],
+    m:["Marmota","Texugo","Paca"], l:["Cigarra","~Coruja-buraqueira|coruja buraqueira"], u:["Cobra-cega|cobra cega|cecilia","~Rato-toupeira-pelado|rato toupeira pelado|rato toupeira"] }
 ];
+const NIV = ["c","r","e","m","l","u"];
+function prepara(p){ const lista = []; NIV.forEach((k, tier) => (p[k] || []).forEach(s => { const dificil = s.startsWith("~"), partes = s.replace(/^~/, "").split("|");
+  lista.push({ nome:partes[0], chaves:partes.map(normKey), tier, dificil }); })); return { q:p.q, lista }; }
+// modo diário: as 5 perguntas, começando por uma diferente a cada dia
+const hoje = Math.floor((Date.now() - new Date().getTimezoneOffset()*60000) / 86400000);
+const QS = PERGUNTAS.map((_, i) => prepara(PERGUNTAS[(hoje + i) % PERGUNTAS.length]));
 const LAYERS = [
   { name:"TOPSOIL",     from:0,    pal:["#5b3a22","#6e4629","#4a2f1b","#7d5532"] },
   { name:"STONE LAYER", from:500,  pal:["#56504a","#635c55","#46413c","#706860"] },
@@ -226,7 +370,7 @@ const FACTS = [[60,"earthworms rarely go below here"],[250,"lost house keys foun
   [600,"stone layer · bring a stronger snout"],[900,"a pirate buried something here. not your problem"],[1330,"dark caves · lamp on"],
   [1800,"the crystals hum if you keep quiet"],[2330,"ice layer · −12 °C"],[2800,"a frozen mammoth waves hello"],
   [3430,"magma · 1,100 °C · do not lick"],[4000,"nobody comes back with eyebrows"],[4630,"bedrock · the oldest stone in the game"],[5600,"end of the map. for now."]];
-const TIME = 25, TOUR_END = 5700, WOB = 40;   // WOB = quanto a divisa entre camadas ondula (m)
+const TOUR_END = 5700, WOB = 40;   // WOB = quanto a divisa entre camadas ondula (m)
 let SURF = 70;   // distância (m) entre a grama e o "0 m" do jogo (= altura da toupeira; recalculada no resize)
 
 /* ================= UTILIDADES ================= */
@@ -243,18 +387,15 @@ const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 function layerIdx(gd, wx){ const d = gd + (vnoise(wx / (PX*40)) - .5) * WOB; for (let i = LAYERS.length - 1; i > 0; i--) if (d >= LAYERS[i].from) return i; return 0; }
 const layerAt = gd => layerIdx(gd, W/2);
 const wyOf = gd => (gd + SURF) * MPX;   // profundidade do jogo (m) -> y no mundo (px)
-function norm(s){ return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim(); }
-function lev(a, b){ if (Math.abs(a.length - b.length) > 1) return 9; const d = Array.from({length:a.length + 1}, (_, i) => [i]);
-  for (let j = 1; j <= b.length; j++) d[0][j] = j;
-  for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i-1][j] + 1, d[i][j-1] + 1, d[i-1][j-1] + (a[i-1] === b[j-1] ? 0 : 1));
-  return d[a.length][b.length]; }
+function normKey(s){ return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\(.*?\)/g, "").replace(/[^a-z0-9]/g, ""); }
+function dist(a, b){ const m = [...Array(b.length + 1).keys()]; for (let i = 1; i <= a.length; i++) { let prev = m[0]; m[0] = i;
+  for (let j = 1; j <= b.length; j++) { const t = m[j]; m[j] = Math.min(m[j] + 1, m[j-1] + 1, prev + (a[i-1] === b[j-1] ? 0 : 1)); prev = t; } } return m[b.length]; }
+const tolera = (n, dificil) => dificil ? Math.max(1, Math.floor(n / 4)) : 0;
+// nome fácil tem que estar certo; nome difícil aceita erro pequeno; maiúscula e acento não importam
 function match(input, q){
-  const n = norm(input); if (!n) return null;
-  for (let k = 0; k < 6; k++) for (const a of q.t[k]) {
-    const key = norm(a);
-    if (n === key || n === key + "s" || n + "s" === key || (key.length >= 6 && lev(n, key) <= 1)) return { tier:k, text:a };
-  }
-  return null;
+  const g = normKey(input); if (!g) return null;
+  const r = q.lista.find(r => r.chaves.some(k => k === g || (g.length >= 4 && dist(g, k) <= tolera(k.length, r.dificil))));
+  return r ? { tier:r.tier, text:r.nome } : null;
 }
 
 /* ================= A TOUPEIRA NOVA (desenho do Christopher + capacete) ================= */
@@ -371,7 +512,7 @@ const tunnelX = wy => snap(W/2 + Math.sin(wy / MPX * .45)*PX*3 + Math.sin(wy / M
 /* ================= ESTADO ================= */
 let SP = {}, SPX = 6, stars = [], motes = [], parts = [];
 let mode = "title", moleD = -SURF, camD = 0, tw = null, digging = false, happy = false, score = 0;
-let qi = -1, cd = 0, timeLeft = TIME, lines = null, chip = null, log = [], lastLayer = 0, bannerT = 0, clock = 0, tourT = 0, started = false;
+let free = false, curQ = null, lastFree = -1, qi = -1, cd = 0, timeLeft = 25, lines = null, chip = null, log = [], lastLayer = 0, bannerT = 0, clock = 0, tourT = 0, started = false;
 // molas do movimento (deixam tudo macio): giro, achatamento e pulinho
 let ang = 0, angV = 0, sq = 0, sqV = 0, hopY = 0, hopV = 0, wasDigging = false;
 
@@ -388,6 +529,7 @@ function resize(){
 const titleCam = () => -SURF - H*.62 / MPX;
 // onde a toupeira fica na tela: logo abaixo da pergunta; no cartão de resultado, mais pra cima (o cartão vem embaixo)
 function moleScreenBottom(){
+  if (moleGone && DEN) return DEN.cy + MH*SPX/2;   // festa da naja: a luz fica no meio da toca
   if (mode === "card" || mode === "end") return clamp(H*.36, MH*SPX + 90, H);
   const qp = $("qp"), top = qp.classList.contains("hide") ? 90 : qp.getBoundingClientRect().bottom;
   return clamp(top + MH*SPX + 28, H*.42, H*.74);
@@ -399,29 +541,35 @@ const show = (id, on) => $(id).classList.toggle("hide", !on);
 function tween(to, dur, done){ tw = { from:moleD, to, t:0, dur, done }; }
 function start(thenTour){
   if (started) return; started = true;
-  show("title", false); show("titleBtns", false); mode = "dive"; hopV = -320;
+  show("title", false); show("titleBtns", false); show("tools", false); show("cfg", false); mode = "dive"; hopV = -320;
   tween(0, 1.6, () => { show("hud", true); if (thenTour) tour(); else nextQ(); });
 }
 function buildSquares(){ $("squares").innerHTML = QS.map(() => '<span class="sq"></span>').join(""); }
 function nextQ(){
   qi++; lines = null; chip = null; happy = false;
-  if (qi >= QS.length) return endGame();
-  const sq = $("squares").children; [...sq].forEach((s, i) => s.classList.toggle("now", i === qi));
-  $("qLabel").textContent = `DIG ${qi + 1} OF ${QS.length}`; $("hDig").textContent = `DIG ${qi + 1} OF ${QS.length}`;
-  $("qText").textContent = QS[qi].q; show("qp", true);
+  if (free) {   // cavada livre: perguntas sorteadas sem fim, sem repetir a anterior
+    let k; do { k = Math.floor(Math.random()*QS.length); } while (QS.length > 1 && k === lastFree); lastFree = k; curQ = QS[k];
+  } else {
+    if (qi >= QS.length) return endGame();
+    curQ = QS[qi];
+    const sq = $("squares").children; [...sq].forEach((s, i) => s.classList.toggle("now", i === qi));
+  }
+  labelQ(); $("qText").textContent = curQ.q; show("qp", true);
   mode = "count"; cd = 3; show("bar", false); show("cdown", true);
 }
-function ask(){ mode = "ask"; timeLeft = TIME; show("cdown", false); show("bar", true); $("ans").value = ""; $("msg").textContent = ""; $("ans").focus(); }
+function labelQ(){ const t = free ? tr("freeLbl", { n:qi + 1 }) : tr("of", { a:qi + 1, b:QS.length }); $("qLabel").textContent = t; $("hDig").textContent = t;
+  const n = $("qNote"); n.textContent = tr("qNote"); n.hidden = !tr("qNote"); }
+function ask(){ mode = "ask"; timeLeft = CFG.tempo; show("cdown", false); show("bar", true); $("ans").value = ""; $("msg").textContent = ""; $("ans").focus(); }
 function timeout(){
   mode = "timeout"; show("bar", false); show("cdown", true);
-  $("cdown").innerHTML = "TIME'S UP · <b>NEXT PROMPT</b>";
-  const s = $("squares").children[qi]; s.classList.remove("now"); s.classList.add("miss");
+  $("cdown").innerHTML = tr("timesUp");
+  const s = $("squares").children[qi]; if (s) { s.classList.remove("now"); s.classList.add("miss"); }
   log.push(null); setTimeout(nextQ, 1500);
 }
 function submit(e){
   e.preventDefault(); if (mode !== "ask") return;
-  const r = match($("ans").value, QS[qi]);
-  if (!r) { $("msg").textContent = "not in the burrow · try another"; const b = $("bar"); b.classList.remove("shake"); void b.offsetWidth; b.classList.add("shake"); $("ans").select(); return; }
+  const r = match($("ans").value, curQ);
+  if (!r) { $("msg").textContent = tr("wrong"); const b = $("bar"); b.classList.remove("shake"); void b.offsetWidth; b.classList.add("shake"); $("ans").select(); return; }
   mode = "dig"; show("bar", false); $("ans").blur();
   const T = TIERS[r.tier];
   lines = { from:moleD, lit:TIERS.map(() => false), alpha:1 };
@@ -433,27 +581,145 @@ function land(r){
   score += T.pts; burst(T.col, 26); hopV = -240;
   setTimeout(() => {
     mode = "card"; gemDraw(T.col);
-    const tn = $("cTier"); tn.textContent = T.name; tn.className = T.col === "rainbow" ? "rainbow" : ""; tn.style.color = T.col === "rainbow" ? "" : T.col;
-    $("cAns").textContent = `“${r.text}”`; $("cPts").innerHTML = `<span style="color:#ff5a36">+${T.pts} PTS</span> · dig ${fmt(T.m)} m`; $("cSay").textContent = T.say;
-    $("bNext").textContent = qi === QS.length - 1 ? "▼ SEE YOUR DIG" : "▼ KEEP DIGGING";
-    const s = $("squares").children[qi]; s.classList.remove("now");
-    s.style.background = T.col === "rainbow" ? "linear-gradient(90deg,#ff4d6d,#ffd257,#86c24f,#4c8dff,#a35cff)" : T.col; s.style.borderColor = "#120c08";
+    const tn = $("cTier"); tn.textContent = L10("tiers")[r.tier]; tn.className = T.col === "rainbow" ? "rainbow" : ""; tn.style.color = T.col === "rainbow" ? "" : T.col;
+    $("cAns").textContent = `“${r.text}”`; $("cPts").innerHTML = `<span style="color:#ff5a36">+${T.pts} ${tr("pts")}</span> · ${tr("digM", { m:fmtL(T.m) })}`; $("cSay").textContent = L10("says")[r.tier];
+    $("bNext").textContent = !free && qi === QS.length - 1 ? tr("see") : tr("keep"); show("bSurface", free);
+    const s = $("squares").children[qi]; if (s) { s.classList.remove("now");
+    s.style.background = T.col === "rainbow" ? "linear-gradient(90deg,#ff4d6d,#ffd257,#86c24f,#4c8dff,#a35cff)" : T.col; s.style.borderColor = "#120c08"; }
     log.push({ text:r.text, tier:r.tier }); show("qp", false); show("card", true); $("bNext").focus();
   }, 650);
 }
 function endGame(){
   mode = "end"; show("qp", false); show("bar", false); show("cdown", false);
-  $("eScore").textContent = `${score} PTS`;
-  $("eLayer").textContent = `dug to ${fmt(moleD)} m · ${LAYERS[layerAt(moleD)].name.toLowerCase()}`;
-  $("eLog").innerHTML = log.map((l, i) => l ? `<li><span>${i + 1}. ${l.text}</span><b class="${TIERS[l.tier].col === "rainbow" ? "rainbow" : ""}" style="color:${TIERS[l.tier].col}">${TIERS[l.tier].name} +${TIERS[l.tier].pts}</b></li>`
-                                             : `<li><span>${i + 1}. —</span><b style="color:#a8927a">TIME'S UP</b></li>`).join("");
-  show("end", true);
+  mode = "end"; show("card", false); show("bSurface", false);
+  $("eScore").textContent = `${score} ${tr("pts")}`;
+  $("eLayer").textContent = tr("dugTo", { m:fmtL(moleD), layer:L10("layers")[layerAt(moleD)].toLowerCase() });
+  $("eLog").innerHTML = log.map((l, i) => l ? `<li><span>${i + 1}. ${l.text}</span><b class="${TIERS[l.tier].col === "rainbow" ? "rainbow" : ""}" style="color:${TIERS[l.tier].col}">${L10("tiers")[l.tier]} +${TIERS[l.tier].pts}</b></li>`
+                                             : `<li><span>${i + 1}. —</span><b style="color:#a8927a">${tr("missed")}</b></li>`).join("");
+  show("end", true); show("tools", true);
 }
+/* ================= A NAJA (preto e amarelo, de lado, olhando pra direita) ================= */
+function Spr(w, hh){ return { w, h:hh, p:new Array(w*hh).fill(null) }; }
+function sSet(s, x, y, c){ x = Math.round(x); y = Math.round(y); if (x >= 0 && y >= 0 && x < s.w && y < s.h) s.p[y*s.w + x] = c; }
+function sGet(s, x, y){ return (x < 0 || y < 0 || x >= s.w || y >= s.h) ? null : s.p[y*s.w + x]; }
+function sEll(s, cx, cy, rx, ry, pal){ for (let y = 0; y < s.h; y++) for (let x = 0; x < s.w; x++) { const dx = (x + .5 - cx)/rx, dy = (y + .5 - cy)/ry;
+  if (dx*dx + dy*dy > 1) continue; const t = dx*.6 + dy*.8; sSet(s, x, y, t < -.42 ? pal[1] : t > .42 ? pal[2] : pal[0]); } }
+function sOutline(s, c){ const add = []; for (let y = 0; y < s.h; y++) for (let x = 0; x < s.w; x++)
+  if (!sGet(s, x, y) && (sGet(s, x-1, y) || sGet(s, x+1, y) || sGet(s, x, y-1) || sGet(s, x, y+1))) add.push([x, y]); add.forEach(([x, y]) => sSet(s, x, y, c)); }
+function sPaint(c, s, k){ c.width = s.w*k; c.height = s.h*k; const g = c.getContext("2d"); g.clearRect(0, 0, c.width, c.height);
+  s.p.forEach((col, i) => { if (col) { g.fillStyle = col; g.fillRect((i % s.w)*k, Math.floor(i / s.w)*k, k, k); } }); }
+function bez(p0, p1, p2, p3, t){ const u = 1 - t; return [u*u*u*p0[0] + 3*u*u*t*p1[0] + 3*u*t*t*p2[0] + t*t*t*p3[0], u*u*u*p0[1] + 3*u*u*t*p1[1] + 3*u*t*t*p2[1] + t*t*t*p3[1]]; }
+function naja(){
+  const BODY = ["#25262c","#454852","#101014"], BELLY = ["#f2c230","#ffe27a","#b88a12"], s = Spr(32, 32);
+  sEll(s,14,28.6,12.5,3.4,BODY); sEll(s,13,25.8,8.5,2.6,BODY); for (let x = 4; x <= 25; x += 3) sSet(s,x,27,BELLY[2]);
+  sEll(s,14.5,12,4.6,7.6,BODY); [[11,8],[11,11],[11,14],[12,17]].forEach(([x, y]) => sSet(s,x,y,BELLY[0]));
+  const P0 = [[18,25],[3,21],[25,15],[18,8]], pts = []; for (let t = 0; t <= 1; t += .01) pts.push([...bez(...P0, t), t]);
+  pts.forEach(([x, y, t]) => { const r = 3.2 - t*.9; sEll(s,x,y,r,r,BODY); });
+  pts.forEach(([x, y, t], i) => { const r = 3.2 - t*.9, a = pts[Math.max(0, i-1)], b = pts[Math.min(pts.length-1, i+1)];
+    let nx = -(b[1] - a[1]), ny = b[0] - a[0]; const L = Math.hypot(nx, ny) || 1; nx /= L; ny /= L; if (nx < 0) { nx = -nx; ny = -ny; }
+    const cx = x + nx*r*.5, cy = y + ny*r*.5, rr = r*.55;
+    for (let yy = Math.floor(cy - rr); yy <= Math.ceil(cy + rr); yy++) for (let xx = Math.floor(cx - rr); xx <= Math.ceil(cx + rr); xx++)
+      if ((xx + .5 - cx)**2 + (yy + .5 - cy)**2 <= rr*rr) sSet(s, xx, yy, yy % 2 ? BELLY[0] : BELLY[2]); });
+  sEll(s,20.5,6.4,4.8,2.7,BODY); sEll(s,21,8,3.6,1.1,BELLY);
+  sSet(s,22,5,"#ff3b30"); sSet(s,21,4,BODY[2]); sSet(s,22,4,BODY[2]); sSet(s,24,6,BODY[2]);
+  [[26,7],[27,7],[28,6],[28,8]].forEach(([x, y]) => sSet(s,x,y,"#e0332a"));
+  sOutline(s, "#050505"); return s;
+}
+sPaint($("najaC"), naja(), 4);
+
+/* ================= FESTA DA NAJA (um aparelho só) ================= */
+const PARTY_D = 1350;   // a toca da naja fica nas cavernas escuras
+let PT = null, deep = false, moleGone = false, DEN = null, lastSpd = "";
+const esc = s => s.replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]));
+// igual às regras do solo, mas também diz se a resposta já foi dita nesta rodada
+function confere(input, q, usadas){
+  const g = normKey(input); if (!g) return { tipo:"vazio" };
+  const c = q.lista.filter(r => r.chaves.some(k => k === g || (g.length >= 4 && dist(g, k) <= tolera(k.length, r.dificil))));
+  if (!c.length) return { tipo:"erro" };
+  const nova = c.find(r => !usadas.has(r.nome));
+  return nova ? { tipo:"ok", r:nova } : { tipo:"rep", r:c[0] };
+}
+function partySetup(){
+  ["title","titleBtns","pEnd","pbar","qp","den"].forEach(id => show(id, false));
+  $("pSetupMsg").textContent = ""; show("pSetup", true); $("pNames").focus();
+}
+$("bParty").onclick = partySetup;
+$("pCancel").onclick = () => { show("pSetup", false);
+  if (deep) { show("qp", true); show("den", true); show("pEnd", true); } else { show("title", true); show("titleBtns", true); } };
+$("pSetup").onsubmit = e => {
+  e.preventDefault();
+  const nomes = $("pNames").value.split(",").map(s => s.trim().slice(0, 15)).filter(Boolean);
+  if (nomes.length < 2 || nomes.length > 8) { $("pSetupMsg").textContent = tr("namesErr"); return; }
+  // quem inicia = 1º nome; a naja começa com o próximo no sentido horário
+  PT = { nomes, botes:nomes.map(() => 0), primeiro:1 % nomes.length, rodadas:0, qi:Math.floor(Math.random()*QS.length), ativo:false };
+  show("pSetup", false); show("tools", false); show("cfg", false); document.body.classList.add("party");
+  if (deep) return rodada();
+  started = true; mode = "dive"; hopV = -320;
+  tween(PARTY_D, 2.8, () => { deep = true; moleGone = true; burst("#a06b3c", 30); rodada(); });   // a toupeira chega na toca e se esconde
+};
+function rodada(){
+  PT.qi = (PT.qi + 1) % QS.length; PT.q = QS[PT.qi]; PT.usadas = new Set(); PT.ativo = true; PT.t = 0; PT.dur = 20 + Math.random()*25;   // 20 a 45 s, ninguém vê
+  PT.vez = (PT.primeiro + PT.rodadas) % PT.nomes.length; PT.rodadas++; mode = "party";
+  $("qLabel").textContent = tr("round", { n:PT.rodadas }); $("qText").textContent = PT.q.q;
+  const n = $("qNote"); n.textContent = tr("qNote"); n.hidden = !tr("qNote");
+  show("qp", true); show("pEnd", false); show("pbar", true); show("den", true);
+  $("pChips").innerHTML = ""; $("pMsg").textContent = ""; $("pIn").value = ""; $("pIn").disabled = false;
+  $("najaC").classList.add("shk"); vez(); layoutDen(); $("pIn").focus();
+}
+function vez(bit){
+  const n = PT.nomes.length, den = $("den");
+  $("pTurn").innerHTML = PT.ativo ? tr("turn", { a:esc(PT.nomes[PT.vez]), b:esc(PT.nomes[(PT.vez + 1) % n]) }) : "";
+  den.querySelectorAll(".seat").forEach(x => x.remove());
+  PT.nomes.forEach((nm, i) => { const a = -Math.PI/2 + i*2*Math.PI/n, x = 50 + 41*Math.cos(a), y = 50 + 41*Math.sin(a);
+    const cls = i === PT.vez ? (bit ? "on bit" : "on") : (PT.ativo && i === (PT.vez + 1) % n ? "next" : "");
+    const b = PT.botes[i] ? tr(PT.botes[i] === 1 ? "bite1" : "biteN", { n:PT.botes[i] }) : "";
+    den.insertAdjacentHTML("beforeend", `<div class="seat ${cls}" style="left:${x}%;top:${y}%"><div class="av">${esc([...nm][0].toUpperCase())}</div><div>${esc(nm)}</div><div class="bt">${b}</div></div>`); });
+  const a = -Math.PI/2 + PT.vez*2*Math.PI/n; $("najaC").style.scale = Math.cos(a) < -.1 ? "-1 1" : "1 1";   // a naja olha pra quem está com a vez
+}
+// a toca fica entre a pergunta e o campo de resposta; a câmera centraliza a luz da lanterna nela
+function layoutDen(){
+  const den = $("den"); if (den.classList.contains("hide")) return;
+  const top = ($("qp").classList.contains("hide") ? 80 : $("qp").getBoundingClientRect().bottom) + 24;
+  const bot = ($("pbar").classList.contains("hide") ? H - 170 : $("pbar").getBoundingClientRect().top) - 24;
+  const s = Math.round(Math.max(200, Math.min(W - 80, bot - top, 460))), cy = Math.round((top + bot)/2);
+  if (DEN && DEN.s === s && DEN.cy === cy) return;
+  DEN = { s, cy }; den.style.width = den.style.height = s + "px"; den.style.left = Math.round((W - s)/2) + "px"; den.style.top = (cy - s/2) + "px";
+}
+$("pbar").addEventListener("submit", e => {
+  e.preventDefault(); if (mode !== "party" || !PT.ativo) return;
+  const v = $("pIn").value, r = confere(v, PT.q, PT.usadas), m = $("pMsg");
+  if (r.tipo === "vazio") return;
+  if (r.tipo === "ok") {
+    PT.usadas.add(r.r.nome); const T = TIERS[r.r.tier], rb = T.col === "rainbow";
+    $("pChips").insertAdjacentHTML("afterbegin", `<span class="pchip" style="${rb ? "border-color:#ffd257" : `color:${T.col};border-color:${T.col}`}"><span class="${rb ? "rainbow" : ""}">${esc(r.r.nome)} · ${L10("tiers")[r.r.tier]}</span></span>`);
+    m.className = "ok"; m.textContent = tr("passed", { name:r.r.nome }); burst(T.col, 14);
+    PT.vez = (PT.vez + 1) % PT.nomes.length; vez(); $("pIn").value = "";
+  } else {
+    m.className = ""; m.textContent = r.tipo === "rep" ? tr("rep2", { name:r.r.nome }) : tr("wrong2", { v });
+    const b = $("pbar"); b.classList.remove("shake"); void b.offsetWidth; b.classList.add("shake"); $("pIn").select();
+  }
+  $("pIn").focus();
+});
+function bite(){
+  PT.ativo = false; mode = "bitten"; PT.botes[PT.vez]++;
+  const nj = $("najaC"), n = PT.nomes.length, a = -Math.PI/2 + PT.vez*2*Math.PI/n, s = DEN ? DEN.s : 300;
+  nj.classList.remove("shk"); nj.style.translate = `${Math.round(Math.cos(a)*s*.27)}px ${Math.round(Math.sin(a)*s*.27)}px`;   // o bote: avança em quem está com a vez
+  setTimeout(() => nj.style.translate = "0px 0px", 280);
+  const f = $("flash"); f.classList.remove("go"); void f.offsetWidth; f.classList.add("go");
+  burst("#ff5a36", 40); vez(true); $("pIn").blur(); show("pbar", false);
+  $("pBoom").textContent = tr("bite", { a:PT.nomes[PT.vez].toUpperCase() }); show("pEnd", true); $("pAgain").focus();
+}
+$("pAgain").onclick = rodada;
+$("pReset").onclick = () => { $("pNames").value = PT.nomes.join(", "); partySetup(); };
+$("pUp").onclick = () => location.reload();
+
 function tour(){ show("end", false); show("qp", false); show("hud", true); lines = null; chip = null; happy = false; mode = "tour"; tourT = 0; show("bBack", true); }
 
-$("bStart").onclick = () => { buildSquares(); start(false); };
-$("bTour").onclick = () => { buildSquares(); $("squares").innerHTML = ""; $("hDig").textContent = "LAYER TOUR"; start(true); };
-$("bTour2").onclick = () => { $("hDig").textContent = "LAYER TOUR"; tour(); };
+$("bStart").onclick = () => { free = false; buildSquares(); start(false); };
+$("bFree").onclick = () => { free = true; $("squares").innerHTML = ""; start(false); };
+$("bSurface").onclick = () => endGame();
+$("bTour").onclick = () => { $("squares").innerHTML = ""; $("hDig").textContent = tr("tourLbl"); start(true); };
+$("bTour2").onclick = () => { $("hDig").textContent = tr("tourLbl"); tour(); };
 $("bAgain").onclick = $("bBack").onclick = () => location.reload();
 $("bar").addEventListener("submit", submit);
 $("bNext").onclick = () => { show("card", false); nextQ(); };
@@ -487,20 +753,24 @@ function update(dt){
   angV += (tA - ang)*90*dt; angV *= Math.exp(-dt*11); ang += angV*dt;
   sqV += -sq*260*dt; sqV *= Math.exp(-dt*9); sq = clamp(sq + sqV*dt, -.22, .22);
   if (hopV !== 0 || hopY < 0) { hopV += 1500*dt; hopY += hopV*dt; if (hopY > 0) { hopY = 0; hopV = 0; sqV -= 2.5; } }
-  if (mode === "count") { cd -= dt; $("cdown").innerHTML = `digging in · the clock starts in <b>${Math.max(1, Math.ceil(cd))}</b>`; if (cd <= 0) ask(); }
-  if (mode === "ask") { timeLeft -= dt; const f = Math.max(0, timeLeft / TIME);
+  if (mode === "count") { cd -= dt; $("cdown").innerHTML = tr("count", { n:Math.max(1, Math.ceil(cd)) }); if (cd <= 0) ask(); }
+  if (mode === "ask") { timeLeft -= dt; const f = Math.max(0, timeLeft / CFG.tempo);
     $("ringN").textContent = Math.max(0, Math.ceil(timeLeft)); $("ringFg").style.strokeDashoffset = 150.8*(1 - f);
     $("ringFg").style.stroke = timeLeft < 6 ? "#ff5a36" : "#f2a93b"; $("tFill").style.width = (f*100) + "%"; $("tFill").style.background = timeLeft < 6 ? "#ff5a36" : "#f2a93b";
     if (timeLeft <= 0) timeout(); }
+  if (mode === "party") { layoutDen();
+    if (PT.ativo) { PT.t += dt; const spd = Math.max(.12, 1.1 - PT.t / PT.dur).toFixed(2) + "s";   // balança mais rápido perto do bote
+      if (spd !== lastSpd) { lastSpd = spd; $("najaC").style.setProperty("--spd", spd); }
+      if (PT.t >= PT.dur) bite(); } }
   if (lines) TIERS.forEach((T, k) => { if (!lines.lit[k] && moleD >= lines.from + T.m - .001) { lines.lit[k] = true; if (mode === "dig") burst(T.col, 8); } });
   // câmera: segue a toupeira com suavidade
   const target = mode === "title" ? titleCam() : camTarget();
   camD += (target - camD)*(1 - Math.exp(-dt*(mode === "dive" ? 3.5 : 7)));
   // camada nova -> faixa com o nome
   if (started && moleD >= 0) { const L = layerAt(moleD);
-    if (L !== lastLayer) { lastLayer = L; $("banner").textContent = `— ${LAYERS[L].name} · ${fmt(LAYERS[L].from)} m —`; $("banner").classList.add("show"); bannerT = 2.8; } }
+    if (L !== lastLayer) { lastLayer = L; $("banner").textContent = `— ${L10("layers")[L]} · ${fmtL(LAYERS[L].from)} m —`; $("banner").classList.add("show"); bannerT = 2.8; } }
   if (bannerT > 0) { bannerT -= dt; if (bannerT <= 0) $("banner").classList.remove("show"); }
-  $("hDepth").textContent = `${fmt(Math.max(0, Math.floor(moleD)))} m`; $("hLayer").textContent = LAYERS[layerAt(Math.max(0, moleD))].name; $("hScore").textContent = score;
+  $("hDepth").textContent = `${fmtL(Math.max(0, Math.floor(moleD)))} m`; $("hLayer").textContent = L10("layers")[layerAt(Math.max(0, moleD))]; $("hScore").textContent = score;
   // partículas
   parts = parts.filter(p => (p.life -= dt) > 0); parts.forEach(p => { p.vy += p.g*dt; p.x += p.vx*dt; p.y += p.vy*dt; });
   if (started && LAYERS[layerAt(moleD)].name === "MAGMA" && Math.random() < .25)
@@ -550,7 +820,7 @@ function draw(){
   const narrow = W < 700, rulerX = W - (narrow ? 14 : 30);
   // curiosidades nas laterais
   ctx.font = `${narrow ? 10 : 12}px Silkscreen, monospace`; ctx.textBaseline = "middle";
-  FACTS.forEach(([d, txt], i) => { const y = wyOf(d); if (y < camY - 40 || y > camY + H + 40) return;
+  FACTS.forEach(([d], i) => { const txt = L10("facts")[i]; const y = wyOf(d); if (y < camY - 40 || y > camY + H + 40) return;
     const lines2 = wrap(txt, narrow ? W*.3 : W*.24), left = i % 2 === 0; ctx.fillStyle = "rgba(200,180,155,.7)";
     lines2.forEach((t, j) => { const ty = y + (j - (lines2.length - 1)/2)*(narrow ? 13 : 16);
       ctx.textAlign = left ? "left" : "right"; const tx = left ? (narrow ? 10 : 28) : rulerX - (narrow ? 12 : 64);
@@ -563,8 +833,9 @@ function draw(){
     ctx.globalAlpha = lines.lit[k] ? 1 : .45; ctx.strokeStyle = st; ctx.lineWidth = lines.lit[k] ? PX*.75 : 2; ctx.setLineDash([PX*2, PX*2]);
     ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x1, y); ctx.stroke(); ctx.setLineDash([]);
     ctx.fillStyle = T.col === "rainbow" ? `hsl(${clock*120 % 360} 90% 65%)` : T.col; ctx.font = `${narrow ? 10 : 12}px Silkscreen, monospace`; ctx.textAlign = "right"; ctx.textBaseline = "bottom";
-    ctx.fillText(`${T.name} · +${T.pts}`, x1, y - 4); ctx.globalAlpha = 1; });
+    ctx.fillText(`${L10("tiers")[k]} · +${T.pts}`, x1, y - 4); ctx.globalAlpha = 1; });
   // toupeira: gira, balança e achata com molas (movimento macio)
+  if (!moleGone) {   // na festa da naja a toupeira se esconde
   const spr = digging ? (Math.floor(clock*12) % 2 ? SP.dig : SP.idle) : ((clock % 3.4) < .13 ? SP.blink : SP.idle);
   ctx.save(); ctx.translate(C.x, C.y); ctx.rotate(ang); ctx.scale(1 + sq, 1 - sq);
   ctx.drawImage(spr, -MW*SPX/2, -MH*SPX/2); ctx.restore();
@@ -573,7 +844,7 @@ function draw(){
   const lx = C.x + ox*ca - oy*sa, ly = C.y + ox*sa + oy*ca;
   ctx.globalCompositeOperation = "lighter"; const lg = ctx.createRadialGradient(lx, ly, 0, lx, ly, SPX*7);
   lg.addColorStop(0, "rgba(255,220,120,.5)"); lg.addColorStop(1, "rgba(255,220,120,0)"); ctx.fillStyle = lg; ctx.fillRect(lx - SPX*7, ly - SPX*7, SPX*14, SPX*14);
-  ctx.globalCompositeOperation = "source-over";
+  ctx.globalCompositeOperation = "source-over"; }
   // a resposta descendo junto
   if (chip) { ctx.font = `${narrow ? 12 : 15}px Silkscreen, monospace`; const tw2 = ctx.measureText(chip.text).width + 22;
     let cx = C.x + SPX*13; if (cx + tw2 > rulerX - 8) cx = C.x - SPX*13 - tw2; if (cx < 4) cx = 4; const cy = C.y;
@@ -586,13 +857,45 @@ function draw(){
   if (started) { ctx.strokeStyle = "rgba(200,180,155,.45)"; ctx.fillStyle = "rgba(200,180,155,.6)"; ctx.lineWidth = 1; ctx.textAlign = "right"; ctx.textBaseline = "middle"; ctx.font = "10px Silkscreen, monospace";
     ctx.beginPath(); ctx.moveTo(rulerX + .5, Math.max(wyOf(0), camY)); ctx.lineTo(rulerX + .5, camY + H); ctx.stroke();
     for (let d = Math.max(0, Math.floor((camY / MPX - SURF) / 50)*50); wyOf(d) < camY + H; d += 50) { const y = Math.round(wyOf(d)) + .5, big = d % 250 === 0;
-      ctx.beginPath(); ctx.moveTo(rulerX - (big ? 9 : 4), y); ctx.lineTo(rulerX, y); ctx.stroke(); if (big && !narrow) ctx.fillText(`${fmt(d)} m`, rulerX - 12, y); }
+      ctx.beginPath(); ctx.moveTo(rulerX - (big ? 9 : 4), y); ctx.lineTo(rulerX, y); ctx.stroke(); if (big && !narrow) ctx.fillText(`${fmtL(d)} m`, rulerX - 12, y); }
     const yy = Math.round(wyOf(Math.max(0, moleD))); ctx.fillStyle = "#f2a93b";
     ctx.beginPath(); ctx.moveTo(rulerX + 2, yy); ctx.lineTo(rulerX + 10, yy - 5); ctx.lineTo(rulerX + 10, yy + 5); ctx.fill();
-    if (!narrow) { ctx.textAlign = "right"; ctx.fillText("YOU", rulerX - 12, yy - 12); } }
+    if (!narrow) { ctx.textAlign = "right"; ctx.fillText(tr("you"), rulerX - 12, yy - 12); } }
   ctx.restore();
 }
 function wrap(txt, max){ const out = []; let cur = ""; txt.split(" ").forEach(w => { const t = cur ? cur + " " + w : w; if (ctx.measureText(t).width > max && cur) { out.push(cur); cur = w; } else cur = t; }); out.push(cur); return out; }
+
+/* ================= CONFIGURAÇÕES + TRADUÇÃO ================= */
+function traduz(){
+  document.documentElement.lang = CFG.lang === "pt" ? "pt-BR" : "en";
+  document.querySelectorAll("[data-t]").forEach(el => el.innerHTML = tr(el.dataset.t));
+  $("pNames").placeholder = tr("namesPh"); $("pIn").placeholder = tr("passPh");
+  $("ans").placeholder = tr("ph"); $("vTempo").textContent = CFG.tempo + " " + tr("seconds");
+  if (curQ && !$("qp").classList.contains("hide")) labelQ();
+  if (mode === "card" && log.length && log[log.length - 1]) { const l = log[log.length - 1];
+    $("cTier").textContent = L10("tiers")[l.tier]; $("cSay").textContent = L10("says")[l.tier];
+    $("bNext").textContent = !free && qi === QS.length - 1 ? tr("see") : tr("keep"); }
+  if (mode === "end") endGame();
+  if (mode === "tour") $("hDig").textContent = tr("tourLbl");
+}
+function aplicaCfg(){
+  const b = document.body; b.style.setProperty("--fs", CFG.fs + "px");
+  b.style.setProperty("--qf", CFG.ff === "pixel" ? "var(--display)" : CFG.ff); b.style.setProperty("--af", CFG.ff === "pixel" ? "var(--ui)" : CFG.ff);
+  b.classList.toggle("contraste", CFG.contr);
+  $("cAcess").checked = CFG.acess; $("cFs").value = CFG.fs; $("vFs").textContent = CFG.fs + " px"; $("cFf").value = CFG.ff;
+  $("cTempo").value = CFG.tempo; $("vTempo").textContent = CFG.tempo + " " + tr("seconds"); $("cContr").checked = CFG.contr; $("cLang").value = CFG.lang;
+  try { localStorage.setItem("digCfg2", JSON.stringify(CFG)); } catch (e) {}
+}
+$("cAcess").onchange = e => { CFG = { ...CFG, ...(e.target.checked ? ACESSIVEL : PADRAO) }; aplicaCfg(); };
+$("cFs").oninput = e => { CFG.fs = +e.target.value; aplicaCfg(); };
+$("cFf").onchange = e => { CFG.ff = e.target.value; aplicaCfg(); };
+$("cTempo").oninput = e => { CFG.tempo = +e.target.value; aplicaCfg(); };
+$("cContr").onchange = e => { CFG.contr = e.target.checked; aplicaCfg(); };
+$("cReset").onclick = () => { CFG = { ...CFG, ...PADRAO }; aplicaCfg(); };
+$("cLang").onchange = e => { CFG.lang = e.target.value; aplicaCfg(); traduz(); };
+$("bCfg").onclick = () => show("cfg", $("cfg").classList.contains("hide"));
+$("cClose").onclick = () => show("cfg", false);
+aplicaCfg(); traduz();
 
 addEventListener("resize", resize);
 resize(); camD = titleCam(); requestAnimationFrame(frame);

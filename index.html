@@ -592,7 +592,7 @@ const STR = {
     stats:"STATS", sPlayed:"Daily digs", sStreak:"Streak", sMax:"Best streak", sBest:"Deepest", sAvg:"Average", sGems:"ANSWERS BY RARITY · ALL MODES", sNone:"Play a daily dig to start your stats.",
     col:"COLLECTION", colHelp:"Every answer you dig up is kept here. The ones you haven't found stay hidden.", colTot:"{a} of {b} found",
     freeEnd:"FREE DIG · {n} PROMPTS", sound:"Sound", statsBtn:"Stats", colBtn:"Collection",
-    th_cidades:"CITIES", th_palavras:"WORDS", th_comida:"FOOD", th_esporte:"SPORTS", th_coisas:"STUFF",
+    th_geohard:"🌍 HARDCORE GEOGRAPHY", th_cidades:"CITIES", th_palavras:"WORDS", th_comida:"FOOD", th_esporte:"SPORTS", th_coisas:"STUFF",
     checking:"🔎 checking online…", chkNo:"not a valid answer (checked online)", chkOff:"not in the burrow · couldn't check online right now",
     wrongWord:"not in our dictionary (only dictionary forms: singular, infinitive)", viaAi:"checked by Claude", viaWiki:"checked on Wikipedia", rare:"rare dictionary word",
     how1:"Each prompt: type ONE answer before the clock runs out.", how2:"The rarer the answer, the deeper the mole digs.",
@@ -651,7 +651,7 @@ const STR = {
     stats:"ESTATÍSTICAS", sPlayed:"Cavadas do dia", sStreak:"Sequência", sMax:"Maior sequência", sBest:"Mais fundo", sAvg:"Média", sGems:"RESPOSTAS POR RARIDADE · TODOS OS MODOS", sNone:"Jogue uma cavada do dia pra começar suas estatísticas.",
     col:"COLEÇÃO", colHelp:"Toda resposta que você desenterra fica guardada aqui. As que você ainda não achou ficam escondidas.", colTot:"{a} de {b} achadas",
     freeEnd:"CAVADA LIVRE · {n} PERGUNTAS", sound:"Som", statsBtn:"Estatísticas", colBtn:"Coleção",
-    th_cidades:"CIDADES", th_palavras:"PALAVRAS", th_comida:"COMIDA", th_esporte:"ESPORTE", th_coisas:"COISAS",
+    th_geohard:"🌍 GEOGRAFIA HARDCORE", th_cidades:"CIDADES", th_palavras:"PALAVRAS", th_comida:"COMIDA", th_esporte:"ESPORTE", th_coisas:"COISAS",
     checking:"🔎 conferindo online…", chkNo:"não vale (conferido online)", chkOff:"não tem na toca · não deu pra conferir online agora",
     wrongWord:"não está no nosso dicionário (só vale a forma de dicionário: singular, infinitivo)", viaAi:"conferido pelo Claude", viaWiki:"conferido na Wikipédia", rare:"palavra rara do dicionário",
     how1:"Cada pergunta: digite UMA resposta antes do tempo acabar.", how2:"Quanto mais rara a resposta, mais fundo a toupeira cava.",
@@ -722,6 +722,11 @@ ELEM_G.forEach(([id, q, en]) => DESC.push({ id, tags:["ciencia"], q, en, fam:"cu
 if (typeof GERADAS !== "undefined") GERADAS.forEach(p => DESC.push({ id:p.id, tags:p.tags || [], q:p.q, en:p.en || null, fam:/^(cidades|mundo)_/.test(p.id) ? "cidades" : "geo", fonte:p }));
 if (typeof PADROES !== "undefined") PADROES.forEach(p => DESC.push({ id:p.id, tags:p.tags || ["palavras"], q:p.q, en:p.en || null, fam:"palavras", pad:p }));
 if (typeof MUNI_P !== "undefined") MUNI_P.forEach(p => DESC.push({ id:p.id, tags:["cidades","brasil"], q:p.q, en:p.en || null, fam:"cidades", mun:p }));
+// geografia específica demais ("cidade da Bósnia", "fronteira com Burkina Faso"): só países conhecidos entram no sorteio normal;
+// o resto vai pro tema GEOGRAFIA HARDCORE da Cavada Livre (h = hardcore; pool() deixa de fora)
+const GEO_FACIL = new Set(("bra usa can mex arg chl col per ury pry bol ven ecu cub prt esp fra ita deu gbr irl nld bel che aut swe nor dnk pol grc " +
+  "rus tur isr egy mar zaf chn jpn kor ind aus nzl are").split(" "));
+DESC.forEach(d => { const m = /^(cidades|fronteira)_([a-z]{3})$/.exec(d.id); if (m && d.fonte && !GEO_FACIL.has(m[2])) { d.h = true; d.tags = ["geohard"]; } });
 const DBY = Object.fromEntries(DESC.map(d => [d.id, d]));
 // palavras (banco.js): uma lista por língua, da mais usada pra menos usada
 const PALA = {}, palavras = l => PALA[l] || (PALA[l] = (typeof PAL !== "undefined" && PAL[l] ? PAL[l].split(" ") : []));
@@ -731,6 +736,11 @@ function testePadrao(p){
   const r = new RegExp(p.re || p.rn); return p.re ? w => r.test(w) : w => r.test(semAc(w));
 }
 // raridade por posição: lista pequena vai por número fixo; lista grande vai por fatia (as 6% mais usadas são comuns...)
+// régua das perguntas de letras em PORTUGUÊS (19/11): a lista PAL.pt está ordenada por "facilidade" = a melhor nota entre
+// frequência em texto e visitas na Wikipédia (limitada a subir 4x). Faixas: COMUM 10%, RARA até 25%, ÉPICA até 45%,
+// MÍTICA até 70%, LENDÁRIA até 92%, ULTRA últimos 8%. (Teste com 71 palavras: 87% de acerto, contra 44% da régua antiga.)
+const FAIXAS = [.10, .25, .45, .70, .92];
+function tierFaixa(i, n){ const f = i / n; let t = 0; while (t < 5 && f >= FAIXAS[t]) t++; return t; }
 function tierPos(i, n){
   if (n > 300) { const f = i / n; return f < .04 ? 0 : f < .12 ? 1 : f < .28 ? 2 : f < .5 ? 3 : f < .75 ? 4 : 5; }
   return i < 5 ? 0 : i < 15 ? 1 : i < 35 ? 2 : i < 70 ? 3 : i < 120 ? 4 : 5;
@@ -747,7 +757,7 @@ function getQ(id){
   if (d.pad) {
     const p = d.pad, ok = testePadrao(p), m = palavras(p.lang).filter(ok), n = m.length;
     Q = { id, tags:d.tags, q:d.q, en:d.en, fechada:true, exata:true, pad:p, ok,
-      lista:m.map((w, i) => ({ nome:w, en:null, chaves:[normKey(w)], tier:tierPos(i, n), dificil:false, i })) };
+      lista:m.map((w, i) => ({ nome:w, en:null, chaves:[normKey(w)], tier:p.lang === "pt" ? tierFaixa(i, n) : tierPos(i, n), dificil:false, i })) };
   } else if (d.mun) {
     const p = d.mun, vis = new Set(), m = munis().filter(x => (!p.uf || x.uf === p.uf) && (!p.ini || x.k.startsWith(p.ini)) && !vis.has(x.k) && vis.add(x.k)), n = m.length;
     Q = { id, tags:d.tags, q:d.q, en:d.en, fechada:true, mun:p,
@@ -767,7 +777,7 @@ function getQ(id){
 }
 const qTxt = Q => (CFG.lang === "en" && Q.en) || Q.q;
 const aTxt = a => (CFG.lang === "en" && a.en) || a.nome;
-const pool = () => DESC.filter(Q => CFG.lang === "pt" || Q.en);   // em inglês ficam de fora as perguntas só em português
+const pool = (h = false) => DESC.filter(Q => (CFG.lang === "pt" || Q.en) && !!Q.h === h);   // em inglês ficam de fora as perguntas só em português
 // cavada do dia: 7 perguntas, iguais pra todo mundo no mesmo dia, com mistura: 3 escritas à mão, 1 de geografia, 1 de cidades, 2 de palavras
 const diaLocal = () => Math.floor((Date.now() - new Date().getTimezoneOffset()*60000) / 86400000);
 const hoje = diaLocal(), DIA0 = Date.UTC(2026, 10, 18) / 86400000, DIA_N = hoje - DIA0 + 1, N_DIA = 7;
@@ -810,7 +820,7 @@ function raraOk(v, Q){
   if (!Q.pad || typeof RARAS === "undefined") return null;
   const t = String(v).trim().toLowerCase(), k = normKey(t);
   if (k.length < 4 || !/^[a-záàâãéêíóôõúüç]+$/.test(t) || !Q.ok(t) || !bloomTem(RARAS[Q.pad.lang], k)) return null;
-  return { nome:t, en:null, chaves:[k], tier:5, dificil:false, i:-1, via:"rara" };
+  return { nome:t, en:null, chaves:[k], tier:Q.pad.lang === "pt" ? 4 : 5, dificil:false, i:-1, via:"rara" };   // só de dicionário: LENDÁRIA (era ULTRA)
 }
 // ---- conferência online: Claude (quando a página roda no claude.ai) ou Wikipédia (no arquivo aberto direto no navegador)
 const LIMPA = s => String(s).normalize("NFC").replace(/[^\p{L}\p{N} '\-\.&]/gu, " ").replace(/\s+/g, " ").trim().slice(0, 50);
@@ -1893,8 +1903,8 @@ $("bShare").onclick = () => {
   try { navigator.clipboard.writeText(t).then(() => { b.textContent = tr("copied"); setTimeout(() => { b.textContent = tr("share"); }, 1800); }, falhou); } catch (e) { falhou(); }
 };
 /* ---- temas da cavada livre ---- */
-const TEMAS = ["all","geo","cidades","palavras","bichos","comida","ciencia","cultura","geek","esporte","coisas","brasil"];
-const temaPool = t => pool().filter(Q => t === "all" || Q.tags.includes(t));
+const TEMAS = ["all","geo","cidades","palavras","bichos","comida","ciencia","cultura","geek","esporte","coisas","brasil","geohard"];
+const temaPool = t => t === "geohard" ? pool(true) : pool().filter(Q => t === "all" || Q.tags.includes(t));
 function abreTemas(){
   escondePaineis(); show("title", false); show("titleBtns", false);
   $("themeList").innerHTML = TEMAS.map(t => { const n = temaPool(t).length;

@@ -197,9 +197,10 @@
   @keyframes flame { 0% { transform:scaleY(1) skewX(0); } 100% { transform:scaleY(1.15) skewX(-6deg); } }
   @keyframes glow { 0% { opacity:.75; } 100% { opacity:1; } }
   body.toca #den { background:none; }
-  body.toca #den::before { inset:auto; left:30%; right:30%; top:57%; height:15%; border:none; border-radius:50%;
+  body.toca #den::before { inset:auto; left:30%; right:30%; top:42%; height:15%; border:none; border-radius:50%;
     background:radial-gradient(ellipse, #000 0 50%, #0a0604 64%, #3f2816 70%, transparent 72%); }
   #najaC { position:relative; z-index:1; }
+  body.toca #najaC { top:calc(var(--dh, 300px) * -.18); }   /* naja e buraco um pouco acima do meio: não cobrem a toupeira de baixo */
   @media (prefers-reduced-motion:reduce) { #toca .torch::before, #toca .torch::after { animation:none; } }
   body.contraste #den { background:#000; } body.contraste .seat .av, body.contraste .pchip, body.contraste #pNames, body.contraste #pIn { background:#000; color:#fff; }
   body.contraste #pTurn, body.contraste #pMsg { background:#000; }
@@ -472,6 +473,7 @@
   <div class="prow"><input id="oLink" readonly aria-label="Link"><button class="btn ghost" id="oCopyB" type="button" data-t="oCopy">COPY</button></div>
   <ul id="oList"></ul>
   <label class="olives"><span data-t="oLives">Lives</span> <select id="oLivesSel"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label>
+  <label class="olives" id="oTemaL"><span data-t="oTema">Theme</span> <select id="oTemaSel"></select></label>
   <div id="oMsg" class="pmsg" aria-live="polite"></div>
   <div class="row"><button class="btn ghost" id="oLeaveB" type="button" data-t="oLeave">◀ LEAVE</button><button class="btn lava" id="oStartB" type="button" data-t="oStart">START ▼</button></div>
 </div>
@@ -516,7 +518,7 @@ const STR = {
     oRound:"NAJA PARTY · ROUND {n}", oYou:"THE COBRA IS WITH <b>YOU</b>! Answer to pass it ↻", oTurn:"The cobra is with <b>{a}</b> · watch the typing live", oNext:"new category in a moment…", oQuit:"◀ LEAVE",
     mStats:"📊 STATS", mCol:"💎 COLLECTION", mHow:"❔ HOW TO PLAY", mCfg:"⚙️ SETTINGS",
     oNamePh:"your name", oCodePh:"CODE", oJoin:"JOIN ▸", oCreate:"CREATE ROOM",
-    oLobby:"ROOM", oShare:"Send this link to your friends:", oCopy:"COPY", oCopied:"COPIED!", oLives:"Lives", oStart:"START ▼", oLeave:"◀ LEAVE",
+    oLobby:"ROOM", oShare:"Send this link to your friends:", oCopy:"COPY", oCopied:"COPIED!", oLives:"Lives", oTema:"Theme", oStart:"START ▼", oLeave:"◀ LEAVE",
     oLeader:"LEADER", oWait:"waiting for {a} to start…", oNeed2:"need at least 2 players", oSoon:"The match started! (the online game itself arrives in stage 2)",
     oErrName:"type your name (up to 15 letters)", oErrCode:"room not found", oErrFull:"room is full (8 players)", oErrNet:"couldn't connect · check your internet", oConnecting:"connecting…", oClosed:"the leader closed the room",
     tiers:["COMMON","RARE","EPIC","MYTHIC","LEGENDARY","ULTRA"],
@@ -524,7 +526,7 @@ const STR = {
     dailyN:"DAILY DIG #{n}", dayInfo:"{q} prompts · the same dig for everyone today", dayDone:"✓ today: {m} m · next dig in {t}",
     dayResume:"▼ RESUME TODAY'S DIG ▼", daySee:"▼ SEE TODAY'S DIG ▼",
     themesT:"PICK A VEIN", themesHelp:"Endless prompts from the theme you pick. Nothing here counts toward the daily dig.",
-    th_all:"EVERYTHING", th_ciencia:"SCIENCE", th_geo:"GEOGRAPHY", th_bichos:"ANIMALS", th_cultura:"CULTURE", th_brasil:"BRAZIL", nPrompts:"{n} prompts",
+    th_all:"EVERYTHING", th_ciencia:"SCIENCE", th_geo:"GEOGRAPHY", th_bichos:"ANIMALS", th_cultura:"CULTURE", th_geek:"GEEK", th_brasil:"BRAZIL", nPrompts:"{n} prompts",
     deeper:"DEEPER DOWN THERE WAS", couldDig:"YOU COULD HAVE DUG WITH", topFound:"Nothing is deeper than that.", newGem:"✦ NEW IN YOUR COLLECTION", validN:"{n} answers counted for this prompt",
     share:"SHARE RESULT", copied:"COPIED ✓", copyFail:"Your browser blocked copying. Select the text below and copy it:",
     ranks:["CURIOUS EARTHWORM","APPRENTICE MOLE","EXCAVATOR","HUMAN JACKHAMMER","UNDERGROUND LEGEND","CORE MOLE"],
@@ -562,7 +564,7 @@ const STR = {
     oRound:"NAJA PARTY · RODADA {n}", oYou:"A NAJA ESTÁ COM <b>VOCÊ</b>! Responda pra passar ↻", oTurn:"A naja está com <b>{a}</b> · olha a digitação ao vivo", oNext:"categoria nova já já…", oQuit:"◀ SAIR",
     mStats:"📊 ESTATÍSTICAS", mCol:"💎 COLEÇÃO", mHow:"❔ COMO JOGAR", mCfg:"⚙️ CONFIGURAÇÕES",
     oNamePh:"seu nome", oCodePh:"CÓDIGO", oJoin:"ENTRAR ▸", oCreate:"CRIAR SALA",
-    oLobby:"SALA", oShare:"Manda esse link pros amigos:", oCopy:"COPIAR", oCopied:"COPIADO!", oLives:"Vidas", oStart:"COMEÇAR ▼", oLeave:"◀ SAIR",
+    oLobby:"SALA", oShare:"Manda esse link pros amigos:", oCopy:"COPIAR", oCopied:"COPIADO!", oLives:"Vidas", oTema:"Tema", oStart:"COMEÇAR ▼", oLeave:"◀ SAIR",
     oLeader:"LÍDER", oWait:"esperando {a} começar…", oNeed2:"precisa de pelo menos 2 jogadores", oSoon:"A partida começou! (o jogo online em si chega na etapa 2)",
     oErrName:"digite seu nome (até 15 letras)", oErrCode:"sala não encontrada", oErrFull:"sala cheia (8 jogadores)", oErrNet:"não deu pra conectar · confere a internet", oConnecting:"conectando…", oClosed:"o líder fechou a sala",
     tiers:["COMUM","RARA","ÉPICA","MÍTICA","LENDÁRIA","ULTRA"],
@@ -570,7 +572,7 @@ const STR = {
     dailyN:"CAVADA DO DIA #{n}", dayInfo:"{q} perguntas · a mesma cavada pra todo mundo hoje", dayDone:"✓ hoje: {m} m · próxima em {t}",
     dayResume:"▼ CONTINUAR A CAVADA DE HOJE ▼", daySee:"▼ VER A CAVADA DE HOJE ▼",
     themesT:"ESCOLHA UM VEIO", themesHelp:"Perguntas sem fim do tema que você escolher. Aqui nada conta pra cavada do dia.",
-    th_all:"TUDO", th_ciencia:"CIÊNCIA", th_geo:"GEOGRAFIA", th_bichos:"BICHOS", th_cultura:"CULTURA", th_brasil:"BRASIL", nPrompts:"{n} perguntas",
+    th_all:"TUDO", th_ciencia:"CIÊNCIA", th_geo:"GEOGRAFIA", th_bichos:"BICHOS", th_cultura:"CULTURA", th_geek:"GEEK", th_brasil:"BRASIL", nPrompts:"{n} perguntas",
     deeper:"MAIS FUNDO TINHA", couldDig:"DAVA PRA CAVAR COM", topFound:"Mais fundo que isso não existe.", newGem:"✦ NOVA NA SUA COLEÇÃO", validN:"{n} respostas valiam nessa pergunta",
     share:"COMPARTILHAR", copied:"COPIADO ✓", copyFail:"O navegador bloqueou a cópia. Selecione o texto abaixo e copie:",
     ranks:["MINHOCA CURIOSA","TOUPEIRA APRENDIZ","ESCAVADEIRA","BRITADEIRA HUMANA","LENDA DO SUBSOLO","TOUPEIRA DO NÚCLEO"],
@@ -1076,7 +1078,7 @@ function nextQ(){
   if (!free && DAY && DAY.pend === qi && DAY.prazo) { const resta = (DAY.prazo - Date.now()) / 1000; return resta > .5 ? ask(resta) : timeout(); }
   mode = "count"; cd = 3; lastCd = 4; show("bar", false); show("cdown", true);
 }
-const ICONE = { geo:"🗺️", cidades:"🏙️", palavras:"🔤", bichos:"🐾", comida:"🍲", ciencia:"🔬", cultura:"🎭", esporte:"⚽", coisas:"🧰", brasil:"🇧🇷" };
+const ICONE = { geo:"🗺️", cidades:"🏙️", palavras:"🔤", bichos:"🐾", comida:"🍲", ciencia:"🔬", cultura:"🎭", geek:"🎮", esporte:"⚽", coisas:"🧰", brasil:"🇧🇷" };
 function etiqueta(Q){ const t = Q && (Q.tags || []).find(x => ICONE[x] && x !== "brasil") || (Q && (Q.tags || []).includes("brasil") ? "brasil" : null);
   return t ? `${ICONE[t]} ${tr("th_" + t)}` : ""; }
 function labelQ(){ $("qTag").textContent = etiqueta(curQ); const t = free ? tr("freeLbl", { n:qi + 1 }) : tr("of", { a:qi + 1, b:QS.length }); $("qLabel").textContent = t; $("hDig").textContent = t; nota(curQ); }
@@ -1250,7 +1252,7 @@ function layoutDen(){
     const h = Math.round(Math.max(140, (Bt - T - 2*meia) / .8)), w = Math.round(Math.max(Math.min(W - 40, 260), Math.min(W - 120, h*1.8, 820))), cy = Math.round((T + Bt)/2);
     if (DEN && DEN.w === w && DEN.h === h && DEN.cy === cy) return;
     DEN = { s:Math.min(w, h), w, h, cy }; den.style.width = w + "px"; den.style.height = h + "px"; den.style.left = Math.round((W - w)/2) + "px"; den.style.top = (cy - h/2) + "px";
-    den.style.setProperty("--ds", Math.min(w, h) + "px"); return; }
+    den.style.setProperty("--ds", Math.round(Math.min(w, h*.8)) + "px"); den.style.setProperty("--dh", h + "px"); return; }   // naja um pouco menor que a roda, pra não cobrir a toupeira de baixo
   const s = Math.round(Math.max(200, Math.min(W - 80, bot - top, 460))), cy = Math.round((top + bot)/2);
   if (DEN && DEN.s === s && DEN.cy === cy && !DEN.w) return;
   DEN = { s, cy }; den.style.width = den.style.height = s + "px"; den.style.left = Math.round((W - s)/2) + "px"; den.style.top = (cy - s/2) + "px";
@@ -1330,6 +1332,9 @@ function oDesenha(r){
   const ids = Object.keys(pl).sort((a, b) => pl[a].joined - pl[b].joined);
   $("oList").innerHTML = ids.map(id => `<li>${esc(pl[id].name)}${id === ON.host ? ` <b>★ ${tr("oLeader")}</b>` : ""}${id === ON.uid ? " ←" : ""}</li>`).join("");
   $("oLivesSel").value = r.meta.lives; $("oLivesSel").disabled = !lider; show("oStartB", lider);
+  show("oTemaL", lider);   // o tema fica só no celular do líder (é ele quem sorteia as perguntas)
+  const ts = $("oTemaSel"); if (lider && ts.dataset.lang !== CFG.lang) { ts.dataset.lang = CFG.lang;
+    ts.innerHTML = O_TEMAS.map(t => `<option value="${t}">${t === "all" ? tr("th_all") : (ICONE[t] || "") + " " + tr("th_" + t)}</option>`).join(""); ts.value = ON.tema || "all"; }
   $("oStartB").disabled = ids.length < 2;
   $("oMsg").textContent = lider ? (ids.length < 2 ? tr("oNeed2") : "") : tr("oWait", { a:pl[ON.host] ? pl[ON.host].name : "?" });
 }
@@ -1352,9 +1357,9 @@ const VEZ_S = 25, ERRO_S = 3;
 // a pergunta viaja pelo banco como CÓDIGO (ex.: fronteira_afg), então todo celular vê a mesma
 // só o líder sorteia: tira de um "saco" (não repete pergunta na partida) e pula pergunta com menos de MIN_RESP respostas,
 // senão as respostas acabam com 6-8 jogadores
-const MIN_RESP = 20;
+const MIN_RESP = 20, O_TEMAS = ["all","geek","cultura","bichos","geo","ciencia","comida","brasil"];
 function oSorteia(){
-  const fonte = () => pool().filter(d => d.fam !== "palavras" || d.pad.lang === CFG.lang);
+  const tema = ON.tema || "all", fonte = () => pool().filter(d => (d.fam !== "palavras" || d.pad.lang === CFG.lang) && (tema === "all" || d.tags.includes(tema)));
   ON.usou = ON.usou || new Set();
   for (let k = 0; k < 3000; k++) {
     if (!ON.saco || !ON.saco.length) { const f = fonte(), novas = f.filter(d => !ON.usou.has(d.id)); ON.saco = misturaFamilias(novas.length > 20 ? novas : f); }
@@ -1493,6 +1498,7 @@ $("oJoinB").onclick = () => { const n = oNome(); if (!n) return; const c = $("oC
   if (!/^[A-Z]{4}$/.test(c)) return oSay("oSetupMsg", "oErrCode"); oEntra(c, n, false); };
 ["oName","oCode"].forEach(id => $(id).addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); $("oJoinB").click(); } }));
 $("oLivesSel").onchange = e => FB.update(oRef(ON.code + "/meta"), { lives:+e.target.value });
+$("oTemaSel").onchange = e => { ON.tema = e.target.value; ON.saco = null; };   // tema novo = saco novo
 $("oStartB").onclick = () => { const pl = ON.room.players || {}, ids = Object.keys(pl).sort((a, b) => pl[a].joined - pl[b].joined);
   if (ids.length < 2) return;
   oMarca(ON.room.live); oRelogio();   // a naja começa com quem está do lado do líder, no sentido horário
@@ -1517,7 +1523,7 @@ $("bShare").onclick = () => {
   try { navigator.clipboard.writeText(t).then(() => { b.textContent = tr("copied"); setTimeout(() => { b.textContent = tr("share"); }, 1800); }, falhou); } catch (e) { falhou(); }
 };
 /* ---- temas da cavada livre ---- */
-const TEMAS = ["all","geo","cidades","palavras","bichos","comida","ciencia","cultura","esporte","coisas","brasil"];
+const TEMAS = ["all","geo","cidades","palavras","bichos","comida","ciencia","cultura","geek","esporte","coisas","brasil"];
 const temaPool = t => pool().filter(Q => t === "all" || Q.tags.includes(t));
 function abreTemas(){
   escondePaineis(); show("title", false); show("titleBtns", false);

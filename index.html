@@ -321,6 +321,34 @@
     #eGrid i { width:22px; height:22px; }
     #howP ol li { font-size:14px; } #howP .cred { font-size:11px; } #howP { padding:16px; }
   }
+
+  /* ===== v5: pular, competitivo, corrida, velocidade, fim da partida online ===== */
+  #bar.pula { grid-template-columns:56px 1fr auto auto; }
+  #bSkip { height:52px; padding:0 12px; font-size:15px; }
+  #oModoDesc { margin:-4px 0 0; color:var(--muted); font-size:.8em; line-height:1.4; }
+  #oRank { position:fixed; right:max(12px, env(safe-area-inset-right, 0px)); top:100px; z-index:5; width:min(240px, 44vw); background:#120c08e6; border:2px solid var(--line);
+    box-shadow:3px 3px 0 #0008; padding:8px 10px; display:grid; gap:4px; font-size:14px; }
+  #oRank .rt { font-family:var(--display); font-size:10px; letter-spacing:2px; color:var(--amber); }
+  #oRank .rl { display:grid; grid-template-columns:18px 1fr auto; gap:6px; align-items:baseline; }
+  #oRank .rl b { font-family:var(--display); font-size:10px; color:var(--muted); }
+  #oRank .rl span { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  #oRank .rl em { font-style:normal; font-family:var(--display); font-size:11px; color:var(--gold); white-space:nowrap; }
+  #oRank .me span { color:var(--amber); } #oRank .out { opacity:.45; }
+  #vRes, #oFim { position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); width:min(460px, calc(100vw - 32px)); max-height:calc(100vh - 40px); overflow:auto;
+    z-index:9; display:grid; gap:10px; text-align:center; }
+  #vResT, #oFimT { font-family:var(--display); letter-spacing:2px; color:var(--gold); font-size:18px; margin:0; line-height:1.3; }
+  #vRes ol, #oFim ol { list-style:none; margin:0; padding:0; display:grid; gap:6px; text-align:left; }
+  #vRes li, #oFim li { display:grid; grid-template-columns:36px 1fr auto; gap:8px; align-items:baseline; border-bottom:2px dashed var(--line); padding:5px 0; }
+  #vRes li b, #oFim li b { font-family:var(--display); font-size:11px; color:var(--amber); }
+  #vRes li em, #oFim li em { font-style:normal; font-family:var(--display); font-size:12px; color:var(--gold); white-space:nowrap; }
+  #vRes li.me span, #oFim li.me span { color:var(--amber); }
+  #oFim li:first-child em { font-size:14px; }
+  .seat.out { opacity:.35; filter:grayscale(1); }
+  body.contraste #oRank { background:#000 !important; }
+  @media (max-width:560px) {
+    #bar.pula { grid-template-columns:48px 1fr auto auto; } #bSkip { height:48px; padding:0 8px; }
+    #oRank { top:auto; bottom:150px; right:10px; width:min(210px, 52vw); font-size:12px; padding:6px 8px; }
+  }
 </style>
 </head>
 <body>
@@ -353,6 +381,7 @@
   <div class="mtop"><h2 id="menuT">MENU</h2><button id="menuX" class="btn ghost" type="button" aria-label="Close">✕</button></div>
   <div class="mgrid">
     <button id="bFree" class="btn" data-t="free">FREE DIG ∞</button>
+    <button id="bComp" class="btn" data-t="compBtn">❤ COMPETITIVE</button>
     <button id="bOnline" class="btn" data-t="onlineBtn">≈ NAJA PARTY ≈</button>
     <button id="bParty" class="btn" data-t="partyBtn">≈ BURROW CIRCLE ≈</button>
     <button id="bTour" class="btn" data-t="tour">TOUR THE LAYERS</button>
@@ -413,6 +442,7 @@
   <div class="ring"><svg viewBox="0 0 56 56"><circle cx="28" cy="28" r="24" class="rb"/><circle cx="28" cy="28" r="24" id="ringFg" class="rf"/></svg><span id="ringN">25</span></div>
   <input id="ans" type="text" placeholder="type one answer…" maxlength="40" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Your answer">
   <button class="btn lava" id="bDig" type="submit" data-t="dig">DIG ▼</button>
+  <button class="btn ghost hide" id="bSkip" type="button">⏭</button>
   <div class="tline"><i id="tFill"></i></div>
   <div id="msg" aria-live="polite"></div>
 </form>
@@ -472,7 +502,12 @@
   <p class="help" data-t="oShare"></p>
   <div class="prow"><input id="oLink" readonly aria-label="Link"><button class="btn ghost" id="oCopyB" type="button" data-t="oCopy">COPY</button></div>
   <ul id="oList"></ul>
-  <label class="olives"><span data-t="oLives">Lives</span> <select id="oLivesSel"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label>
+  <label class="olives" id="oModoL"><span data-t="oModo">Mode</span> <select id="oModoSel"></select></label>
+  <p class="help" id="oModoDesc"></p>
+  <label class="olives" id="oTempoL"><span id="oTempoT">Time</span> <select id="oTempoSel"></select></label>
+  <label class="olives" id="oRodL"><span data-t="oRod">Questions</span> <select id="oRodSel"><option>10</option><option>15</option><option>20</option></select></label>
+  <label class="olives" id="oTipoL"><span data-t="oTipo">Type</span> <select id="oTipoSel"></select></label>
+  <label class="olives" id="oLivesL"><span data-t="oLives">Lives</span> <select id="oLivesSel"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option value="0">∞</option></select></label>
   <label class="olives" id="oTemaL"><span data-t="oTema">Theme</span> <select id="oTemaSel"></select></label>
   <div id="oMsg" class="pmsg" aria-live="polite"></div>
   <div class="row"><button class="btn ghost" id="oLeaveB" type="button" data-t="oLeave">◀ LEAVE</button><button class="btn lava" id="oStartB" type="button" data-t="oStart">START ▼</button></div>
@@ -487,6 +522,14 @@
 <div id="pEnd" class="panel hide" role="dialog" aria-live="assertive">
   <div id="pBoom"></div>
   <div class="row"><button id="pAgain" class="btn lava" data-t="newRound">↻ NEW ROUND</button><button id="pReset" class="btn ghost" data-t="changePlayers">CHANGE PLAYERS</button><button id="pUp" class="btn ghost" data-t="surface">▲ SURFACE</button></div>
+</div>
+<div id="oRank" class="hide" aria-live="off"></div>
+<div id="vRes" class="panel hide" role="status"><h2 id="vResT"></h2><ol id="vResList"></ol></div>
+<div id="oFim" class="panel hide" role="dialog" aria-labelledby="oFimT">
+  <h2 id="oFimT"></h2>
+  <ol id="oFimList"></ol>
+  <div class="row"><button class="btn ghost" id="oFimSair" type="button" data-t="oLeave">◀ LEAVE</button><button class="btn lava" id="oFimDeNovo" type="button" data-t="oAgain">↻ PLAY AGAIN</button></div>
+  <div id="oFimMsg" class="help"></div>
 </div>
 <div id="oBoom" class="panel hide" role="alert"><div id="oBoomT"></div><small data-t="oNext"></small></div>
 <button id="oQuit" class="btn ghost hide" type="button" data-t="oQuit">◀ LEAVE</button>
@@ -527,6 +570,19 @@ const STR = {
     dayResume:"▼ RESUME TODAY'S DIG ▼", daySee:"▼ SEE TODAY'S DIG ▼",
     themesT:"PICK A VEIN", themesHelp:"Endless prompts from the theme you pick. Nothing here counts toward the daily dig.",
     th_all:"EVERYTHING", th_ciencia:"SCIENCE", th_geo:"GEOGRAPHY", th_bichos:"ANIMALS", th_cultura:"CULTURE", th_geek:"GEEK", th_brasil:"BRAZIL", nPrompts:"{n} prompts",
+    compBtn:"❤ COMPETITIVE", compLbl:"COMPETITIVE · {n}", compEnd:"COMPETITIVE · GAME OVER", compShare:"COMPETITIVE", compBest:"record {m} m", newRec:"NEW RECORD!",
+    noLives:"OUT OF LIVES", timeUp:"TIME'S UP", skip:"Skip", usedAns:"you already used “{name}” here · try another",
+    oModo:"Mode", oRod:"Questions", oTipo:"Type", oTempoN:"Time per turn", oTempoC:"Race time", oTempoV:"Time per question", nQ:"{n} questions",
+    m_naja:"🐍 Naja Party", m_corrida:"🏁 Race", m_vel1:"⚡ Speed · first one scores", m_vel2:"⚡ Speed · ranking",
+    d_naja:"pass the cobra with an answer before it strikes; whoever takes all the bites is out.",
+    d_corrida:"everyone gets the same prompts; the rarer the answer, the deeper you dig. Deepest when time runs out wins.",
+    d_vel1:"one-answer questions (math, capitals, symbols): only the first to get it right scores.",
+    d_vel2:"one-answer questions: everyone answers and scores by speed order (1st scores the most).",
+    t_contas:"🧮 Math", t_mix:"🎲 Mixed (math, capitals, symbols)",
+    oAgain:"↻ PLAY AGAIN", oWaitLeader:"waiting for the leader…", oWinner:"🏆 {a} WINS!", oDraw:"🤝 DRAW!", rPts:"{n} pts", najaOut:"OUT",
+    cRound:"RACE", cOut:"OUT OF LIVES · watch the race", cEnd:"time's up! waiting for everyone…", rSpect:"you're watching this match",
+    vRound:"SPEED · {a}/{b}", vHint:"▼ only one answer · be fast ▼", vWrong:"not that · try again", vYou:"✓ you got it in {s} s",
+    vAns:"answer: {a}", vNoOne:"nobody got it", voltou:"↻ BACK", voltouHint:"▼ this one's back · no repeated answers ▼",
     deeper:"DEEPER DOWN THERE WAS", couldDig:"YOU COULD HAVE DUG WITH", topFound:"Nothing is deeper than that.", newGem:"✦ NEW IN YOUR COLLECTION", validN:"{n} answers counted for this prompt",
     share:"SHARE RESULT", copied:"COPIED ✓", copyFail:"Your browser blocked copying. Select the text below and copy it:",
     ranks:["CURIOUS EARTHWORM","APPRENTICE MOLE","EXCAVATOR","HUMAN JACKHAMMER","UNDERGROUND LEGEND","CORE MOLE"],
@@ -573,6 +629,19 @@ const STR = {
     dayResume:"▼ CONTINUAR A CAVADA DE HOJE ▼", daySee:"▼ VER A CAVADA DE HOJE ▼",
     themesT:"ESCOLHA UM VEIO", themesHelp:"Perguntas sem fim do tema que você escolher. Aqui nada conta pra cavada do dia.",
     th_all:"TUDO", th_ciencia:"CIÊNCIA", th_geo:"GEOGRAFIA", th_bichos:"BICHOS", th_cultura:"CULTURA", th_geek:"GEEK", th_brasil:"BRASIL", nPrompts:"{n} perguntas",
+    compBtn:"❤ COMPETITIVO", compLbl:"COMPETITIVO · {n}", compEnd:"COMPETITIVO · FIM DE JOGO", compShare:"COMPETITIVO", compBest:"recorde {m} m", newRec:"RECORDE NOVO!",
+    noLives:"ACABARAM AS VIDAS", timeUp:"ACABOU O TEMPO", skip:"Pular", usedAns:"você já usou “{name}” aqui · tenta outra",
+    oModo:"Modo", oRod:"Perguntas", oTipo:"Tipo", oTempoN:"Tempo por vez", oTempoC:"Tempo da corrida", oTempoV:"Tempo por pergunta", nQ:"{n} perguntas",
+    m_naja:"🐍 Naja Party", m_corrida:"🏁 Corrida", m_vel1:"⚡ Velocidade · só o primeiro pontua", m_vel2:"⚡ Velocidade · ranking",
+    d_naja:"passe a naja com uma resposta antes do bote; quem levar todos os botes sai.",
+    d_corrida:"todo mundo recebe as mesmas perguntas; quanto mais rara a resposta, mais fundo cava. Ganha quem estiver mais fundo quando o tempo acabar.",
+    d_vel1:"perguntas de uma resposta só (contas, capitais, símbolos): só o primeiro que acertar pontua.",
+    d_vel2:"perguntas de uma resposta só: todo mundo responde e pontua pela ordem de velocidade (o 1º ganha mais).",
+    t_contas:"🧮 Contas", t_mix:"🎲 Misturadas (contas, capitais, símbolos)",
+    oAgain:"↻ JOGAR DE NOVO", oWaitLeader:"esperando o líder…", oWinner:"🏆 {a} VENCEU!", oDraw:"🤝 EMPATE!", rPts:"{n} pts", najaOut:"FORA",
+    cRound:"CORRIDA", cOut:"SEM VIDAS · acompanhe a corrida", cEnd:"acabou! esperando todo mundo…", rSpect:"você está assistindo essa partida",
+    vRound:"VELOCIDADE · {a}/{b}", vHint:"▼ uma resposta só · seja rápido ▼", vWrong:"não é isso · tenta de novo", vYou:"✓ você acertou em {s} s",
+    vAns:"resposta: {a}", vNoOne:"ninguém acertou", voltou:"↻ VOLTOU", voltouHint:"▼ essa voltou · não vale repetir resposta ▼",
     deeper:"MAIS FUNDO TINHA", couldDig:"DAVA PRA CAVAR COM", topFound:"Mais fundo que isso não existe.", newGem:"✦ NOVA NA SUA COLEÇÃO", validN:"{n} respostas valiam nessa pergunta",
     share:"COMPARTILHAR", copied:"COPIADO ✓", copyFail:"O navegador bloqueou a cópia. Selecione o texto abaixo e copie:",
     ranks:["MINHOCA CURIOSA","TOUPEIRA APRENDIZ","ESCAVADEIRA","BRITADEIRA HUMANA","LENDA DO SUBSOLO","TOUPEIRA DO NÚCLEO"],
@@ -980,6 +1049,8 @@ const tunnelX = wy => snap(W/2 + Math.sin(wy / MPX * .45)*PX*3 + Math.sin(wy / M
 /* ================= ESTADO ================= */
 let SP = {}, SPX = 6, stars = [], motes = [], parts = [];
 let mode = "title", moleD = -SURF, camD = 0, tw = null, digging = false, happy = false, score = 0;
+let comp = false, race = false, vidas = 0, pulos = 0, RACE = null, COMPMSG = ""; const USADAS = new Map();   // v5
+let VISTAS = [], VOLTOU = false;   // livre/competitivo: perguntas que já apareceram (podem voltar; a resposta não pode repetir)
 let free = false, curQ = null, lastFree = -1, qi = -1, cd = 0, timeLeft = 25, lines = null, chip = null, log = [], lastLayer = 0, bannerT = 0, clock = 0, tourT = 0, started = false;
 // molas do movimento (deixam tudo macio): giro, achatamento e pulinho
 let ang = 0, angV = 0, sq = 0, sqV = 0, hopY = 0, hopV = 0, wasDigging = false;
@@ -1053,7 +1124,7 @@ function buildSquares(){ $("squares").innerHTML = QS.map(() => '<span class="sq"
 function pintaSq(i, l){ const s = $("squares").children[i]; if (!s) return; s.classList.remove("now");
   if (!l) { s.classList.add("miss"); return; } const T = TIERS[l.t];
   s.style.background = T.col === "rainbow" ? "linear-gradient(90deg,#ff4d6d,#ffd257,#86c24f,#4c8dff,#a35cff)" : T.col; s.style.borderColor = "#120c08"; }
-function salvaDia(){ if (free || !DAY) return; DAY.log = log.slice(); DAY.score = score; DAY.pend = null; DAY.prazo = 0; grava(KEY.dia, DAY); }
+function salvaDia(){ if (free || race || !DAY) return; DAY.log = log.slice(); DAY.score = score; DAY.pend = null; DAY.prazo = 0; grava(KEY.dia, DAY); }
 // cavada do dia: uma tentativa por dia; se fechar a página no meio, continua de onde parou (e o relógio não recomeça)
 function cavaDoDia(){
   free = false; if (!DAY) { DAY = { dia:hoje, ids:cavadaDoDia(), log:[], score:0, done:false, pend:null, prazo:0 }; grava(KEY.dia, DAY); }
@@ -1062,7 +1133,14 @@ function cavaDoDia(){
   $("hDig").textContent = tr("dailyN", { n:DIA_N });
   start(() => desce(score*10, () => DAY.done ? endGame() : nextQ()));
 }
-function tiraDoSaco(){   // cavada livre: sorteia sem repetir até passar por todas do tema
+function tiraDoSaco(){   // cavada livre: sorteia do saco do tema; a partir da 7ª, ~1 em 4 é uma que já saiu (resposta repetida não vale)
+  const velhas = VISTAS.slice(-60, -4).filter(id => { const Q = getQ(id); return Q && Q.lista.filter(a => !usada(id, a)).length >= 3; });
+  if (VISTAS.length >= 6 && velhas.length && Math.random() < .25) { const id = velhas[Math.random()*velhas.length | 0];
+    VISTAS = VISTAS.filter(x => x !== id).concat(id); VOLTOU = true; return getQ(id); }
+  VOLTOU = false;
+  const Q = tiraNova(); if (Q) VISTAS = VISTAS.filter(x => x !== Q.id).concat(Q.id); return Q;
+}
+function tiraNova(){
   if (!saco.length) { saco = tema === "all" ? misturaFamilias(temaPool(tema)) : embaralha(temaPool(tema).map(d => d.id)); if (saco.length > 1 && curQ && saco[saco.length - 1] === curQ.id) saco.unshift(saco.pop()); }
   return getQ(saco.pop());
 }
@@ -1081,19 +1159,45 @@ function nextQ(){
 const ICONE = { geo:"🗺️", cidades:"🏙️", palavras:"🔤", bichos:"🐾", comida:"🍲", ciencia:"🔬", cultura:"🎭", geek:"🎮", esporte:"⚽", coisas:"🧰", brasil:"🇧🇷" };
 function etiqueta(Q){ const t = Q && (Q.tags || []).find(x => ICONE[x] && x !== "brasil") || (Q && (Q.tags || []).includes("brasil") ? "brasil" : null);
   return t ? `${ICONE[t]} ${tr("th_" + t)}` : ""; }
-function labelQ(){ $("qTag").textContent = etiqueta(curQ); const t = free ? tr("freeLbl", { n:qi + 1 }) : tr("of", { a:qi + 1, b:QS.length }); $("qLabel").textContent = t; $("hDig").textContent = t; nota(curQ); }
+const coracoes = () => vidas > 0 ? "❤".repeat(vidas) : "";
+function labelQ(){ $("qTag").textContent = etiqueta(curQ);
+  const t = race ? tr("cRound") + (RACE && RACE.vid ? " · " + coracoes() : "") : comp ? tr("compLbl", { n:qi + 1 }) + " · " + coracoes()
+    : free ? tr("freeLbl", { n:qi + 1 }) : tr("of", { a:qi + 1, b:QS.length });
+  const v = free && !race && VOLTOU, qh = $("qp").querySelector(".qh"); if (qh) qh.textContent = tr(v ? "voltouHint" : "hint");
+  $("qLabel").textContent = v ? t + " · " + tr("voltou") : t; $("hDig").textContent = t; nota(curQ); }
+// botão pular: livre = à vontade; competitivo e corrida = 3 por partida
+function pulaBotao(){ const pode = free || race, b = $("bSkip"), lim = comp || race; show("bSkip", pode); $("bar").classList.toggle("pula", pode);
+  b.textContent = lim ? `⏭ ${pulos}` : "⏭"; b.disabled = lim && pulos <= 0; b.title = tr("skip"); b.setAttribute("aria-label", tr("skip")); }
+// respostas já usadas (livre, competitivo e corrida): a pergunta pode voltar, a resposta não
+const usada = (id, a) => { const s = USADAS.get(id); return !!s && a.chaves.some(k => s.has(k)); };
+function marcaUsada(id, a){ if (!USADAS.has(id)) USADAS.set(id, new Set()); a.chaves.forEach(k => USADAS.get(id).add(k)); }
+// errou: no competitivo (e na corrida com vidas) custa uma vida
+function errou(txt){
+  if ((comp || (race && RACE && RACE.vid)) && vidas > 0) { vidas--; labelQ(); txt += " · −1 ❤"; vib([60, 40, 60]);
+    if (race) corridaPublica();
+    if (vidas <= 0) { erroResp(txt); return comp ? compFim(tr("noLives")) : corridaSemVida(); } }
+  erroResp(txt);
+}
+function compFim(motivo){
+  const fundo = score*10, rec = fundo > (EST.compMelhor || 0); if (rec) { EST.compMelhor = fundo; grava(KEY.est, EST); }
+  COMPMSG = (motivo ? motivo + " · " : "") + (rec && fundo > 0 ? tr("newRec") : tr("compBest", { m:fmtL(EST.compMelhor || 0) }));
+  endGame();
+}
 function nota(Q){ const n = $("qNote"), so = CFG.lang === "en" && !!Q && !Q.en; n.textContent = so ? tr("qNote") : ""; n.hidden = !so; }
 function ask(resta){
   mode = "ask"; timeLeft = resta ?? CFG.tempo; lastTick = Math.ceil(timeLeft); show("cdown", false); show("bar", true); $("ans").value = ""; $("msg").textContent = ""; $("ans").focus();
-  if (!free && DAY) { DAY.pend = qi; DAY.prazo = Date.now() + timeLeft*1000; grava(KEY.dia, DAY); }
+  pulaBotao();
+  if (!free && !race && DAY) { DAY.pend = qi; DAY.prazo = Date.now() + timeLeft*1000; grava(KEY.dia, DAY); }
 }
 function timeout(){
+  if (race) return corridaAcabou();
+  if (comp) { vidas = 0; SOM.sem(); vib([80, 60, 160]); return compFim(tr("timeUp")); }   // competitivo: acabou o tempo = acabou o jogo
   mode = "card"; show("bar", false); show("cdown", false); SOM.sem(); vib(60);
   pintaSq(qi, null); log.push(null); salvaDia(); mostraCard(null, false);
 }
 function erroResp(txt){ $("msg").textContent = txt; SOM.erro(); vib(30); const b = $("bar"); b.classList.remove("shake"); void b.offsetWidth; b.classList.add("shake"); $("ans").select(); }
 async function submit(e){
-  e.preventDefault(); if (mode !== "ask") return;
+  e.preventDefault(); if (mode === "vel") return velEnvia(); if (mode !== "ask") return;
   const v = $("ans").value; if (!normKey(v)) return;
   let a = acha(v, curQ) || raraOk(v, curQ);
   if (!a && podeConferir(curQ)) {   // não está na lista: confere online (o relógio para enquanto isso)
@@ -1101,14 +1205,17 @@ async function submit(e){
     const r = await confereOnline(Q, v);
     $("ans").readOnly = false; $("bar").classList.remove("checando");
     if (mode !== "check" || curQ !== Q) return;
-    mode = "ask"; if (!free && DAY) { DAY.prazo = Date.now() + timeLeft*1000; grava(KEY.dia, DAY); }
-    if (!r.ok) return erroResp(r.motivo === "off" ? tr("chkOff") : tr("chkNo"));
+    mode = "ask"; if (!free && !race && DAY) { DAY.prazo = Date.now() + timeLeft*1000; grava(KEY.dia, DAY); }
+    if (!r.ok) return r.motivo === "off" ? erroResp(tr("chkOff")) : errou(tr("chkNo"));
     a = r.a;
   }
-  if (!a) return erroResp(curQ.pad ? tr("wrongWord") : tr("wrong"));
+  if (!a) return errou(curQ.pad ? tr("wrongWord") : tr("wrong"));
+  if ((free || race) && usada(curQ.id, a)) return erroResp(tr("usedAns", { name:aTxt(a) }));
+  if (free || race) marcaUsada(curQ.id, a);
+  if (race) return corridaAcertou(a);
   mode = "dig"; show("bar", false); $("ans").blur();
   const T = TIERS[a.tier], entrada = { id:curQ.id, k:a.chaves[0], n:a.nome, ne:a.en || null, t:a.tier, v:a.via || null };
-  if (!free && DAY) { DAY.log = [...log, entrada]; DAY.score = score + T.pts; DAY.pend = null; DAY.prazo = 0; grava(KEY.dia, DAY); }   // já vale, mesmo se a página fechar na descida
+  if (!free && !race && DAY) { DAY.log = [...log, entrada]; DAY.score = score + T.pts; DAY.pend = null; DAY.prazo = 0; grava(KEY.dia, DAY); }   // já vale, mesmo se a página fechar na descida
   lines = { from:moleD, lit:TIERS.map(() => false), alpha:1 };
   chip = { text:`“${aTxt(a).toUpperCase()}”`, col:null };
   tween(moleD + T.m, 1.3 + Math.sqrt(T.m / 100)*.85, () => land(a, entrada));   // queda proporcional: mais pontos = mais fundo
@@ -1145,7 +1252,7 @@ function endGame(){
   mode = "end"; ["qp","bar","cdown","card","bSurface"].forEach(id => show(id, false));
   const fundo = score*10;
   if (!free && DAY && !DAY.done) { DAY.done = true; DAY.fundo = fundo; grava(KEY.dia, DAY); fechaDia(fundo); }
-  $("eTitle").textContent = free ? tr("freeEnd", { n:log.length }) : tr("dailyN", { n:DIA_N });
+  $("eTitle").textContent = comp ? tr("compEnd") : free ? tr("freeEnd", { n:log.length }) : tr("dailyN", { n:DIA_N });
   $("eScore").textContent = `${score} ${tr("pts")}`;
   $("eRank").textContent = rankDe(fundo); document.body.classList.add("fim");
   $("eGrid").innerHTML = log.map(l => { const T = l && TIERS[l.t]; return `<i style="background:${!T ? "#120c08" : T.col === "rainbow" ? "linear-gradient(135deg,#ff4d6d,#ffd257,#86c24f,#4c8dff,#a35cff)" : T.col}"></i>`; }).join("");
@@ -1154,7 +1261,7 @@ function endGame(){
     if (!a || !Q) { const q = free ? null : QS[i]; return `<li><span>${i + 1}. —${q ? `<small>${esc(qTxt(q))}</small>` : ""}</span><b style="color:#a8927a">${tr("missed")}</b></li>`; }
     const T = TIERS[a.tier] || TIERS[0];
     return `<li><span>${i + 1}. ${esc(aTxt(a))}<small>${esc(qTxt(Q))}</small></span><b class="${T.col === "rainbow" ? "rainbow" : ""}" style="color:${T.col}">${L10("tiers")[a.tier]} +${T.pts}</b></li>`; }).join("");
-  $("eStats").innerHTML = free ? "" : `🔥 ${tr("streakTxt", { n:seqAtual() })} · ${tr("bestTxt", { m:fmtL(EST.melhor) })}<br><span id="eNext"></span>`;
+  $("eStats").innerHTML = comp ? esc(COMPMSG) : free ? "" : `🔥 ${tr("streakTxt", { n:seqAtual() })} · ${tr("bestTxt", { m:fmtL(EST.melhor) })}<br><span id="eNext"></span>`;
   $("bAgain").textContent = free ? tr("again") : tr("back");
   $("shareTxt").hidden = true; $("shareMsg").textContent = ""; $("bShare").textContent = tr("share");
   show("end", true); show("tools", true); relogioFim();
@@ -1164,7 +1271,7 @@ function falta(){ const ag = new Date(), am = new Date(ag); am.setHours(24, 0, 0
   return [s / 3600 | 0, (s % 3600) / 60 | 0, s % 60].map(v => String(v).padStart(2, "0")).join(":"); }
 const EMO = ["⬜","🟦","🟪","🟥","🟨","🌈"];
 function textoShare(){
-  const cab = free ? `DIGATHLON · ${tr("freeEnd", { n:log.length })}` : `DIGATHLON #${DIA_N}`, s = seqAtual();
+  const cab = comp ? `DIGATHLON · ${tr("compShare")}` : free ? `DIGATHLON · ${tr("freeEnd", { n:log.length })}` : `DIGATHLON #${DIA_N}`, s = seqAtual();
   return `${cab} · ${fmtL(score*10)} m${!free && s > 1 ? ` · 🔥${s}` : ""}\n${log.map(l => l ? EMO[l.t] : "⬛").join("")}`;
 }
 /* ================= A NAJA (preto e amarelo, de lado, olhando pra direita) ================= */
@@ -1328,7 +1435,9 @@ function oDesenha(r){
   if (!ON) return;
   if (!r || !r.meta) return oSai(true);
   ON.room = r; ON.host = r.meta.host; const pl = r.players || {}, lider = ON.host === ON.uid;
-  if (r.meta.state === "play" && r.game) return oPartida(r);
+  if (r.meta.state === "play" && r.game && r.game.order) return oPartida(r);
+  if (ON.jogo) oLimpaCena();
+  show("oFim", false); show("oLobby", true);
   const ids = Object.keys(pl).sort((a, b) => pl[a].joined - pl[b].joined);
   $("oList").innerHTML = ids.map(id => `<li>${esc(pl[id].name)}${id === ON.host ? ` <b>★ ${tr("oLeader")}</b>` : ""}${id === ON.uid ? " ←" : ""}</li>`).join("");
   $("oLivesSel").value = r.meta.lives; $("oLivesSel").disabled = !lider; show("oStartB", lider);
@@ -1337,9 +1446,10 @@ function oDesenha(r){
     ts.innerHTML = O_TEMAS.map(t => `<option value="${t}">${t === "all" ? tr("th_all") : (ICONE[t] || "") + " " + tr("th_" + t)}</option>`).join(""); ts.value = ON.tema || "all"; }
   $("oStartB").disabled = ids.length < 2;
   $("oMsg").textContent = lider ? (ids.length < 2 ? tr("oNeed2") : "") : tr("oWait", { a:pl[ON.host] ? pl[ON.host].name : "?" });
+  oLobbyModo(r, lider);
 }
 async function oSai(fechou){
-  if (!ON) return; const o = ON; ON = null; if (o.off) o.off(); if (o.tick) clearInterval(o.tick);
+  if (!ON) return; if (ON.jogo) oLimpaCena(false); const o = ON; ON = null; if (o.off) o.off(); if (o.tick) clearInterval(o.tick);
   try { await FB.remove(oRef(`${o.code}/players/${o.uid}`)); await FB.remove(oRef(`${o.code}/live/${o.uid}`));
     if (!fechou && o.host === o.uid) await FB.update(oRef(o.code), { meta:null, game:null }); } catch (e) {}
   history.replaceState(null, "", location.pathname);
@@ -1359,31 +1469,41 @@ const VEZ_S = 25, ERRO_S = 3;
 // senão as respostas acabam com 6-8 jogadores
 const MIN_RESP = 20, O_TEMAS = ["all","geek","cultura","bichos","geo","ciencia","comida","brasil"];
 function oSorteia(){
-  const tema = ON.tema || "all", fonte = () => pool().filter(d => (d.fam !== "palavras" || d.pad.lang === CFG.lang) && (tema === "all" || d.tags.includes(tema)));
+  const tema = ON.tema || "all", fonte0 = () => pool().filter(d => (d.fam !== "palavras" || d.pad.lang === CFG.lang) && (tema === "all" || d.tags.includes(tema))),
+    fonte = () => { const f = fonte0(), sem = f.filter(d => !/_\dl_/.test(d.id)); return sem.length >= 30 ? sem : f; };
   ON.usou = ON.usou || new Set();
   for (let k = 0; k < 3000; k++) {
     if (!ON.saco || !ON.saco.length) { const f = fonte(), novas = f.filter(d => !ON.usou.has(d.id)); ON.saco = misturaFamilias(novas.length > 20 ? novas : f); }
     const id = ON.saco.pop(), Q = getQ(id); if (Q && Q.lista.length >= MIN_RESP && !ON.usou.has(id)) { ON.usou.add(id); return id; } }
   const p = fonte(); return p[Math.random()*p.length | 0].id; }
-function oRelogio(){ ON.t0 = performance.now(); ON.dur = VEZ_S*1000; ON.biting = false; if (!ON.tick) ON.tick = setInterval(oTick, 250); }
+function oRelogio(seg){ const g = ON.room && ON.room.game; ON.t0 = performance.now(); ON.dur = (seg || (g && g.cfg && g.cfg.tempo) || VEZ_S)*1000; ON.biting = false; oGarante(); }
+// o juiz (celular do líder) confere tudo a cada 250 ms, em qualquer modo
+function oGarante(){ if (!ON.tick) ON.tick = setInterval(oTickGeral, 250); }
+function oTickGeral(){ const g = ON && ON.room && ON.room.game; if (!g || ON.host !== ON.uid || ON.room.meta.state !== "play" || g.phase === "fim") return;
+  if (g.modo === "corrida") return corridaTick(g); if (g.modo === "vel1" || g.modo === "vel2") return velTick(g); oTick(); }
+const najaVivos = g => g.order.filter(u => (ON.room.players || {})[u] && !(g.out || {})[u]);
 // próximo da roda no sentido horário que ainda está na sala
 function oProx(g, from){ const o = g.order, pl = ON.room.players || {}, i = o.indexOf(from);
-  for (let k = 1; k <= o.length; k++) { const u = o[(i + k) % o.length]; if (pl[u]) return u; } return from; }
+  for (let k = 1; k <= o.length; k++) { const u = o[(i + k) % o.length]; if (pl[u] && !(g.out || {})[u]) return u; } return from; }
 function oTick(){
   if (!ON || ON.host !== ON.uid || !ON.room || !ON.room.game || ON.biting) return;
   const g = ON.room.game, pl = ON.room.players || {};
   if (g.phase !== "go") return;
+  if (g.order.length > 1 && najaVivos(g).length <= 1) return FB.update(oGame(), { phase:"fim", vence:najaVivos(g)[0] || null });   // sobrou um: venceu
   if (!pl[g.turn]) { oRelogio(); return FB.update(oGame(), { turn:oProx(g, g.turn), heat:0 }); }   // quem estava com a naja saiu
   const f = (performance.now() - ON.t0) / ON.dur;
-  if (f >= 1) { ON.biting = true; const quem = g.turn;   // BOTE
-    FB.update(oGame(), { phase:"bite", bit:quem, ["bites/" + quem]:((g.bites || {})[quem] || 0) + 1 });
+  if (f >= 1) { ON.biting = true; const quem = g.turn, nb = ((g.bites || {})[quem] || 0) + 1, vid = (g.cfg && g.cfg.vidas) || 0;   // BOTE
+    const sai = vid > 0 && nb >= vid;   // levou todos os botes que valiam = está fora
+    FB.update(oGame(), { phase:"bite", bit:quem, ["bites/" + quem]:nb, ...(sai ? { ["out/" + quem]:true } : {}) });
     return setTimeout(() => oRodada(quem), 4200); }
   const heat = Math.min(3, f*4 | 0); if (heat !== (g.heat || 0)) FB.update(oGame(), { heat });   // a naja fica mais agitada
 }
 // rodada nova: categoria nova e a naja começa com quem tomou o bote
 function oRodada(quem){
   if (!ON || ON.host !== ON.uid || !ON.room || !ON.room.game) return;
-  const g = ON.room.game; if (!(ON.room.players || {})[quem]) quem = oProx(g, quem);
+  const g = ON.room.game, vivos = najaVivos(g);
+  if (g.order.length > 1 && vivos.length <= 1) return FB.update(oGame(), { phase:"fim", vence:vivos[0] || null });
+  if (!(ON.room.players || {})[quem] || (g.out || {})[quem]) quem = oProx(g, quem);
   oMarca(ON.room.live); oRelogio();
   FB.update(oGame(), { turn:quem, q:oSorteia(), round:g.round + 1, phase:"go", heat:0, used:null, fb:null, bit:null });
 }
@@ -1399,6 +1519,9 @@ function oJulga(g, v){
 }
 function oPartida(r){
   const g = r.game;
+  if (g.phase === "fim") return oFimTela(r);
+  if (g.modo === "corrida") return corridaTela(r);
+  if (g.modo === "vel1" || g.modo === "vel2") return velTela(r);
   if (!ON.jogo) { ON.jogo = true; oEntraNaToca(); }
   if (ON.host === ON.uid) {
     if (!ON.tick) { oMarca(r.live); oRelogio(); }
@@ -1470,12 +1593,13 @@ function oTela(r){
     ang = i => { const k = (i - base + n) % n; return k === 0 ? Math.PI/2 : Math.PI*.92 + (k - .5)/m*Math.PI*1.16; };
   MOLEIMG = MOLEIMG || SP.idle.toDataURL();
   den.querySelectorAll(".seat").forEach(x => x.remove());
-  ord.forEach((u, i) => { const a = ang(i), x = 50 + 44*Math.cos(a), y = 50 + 40*Math.sin(a), b = (g.bites || {})[u] || 0;
-    const cls = [u === g.turn ? (g.phase === "bite" ? "on bit" : "on") : "", u === eu ? "me" : "", ON.bad === u && performance.now() < ON.badT ? "bad" : ""].join(" ");
+  const vid = (g.cfg && g.cfg.vidas) || 0;
+  ord.forEach((u, i) => { const a = ang(i), x = 50 + 44*Math.cos(a), y = 50 + 40*Math.sin(a), b = (g.bites || {})[u] || 0, fora = !!(g.out || {})[u];
+    const cls = [u === g.turn ? (g.phase === "bite" ? "on bit" : "on") : "", u === eu ? "me" : "", ON.bad === u && performance.now() < ON.badT ? "bad" : "", fora ? "out" : ""].join(" ");
     const txt = u === g.turn && lv[u] ? lv[u].t || "" : "";
     den.insertAdjacentHTML("beforeend", `<div class="seat ${cls}" style="left:${x}%;top:${y}%"><div class="mnd"><img src="${MOLEIMG}" alt=""></div>` +
       `<div>${esc(nm(u))}${u === eu ? ` <small>· ${tr("you")}</small>` : ""}</div><div class="bal">${esc(txt)}</div>` +
-      `<div class="bt">${b ? tr(b === 1 ? "bite1" : "biteN", { n:b }) : ""}</div></div>`); });
+      `<div class="bt">${fora ? tr("najaOut") : vid ? "❤".repeat(Math.max(0, vid - b)) : b ? tr(b === 1 ? "bite1" : "biteN", { n:b }) : ""}</div></div>`); });
   // a naja olha pra quem está com ela e cresce/agita conforme o relógio secreto avança
   const a = ang(Math.max(0, ord.indexOf(g.turn))), nj = $("najaC"), heat = g.heat || 0;
   nj.style.scale = Math.cos(a) < -.1 ? "-1 1" : "1 1"; nj.style.width = `calc(var(--ds, 300px) * ${(30 + heat*5) / 100})`;
@@ -1501,17 +1625,227 @@ $("oLivesSel").onchange = e => FB.update(oRef(ON.code + "/meta"), { lives:+e.tar
 $("oTemaSel").onchange = e => { ON.tema = e.target.value; ON.saco = null; };   // tema novo = saco novo
 $("oStartB").onclick = () => { const pl = ON.room.players || {}, ids = Object.keys(pl).sort((a, b) => pl[a].joined - pl[b].joined);
   if (ids.length < 2) return;
-  oMarca(ON.room.live); oRelogio();   // a naja começa com quem está do lado do líder, no sentido horário
-  FB.update(oRef(ON.code), { "meta/state":"play", game:{ order:ids, turn:ids[1], q:oSorteia(), round:1, phase:"go", heat:0 } }); };
+  const c = { ...oCfg(), vidas:+ON.room.meta.lives || 0, tema:ON.tema || "all" };
+  if (c.modo === "corrida") return corridaComeca(ids, c);
+  if (c.modo === "vel1" || c.modo === "vel2") return velComeca(ids, c);
+  oMarca(ON.room.live); oRelogio(c.tempo);   // a naja começa com quem está do lado do líder, no sentido horário
+  FB.update(oRef(ON.code), { "meta/state":"play", game:{ modo:"naja", cfg:c, order:ids, turn:ids[1], q:oSorteia(), round:1, phase:"go", heat:0 } }); };
 $("oLeaveB").onclick = () => oSai(false);
 $("oCopyB").onclick = async () => { try { await navigator.clipboard.writeText($("oLink").value); } catch (e) { $("oLink").select(); }
   $("oCopyB").textContent = tr("oCopied"); setTimeout(() => $("oCopyB").textContent = tr("oCopy"), 1500); };
+
+/* ================= v5: escolha do modo online, fim da partida, CORRIDA e VELOCIDADE ================= */
+const MODOS = ["naja","corrida","vel1","vel2"], TEMPOS = { naja:[15,25,40], corrida:[60,120,180,300], vel1:[5,8,10,15,20], vel2:[5,8,10,15,20] },
+  TEMPO_PAD = { naja:25, corrida:120, vel1:10, vel2:10 };
+const ehVel = m => m === "vel1" || m === "vel2";
+// cada celular grava o seu placar em live/ID/c (corrida) ou live/ID/vl (velocidade), marcado com o id da partida (gid);
+// o que sobrou de uma partida anterior é ignorado, então ninguém precisa apagar nada da pasta dos outros
+const oViva = (lv, u, k, g) => { const x = ((lv || {})[u] || {})[k]; return x && x.g === g.gid ? x : null; };
+function oCfg(){ return ON.cfg || (ON.cfg = { modo:"naja", tempo:25, rod:10, tipo:"contas" }); }
+const fmtTempo = s => s >= 60 ? `${s/60} min` : `${s} s`;
+// o líder escolhe; os outros veem o resumo (o líder grava a escolha em game/cfg enquanto a sala está esperando)
+function oLobbyModo(r, lider){
+  const c = lider ? oCfg() : ((r.game && r.game.cfg) || { modo:"naja", tempo:25, rod:10, tipo:"contas" }), vel = ehVel(c.modo), ms = $("oModoSel"), ts = $("oTempoSel");
+  if (lider) {
+    if (ms.dataset.lang !== CFG.lang) { ms.dataset.lang = CFG.lang; ms.innerHTML = MODOS.map(m => `<option value="${m}">${tr("m_" + m)}</option>`).join("");
+      $("oTipoSel").innerHTML = ["contas","mix"].map(t => `<option value="${t}">${tr("t_" + t)}</option>`).join(""); ts.dataset.k = ""; }
+    if (ts.dataset.k !== c.modo) { ts.dataset.k = c.modo; ts.innerHTML = TEMPOS[c.modo].map(s => `<option value="${s}">${fmtTempo(s)}</option>`).join(""); }
+    ms.value = c.modo; ts.value = c.tempo; $("oRodSel").value = c.rod; $("oTipoSel").value = c.tipo;
+  }
+  show("oModoL", lider); show("oTempoL", lider); show("oRodL", lider && vel); show("oTipoL", lider && vel); show("oLivesL", !vel); if (vel) show("oTemaL", false);
+  $("oTempoT").textContent = tr(c.modo === "naja" ? "oTempoN" : c.modo === "corrida" ? "oTempoC" : "oTempoV");
+  const vid = +r.meta.lives || 0;
+  $("oModoDesc").textContent = `${tr("m_" + c.modo)} · ${fmtTempo(c.tempo)}${vel ? ` · ${tr("nQ", { n:c.rod })}` : ` · ❤ ${vid || "∞"}`} — ${tr("d_" + c.modo)}`;
+}
+function oCfgMuda(){ if (!ON || ON.host !== ON.uid) return; FB.update(oRef(ON.code + "/game"), { cfg:oCfg() }); oDesenha(ON.room); }
+$("oModoSel").onchange = e => { const c = oCfg(); c.modo = e.target.value; c.tempo = TEMPO_PAD[c.modo]; oCfgMuda(); };
+$("oTempoSel").onchange = e => { oCfg().tempo = +e.target.value; oCfgMuda(); };
+$("oRodSel").onchange = e => { oCfg().rod = +e.target.value; oCfgMuda(); };
+$("oTipoSel").onchange = e => { oCfg().tipo = e.target.value; oCfgMuda(); };
+// sai da cena da partida (toca, corrida, velocidade) e volta pro jeito de sala
+function oLimpaCena(lobby = true){
+  if (ON) { ON.jogo = false; ON.velR = null; ON.velResR = null; ON.fimR = null; ON.velFim = null; ON.velPrim = null; ON.fimMandado = null; }
+  race = false; RACE = null; free = false; comp = false;
+  ["toca","qp","bar","den","pbar","oRank","vRes","cdown","card","hud","oQuit","oBoom","bSurface","oFim","end","bSkip"].forEach(id => show(id, false));
+  document.body.classList.remove("party", "toca", "fim"); $("bar").classList.remove("pula");
+  const qh = $("qp").querySelector(".qh"); if (qh) qh.textContent = tr("hint");
+  tw = null; lines = null; chip = null; happy = false; score = 0; log = []; moleD = -SURF; mode = "title";
+  if (lobby) { show("oLobby", true); ["tools","title","titleBtns"].forEach(id => show(id, false)); }
+}
+// cena comum de corrida e velocidade: esconde o menu e o saguão
+function oEntraCena(){
+  ["oLobby","oSetup","tools","cfg","menu","title","titleBtns","pEnd","oFim","themes"].forEach(id => show(id, false)); escondePaineis();
+  show("oQuit", true); SOM.init(); started = true;
+}
+// fim da partida (todos os modos): ranking, vencedor e "jogar de novo" pro líder
+function oFimTela(r){
+  const g = r.game, pl = r.players || {}, lv = r.live || {}, eu = ON.uid, nm = u => (pl[u] || {}).name || "?";
+  if (ON.jogo) oLimpaCena(false);
+  let lista;
+  if (g.modo === "corrida") lista = g.order.map(u => { const d = (oViva(lv, u, "c", g) || {}).d || 0; return { u, v:d, txt:`${fmtL(d)} m` }; });
+  else if (ehVel(g.modo)) lista = g.order.map(u => ({ u, v:(g.pts || {})[u] || 0, txt:tr("rPts", { n:(g.pts || {})[u] || 0 }) }));
+  else { const vid = (g.cfg && g.cfg.vidas) || 0;
+    lista = g.order.map(u => { const b = (g.bites || {})[u] || 0; return { u, v:u === g.vence ? 1e9 : -b, txt:u === g.vence ? "🏆" : (g.out || {})[u] ? tr("najaOut") : vid ? "❤".repeat(Math.max(0, vid - b)) : tr(b === 1 ? "bite1" : "biteN", { n:b }) }; }); }
+  lista = lista.filter(x => pl[x.u] || x.v > 0).sort((a, b) => b.v - a.v);
+  const top = lista[0], empate = !top || (lista.length > 1 && lista[1].v === top.v);
+  $("oFimT").textContent = empate ? tr("oDraw") : tr("oWinner", { a:nm(top.u) });
+  $("oFimList").innerHTML = lista.map((x, i) => `<li class="${x.u === eu ? "me" : ""}"><b>${i + 1}º</b><span>${esc(nm(x.u))}${x.u === eu ? ` · ${tr("you")}` : ""}</span><em>${x.txt}</em></li>`).join("");
+  const lider = ON.host === eu; show("oFimDeNovo", lider); $("oFimMsg").textContent = lider ? "" : tr("oWaitLeader");
+  ["oLobby","tools","title","titleBtns"].forEach(id => show(id, false)); show("oFim", true);
+  const chave = g.modo + "|" + (g.t0 || g.round); if (ON.fimR !== chave) { ON.fimR = chave; SOM.pousa(top && top.u === eu ? 5 : 2); if (top && top.u === eu) burst("#ffd257", 40); }
+}
+$("oFimDeNovo").onclick = () => { if (!ON || ON.host !== ON.uid) return; FB.update(oRef(ON.code), { "meta/state":"lobby", game:{ cfg:oCfg() } }); };
+$("oFimSair").onclick = () => oSai(false);
+function oRankDesenha(titulo, linhas){ $("oRank").innerHTML = `<div class="rt">${titulo}</div>` + linhas.map((x, i) =>
+  `<div class="rl${x.me ? " me" : ""}${x.out ? " out" : ""}"><b>${i + 1}</b><span>${esc(x.nome)}</span><em>${x.txt}</em></div>`).join(""); show("oRank", true); }
+
+/* ----- CORRIDA: as mesmas perguntas pra todo mundo; cada um cava no seu ritmo; quem estiver mais fundo no fim ganha ----- */
+function corridaComeca(ids, c){   // só o líder
+  const t0 = FB.now() + 6000, seq = []; ON.saco = null;
+  for (let i = 0; i < 90; i++) seq.push(oSorteia());
+  FB.update(oRef(ON.code), { "meta/state":"play", game:{ modo:"corrida", cfg:c, order:ids, round:1, phase:"go", seq, t0, gid:t0, fim:t0 + c.tempo*1000 } });
+  oGarante();
+}
+function corridaTela(r){
+  const g = r.game, eu = ON.uid, joga = g.order.includes(eu), pl = r.players || {}, lv = r.live || {}, vid = g.cfg.vidas || 0;
+  if (!ON.jogo) { ON.jogo = true; oEntraCena();
+    if (joga) corridaEntra(g); else { $("cdown").innerHTML = tr("rSpect"); show("cdown", true); } }
+  oRankDesenha(`🏁 ${tr("cRound")}`, g.order.filter(u => pl[u]).map(u => { const x = oViva(lv, u, "c", g) || {}, v = x.v ?? vid;
+    return { nome:pl[u].name, me:u === eu, out:!!(vid && x.x && !v), d:x.d || 0, txt:`${fmtL(x.d || 0)} m${vid ? " " + "❤".repeat(Math.max(0, v)) : ""}` }; }).sort((a, b) => b.d - a.d));
+  if (ON.host === eu) corridaTick(g);
+}
+function corridaEntra(g){
+  race = true; free = false; comp = false; RACE = { g, i:-1, t0:g.t0, fim:g.fim, tot:(g.fim - g.t0) / 1000, vid:(g.cfg.vidas || 0) > 0, acabou:false };
+  vidas = g.cfg.vidas || 0; pulos = 3; score = 0; log = []; qi = -1; USADAS.clear(); tw = null; lines = null; chip = null; lastCd = 0;
+  $("squares").innerHTML = ""; $("hDig").textContent = tr("cRound"); moleD = -SURF; mode = "dive"; hopV = -320;
+  desce(0, () => { mode = "raceWait"; show("hud", true); corridaPublica(); });
+}
+function corridaEspera(){   // contagem até a largada (o relógio é o do servidor, igual pra todo mundo)
+  const s = (RACE.t0 - FB.now()) / 1000;
+  if (s > 0) { const n = Math.ceil(s); $("cdown").innerHTML = tr("count", { n }); show("cdown", true); if (n !== lastCd) { lastCd = n; if (n <= 3) SOM.conta(false); } return; }
+  show("cdown", false); SOM.conta(true); corridaProx();
+}
+function corridaProx(){
+  if (!RACE || RACE.acabou) return;
+  RACE.i++; qi = RACE.i; const seq = RACE.g.seq; curQ = getQ(seq[RACE.i % seq.length]);
+  lines = null; chip = null; labelQ(); $("qText").textContent = qTxt(curQ); show("qp", true);
+  ask((RACE.fim - FB.now()) / 1000);
+}
+function corridaAcertou(a){   // a toupeira cava enquanto a próxima pergunta já aparece (resposta rara não custa tempo de animação)
+  const T = TIERS[a.tier], entrada = { id:curQ.id, k:a.chaves[0], n:a.nome, ne:a.en || null, t:a.tier };
+  score += T.pts; log.push(entrada); placarPop(T); burst(T.col, 18); SOM.pousa(a.tier); vib(25); happy = true;
+  guardaCol(curQ.id, a); EST.tiers[a.tier] = (EST.tiers[a.tier] || 0) + 1; grava(KEY.est, EST);
+  tween((tw ? tw.to : moleD) + T.m, .9 + Math.sqrt(T.m / 100)*.35, null);
+  corridaPublica(); corridaProx();
+  chip = { text:`“${aTxt(a).toUpperCase()}” +${T.pts}`, col:T.col };
+}
+function corridaPublica(){ if (!ON || !RACE) return; FB.update(oRef(`${ON.code}/live/${ON.uid}`), { c:{ g:RACE.g.gid, d:score*10, v:vidas, n:log.length, x:RACE.acabou ? 1 : 0 } }); }
+function corridaParou(txt){ RACE.acabou = true; mode = "raceFim"; ["bar","qp","bSkip"].forEach(id => show(id, false)); $("cdown").innerHTML = txt; show("cdown", true); corridaPublica(); }
+function corridaSemVida(){ if (!RACE || RACE.acabou) return; SOM.sem(); corridaParou(tr("cOut")); }
+function corridaAcabou(){ if (!RACE || RACE.acabou) return; SOM.sem(); vib(60); corridaParou(tr("cEnd")); }
+function corridaTick(g){   // líder: fecha quando o tempo acabou (com folga) ou todo mundo já parou
+  if (g.phase !== "go" || ON.fimMandado === g.t0) return;
+  const pl = ON.room.players || {}, lv = ON.room.live || {}, ativos = g.order.filter(u => pl[u]);
+  if (FB.now() >= g.fim + 2500 || (ativos.length && ativos.every(u => (oViva(lv, u, "c", g) || {}).x))) { ON.fimMandado = g.t0; FB.update(oGame(), { phase:"fim" }); }
+}
+
+/* ----- VELOCIDADE: pergunta de uma resposta só; só o primeiro pontua (vel1) ou ranking por velocidade (vel2) ----- */
+function contaGera(){
+  const R = (a, b) => a + Math.floor(Math.random()*(b - a + 1)), k = Math.random(); let pt, en, res;
+  if (k < .25) { const a = R(12, 99), b = R(12, 99); pt = en = `${a} + ${b}`; res = a + b; }
+  else if (k < .45) { const a = R(30, 150), b = R(5, a - 5); pt = en = `${a} − ${b}`; res = a - b; }
+  else if (k < .7) { const a = R(3, 12), b = R(3, 12); pt = en = `${a} × ${b}`; res = a*b; }
+  else if (k < .82) { const b = R(2, 12), q = R(2, 12); pt = en = `${b*q} ÷ ${b}`; res = q; }
+  else if (k < .9) { const a = R(11, 25); pt = en = `${a}²`; res = a*a; }
+  else if (k < .96) { const p = [10, 20, 25, 50][R(0, 3)], base = R(2, 20)*(p === 25 ? 4 : p === 20 ? 5 : p === 50 ? 2 : 10); pt = `${p}% de ${base}`; en = `${p}% of ${base}`; res = base*p/100; }
+  else { const a = R(2, 9), b = R(2, 9), c = R(2, 9); pt = en = `${a} + ${b} × ${c}`; res = a + b*c; }
+  return { p:`Quanto é ${pt}?`, e:`What is ${en}?`, r:[String(res)] };
+}
+function velPergunta(tipo){   // não repete pergunta na mesma partida
+  ON.velUsou = ON.velUsou || new Set();
+  for (let k = 0; k < 40; k++) {
+    let q;
+    if (tipo === "contas" || typeof UNICAS === "undefined" || Math.random() < .45) q = contaGera();
+    else { const U = UNICAS.filter(x => CFG.lang === "pt" || x.e), x = U[Math.random()*U.length | 0]; q = { p:x.p, e:x.e || x.p, r:x.r }; }
+    if (!ON.velUsou.has(q.p)) { ON.velUsou.add(q.p); return q; } }
+  return contaGera();
+}
+function velComeca(ids, c){   // só o líder
+  ON.velUsou = new Set(); const t0 = FB.now() + 4000;
+  FB.update(oRef(ON.code), { "meta/state":"play", game:{ modo:c.modo, cfg:c, order:ids, round:1, phase:"go", q:velPergunta(c.tipo), t0, gid:t0, fim:t0 + c.tempo*1000 } });
+  oGarante();
+}
+function velTela(r){
+  const g = r.game, eu = ON.uid, pl = r.players || {};
+  if (!ON.jogo) { ON.jogo = true; oEntraCena(); race = false; free = false; comp = false; show("hud", false); show("bSkip", false); $("bar").classList.remove("pula"); }
+  const pts = g.pts || {};
+  oRankDesenha(`⚡ ${tr("vRound", { a:g.round, b:g.cfg.rod })}`, g.order.filter(u => pl[u]).map(u => ({ nome:pl[u].name, me:u === eu, p:pts[u] || 0, txt:tr("rPts", { n:pts[u] || 0 }) })).sort((a, b) => b.p - a.p));
+  if (ON.velR !== g.round) {   // pergunta nova
+    ON.velR = g.round; show("vRes", false); show("bar", false); $("ans").value = ""; $("msg").textContent = ""; lastCd = 0;
+    $("qLabel").textContent = tr("vRound", { a:g.round, b:g.cfg.rod }); $("qTag").textContent = ""; $("qText").textContent = CFG.lang === "en" ? g.q.e : g.q.p;
+    $("qNote").hidden = true; const qh = $("qp").querySelector(".qh"); if (qh) qh.textContent = tr("vHint"); show("qp", true);
+    mode = "velWait";
+  }
+  if (g.phase === "res") velResultado(r);
+  if (ON.host === eu) velTick(g);
+}
+function velUpdate(){
+  const g = ON && ON.room && ON.room.game; if (!g || !g.t0 || !ehVel(g.modo) || g.phase !== "go") return; const agora = FB.now();
+  if (mode === "velWait") { const s = (g.t0 - agora) / 1000;
+    if (s > 0) { const n = Math.ceil(s); $("cdown").innerHTML = tr("count", { n }); show("cdown", true); if (n !== lastCd) { lastCd = n; SOM.conta(false); } return; }
+    show("cdown", false); SOM.conta(true);
+    if (!g.order.includes(ON.uid)) { mode = "velEsp"; $("cdown").innerHTML = tr("rSpect"); show("cdown", true); return; }
+    mode = "vel"; show("bar", true); $("ans").value = ""; $("msg").textContent = ""; $("ans").focus(); lastTick = 99; }
+  if (mode === "vel") { timeLeft = (g.fim - agora) / 1000; const f = clamp(timeLeft / g.cfg.tempo, 0, 1);
+    $("ringN").textContent = Math.max(0, Math.ceil(timeLeft)); $("ringFg").style.strokeDashoffset = 150.8*(1 - f);
+    $("ringFg").style.stroke = f < .3 ? "#ff5a36" : "#f2a93b"; $("tFill").style.width = (f*100) + "%"; $("tFill").style.background = f < .3 ? "#ff5a36" : "#f2a93b";
+    const nt = Math.ceil(timeLeft); if (nt !== lastTick) { lastTick = nt; if (nt > 0 && nt <= 3) SOM.tique(true); }
+    if (timeLeft <= 0) { mode = "velEsp"; show("bar", false); $("cdown").innerHTML = tr("timeUp"); show("cdown", true); } }
+}
+// respondeu: o próprio celular já sabe se acertou (a resposta é uma só); só a hora do acerto vai pro juiz
+function velEnvia(){
+  const g = ON && ON.room && ON.room.game; if (!g || mode !== "vel") return; const v = $("ans").value, b = normKey(v); if (!b) return;
+  const ok = g.q.r.some(x => { const a = normKey(String(x)); return a === b || (!/^\d+$/.test(a) && a.length >= 4 && dist(a, b) <= tolera(a.length, false)); });
+  if (!ok) return erroResp(tr("vWrong"));
+  const t = FB.now(); mode = "velEsp"; show("bar", false); SOM.pousa(3); burst("#ffd257", 16); vib(25);
+  $("cdown").innerHTML = tr("vYou", { s:fmtSeg(t - g.t0) }); show("cdown", true);
+  FB.update(oRef(`${ON.code}/live/${ON.uid}`), { vl:{ g:g.gid, r:g.round, s:t } });
+}
+const fmtSeg = ms => (Math.max(0, ms) / 1000).toFixed(2).replace(".", CFG.lang === "pt" ? "," : ".");
+function velTick(g){   // líder: fecha a pergunta e dá os pontos
+  if (g.phase !== "go" || ON.velFim === g.round) return;
+  const pl = ON.room.players || {}, lv = ON.room.live || {}, ativos = g.order.filter(u => pl[u]), agora = FB.now();
+  const certos = ativos.map(u => ({ u, x:oViva(lv, u, "vl", g) })).filter(o => o.x && o.x.r === g.round).map(o => ({ u:o.u, ms:Math.max(0, o.x.s - g.t0) })).sort((a, b) => a.ms - b.ms);
+  if (g.modo === "vel1" && certos.length && !ON.velPrim) ON.velPrim = agora;   // espera um tiquinho: dois acertos quase juntos, ganha o que chegou antes de verdade
+  const fecha = agora >= g.fim + 500 || (g.modo === "vel1" ? ON.velPrim && agora >= ON.velPrim + 400 : certos.length >= ativos.length);
+  if (!fecha) return;
+  ON.velFim = g.round; ON.velPrim = null;
+  const n = g.order.length, pts = { ...(g.pts || {}) }, res = (g.modo === "vel1" ? certos.slice(0, 1) : certos).map((x, i) => ({ ...x, p:g.modo === "vel1" ? 1 : Math.max(1, n - i) }));
+  res.forEach(x => pts[x.u] = (pts[x.u] || 0) + x.p);
+  FB.update(oGame(), { phase:"res", res:res.length ? res : null, pts:Object.keys(pts).length ? pts : null });
+  setTimeout(() => { if (!ON || !ON.room || !ON.room.game || ON.room.game.round !== g.round || ON.room.game.phase === "fim") return;
+    if (g.round >= g.cfg.rod) return FB.update(oGame(), { phase:"fim" });
+    const t0 = FB.now() + 2500; FB.update(oGame(), { phase:"go", round:g.round + 1, q:velPergunta(g.cfg.tipo), t0, fim:t0 + g.cfg.tempo*1000, res:null }); }, 3800);
+}
+function velResultado(r){
+  const g = r.game, pl = r.players || {}, eu = ON.uid, nm = u => (pl[u] || {}).name || "?";
+  if (ON.velResR === g.round) return; ON.velResR = g.round;
+  mode = "velEsp"; show("bar", false); show("cdown", false);
+  const res = g.res || [];
+  $("vResT").textContent = tr("vAns", { a:g.q.r[0] });
+  $("vResList").innerHTML = res.length ? res.map((x, i) => `<li class="${x.u === eu ? "me" : ""}"><b>${i + 1}º</b><span>${esc(nm(x.u))}</span><em>${fmtSeg(x.ms)} s · +${x.p}</em></li>`).join("")
+    : `<li><b>—</b><span>${tr("vNoOne")}</span><em></em></li>`;
+  show("vRes", true); if (res.some(x => x.u === eu)) SOM.passou(); else SOM.sem();
+}
 
 function tour(){ document.body.classList.remove("fim"); show("end", false); show("qp", false); show("hud", true); lines = null; chip = null; happy = false; mode = "tour"; tourT = 0; show("bBack", true); }
 
 $("bStart").onclick = cavaDoDia;
 $("bFree").onclick = abreTemas;
-$("bSurface").onclick = () => endGame();
+$("bSurface").onclick = () => comp ? compFim() : endGame();
+$("bComp").onclick = () => { free = true; comp = true; tema = "all"; saco = []; vidas = 3; pulos = 3; USADAS.clear(); VISTAS = []; VOLTOU = false; $("squares").innerHTML = ""; start(() => desce(0, nextQ)); };
+$("bSkip").onclick = () => { if (mode !== "ask") return; if ((comp || race) && pulos <= 0) return; if (comp || race) pulos--;
+  SOM.clique(); show("bar", false); if (race) { corridaPublica(); return corridaProx(); } nextQ(); };
 $("bTour").onclick = () => { $("squares").innerHTML = ""; $("hDig").textContent = tr("tourLbl"); start(() => desce(0, tour)); };
 $("bTour2").onclick = () => { $("hDig").textContent = tr("tourLbl"); tour(); };
 $("bAgain").onclick = $("bBack").onclick = () => location.reload();
@@ -1532,7 +1866,7 @@ function abreTemas(){
   show("themes", true); const b = $("themeList").querySelector("button"); if (b) b.focus();
 }
 $("themeList").onclick = e => { const b = e.target.closest("[data-tema]"); if (!b) return;
-  show("themes", false); free = true; tema = b.dataset.tema; saco = []; $("squares").innerHTML = ""; start(() => desce(0, nextQ)); };
+  show("themes", false); free = true; comp = false; USADAS.clear(); VISTAS = []; VOLTOU = false; tema = b.dataset.tema; saco = []; $("squares").innerHTML = ""; start(() => desce(0, nextQ)); };
 $("thBack").onclick = () => { show("themes", false); show("title", true); show("titleBtns", true); };
 /* ---- painéis: estatísticas e coleção ---- */
 function escondePaineis(){ ["cfg","stats","colP","howP"].forEach(id => show(id, false)); }
@@ -1613,7 +1947,10 @@ function update(dt){
   if (hopV !== 0 || hopY < 0) { hopV += 1500*dt; hopY += hopV*dt; if (hopY > 0) { hopY = 0; hopV = 0; sqV -= 2.5; } }
   if (mode === "count") { cd -= dt; const n = Math.max(1, Math.ceil(cd)); $("cdown").innerHTML = tr("count", { n });
     if (n !== lastCd && cd > 0) { lastCd = n; SOM.conta(false); } if (cd <= 0) { SOM.conta(true); ask(); } }
-  if (mode === "ask") { timeLeft -= dt; const f = Math.max(0, timeLeft / CFG.tempo);
+  if (race && RACE && !RACE.acabou && mode !== "raceWait" && mode !== "dive" && FB.now() >= RACE.fim) corridaAcabou();
+  if (mode === "raceWait") corridaEspera();
+  if (mode === "velWait" || mode === "vel") velUpdate();
+  if (mode === "ask") { timeLeft = race && RACE ? (RACE.fim - FB.now()) / 1000 : timeLeft - dt; const f = Math.max(0, timeLeft / (race && RACE ? RACE.tot : CFG.tempo));
     $("ringN").textContent = Math.max(0, Math.ceil(timeLeft)); $("ringFg").style.strokeDashoffset = 150.8*(1 - f);
     $("ringFg").style.stroke = timeLeft < 6 ? "#ff5a36" : "#f2a93b"; $("tFill").style.width = (f*100) + "%"; $("tFill").style.background = timeLeft < 6 ? "#ff5a36" : "#f2a93b";
     const nt = Math.ceil(timeLeft); if (nt !== lastTick) { lastTick = nt; if (nt > 0 && nt <= 5) SOM.tique(nt <= 3); }
@@ -1797,7 +2134,8 @@ const app = initializeApp({
   projectId:"digathlon", storageBucket:"digathlon.firebasestorage.app", messagingSenderId:"722791842502", appId:"1:722791842502:web:8d2df35d5d39c6cf218dc7" });
 const auth = initializeAuth(app, { persistence:browserSessionPersistence });   // cada aba = um jogador anônimo
 const db = getDatabase(app);
-window.FB = { ref:p => ref(db, p), get, set, update, remove, onValue, onDisconnect,
+let OFF = 0; onValue(ref(db, ".info/serverTimeOffset"), s => { OFF = s.val() || 0; });   // diferença entre o relógio do celular e o do servidor
+window.FB = { ref:p => ref(db, p), get, set, update, remove, onValue, onDisconnect, now:() => Date.now() + OFF,
   login: async () => (auth.currentUser || (await signInAnonymously(auth)).user).uid };
 </script>
 </body>

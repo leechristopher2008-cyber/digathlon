@@ -8,7 +8,7 @@
           ".write": "auth != null && (!data.exists() || data.child('host').val() === auth.uid)",
           ".validate": "newData.hasChildren(['host', 'state', 'lives', 'created'])",
           "host": {
-            ".write": "auth != null && newData.val() === auth.uid && root.child('rooms').child($code).child('players').child(auth.uid).exists() && !root.child('rooms').child($code).child('players').child(data.val()).exists()",
+            ".write": "auth != null && newData.val() === auth.uid && root.child('rooms').child($code).child('players').child(auth.uid).exists() && (!root.child('rooms').child($code).child('players').child(data.val()).exists() || (root.child('rooms').child($code).child('game').child('hb').isNumber() && root.child('rooms').child($code).child('game').child('hb').val() < now - 10000))",
             ".validate": "newData.isString() && ((data.exists() && newData.val() === data.val()) || newData.val() === auth.uid)"
           },
           "state": {

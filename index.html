@@ -571,6 +571,25 @@
   #hud.v10dano, #bar.v10dano { animation:v10dano .45s; }
   @keyframes v10dano { 0%, 100% { transform:none; filter:none; } 20% { transform:translateX(-6px); filter:brightness(1.6) saturate(1.6); } 40% { transform:translateX(6px); } 60% { transform:translateX(-4px); } 80% { transform:translateX(3px); } }
   @media (prefers-reduced-motion:reduce) { #hud.v10dano, #bar.v10dano { animation:none; } }
+  /* ================= v10b: guarda-roupa suave ================= */
+  .v6abas button.on { animation:v10aba .28s ease-out; }
+  @keyframes v10aba { 0% { box-shadow:0 0 0 0 rgba(242,169,59,.0); } 40% { box-shadow:0 0 14px 2px rgba(242,169,59,.75); } 100% { box-shadow:0 0 0 0 rgba(242,169,59,0); } }
+  #v8sala canvas.v8pulo.v10cai { animation:v10cai .72s cubic-bezier(.3, 1.1, .5, 1) both; }
+  @keyframes v10cai { 0% { transform:translateY(-34px) scale(.96, 1.06); } 45% { transform:translateY(0) scale(1.1, .88); } 62% { transform:translateY(-9px) scale(.97, 1.04); } 80% { transform:translateY(0) scale(1.04, .96); } 100% { transform:none; } }
+  #v8sala canvas.v8pulo.v10gira { animation:v10gira .7s cubic-bezier(.3, .8, .3, 1) both; }
+  @keyframes v10gira { 0% { transform:scaleX(1); } 25% { transform:scaleX(-1) translateY(-8px); } 50% { transform:scaleX(1) translateY(-10px); } 75% { transform:scaleX(-1) translateY(-4px); } 100% { transform:none; } }
+  #v8sala canvas.v8pulo.v10bote { animation:v10bote .6s cubic-bezier(.3, 1.4, .5, 1) both; }
+  @keyframes v10bote { 0% { transform:none; } 30% { transform:translate(14px, -10px) rotate(8deg) scale(1.08); } 55% { transform:translate(-4px, 0) rotate(-4deg); } 100% { transform:none; } }
+  .v10estrela { position:fixed; z-index:9; color:#ffd257; font-style:normal; font-size:14px; pointer-events:none; text-shadow:0 0 6px #ffb020; animation:v10estrela .8s ease-out both; translate:-50% -50%; }
+  @keyframes v10estrela { 0% { opacity:0; transform:scale(.2) rotate(0); } 30% { opacity:1; transform:scale(1.3) rotate(40deg); } 100% { opacity:0; transform:scale(.6) rotate(120deg) translateY(-10px); } }
+  @media (prefers-reduced-motion:reduce) { .v6abas button.on, .v10estrela { animation:none !important; } }
+  /* ================= v10c: abertura cinemática ================= */
+  #v10cine { position:absolute; inset:0; width:100%; height:100%; image-rendering:pixelated; z-index:0; }
+  #v6cort.cine #v6logo { z-index:1; translate:0 calc(-50% - 70px); }
+  #v6cort.cine #v6logo b { animation-delay:calc(1000ms + var(--i) * 60ms); }
+  #v6cort.cine #v6logo canvas { display:none; }
+  #v6cort.cine #v6logo small { opacity:0; animation:v10tag .4s 1500ms ease forwards; color:var(--cream); text-shadow:0 2px 0 #000; }
+  @keyframes v10tag { to { opacity:1; } }
 </style>
 </head>
 <body>
@@ -787,7 +806,7 @@
   <p class="help" id="v6shMsg" aria-live="polite"></p>
 </div>
 <div id="v6cort" class="fechada espera" aria-hidden="true"><i></i><i></i><div id="v6logo"></div></div>
-<div class="draft">v10</div>
+<div class="draft">v10c</div>
 
 
 <script src="dados.js"></script>
@@ -2222,7 +2241,7 @@ function atualizaTitulo(){ if (mode === "title") legenda();
 /* ================= PARTÍCULAS ================= */
 function moleWY(){ return wyOf(moleD); }
 const tunnelXs = wy => W/2 + Math.sin(wy / MPX * .009)*PX*3 + Math.sin(wy / MPX * .0026)*PX*5;   // centro do túnel, sem degraus
-function moleCenter(){ const bob = digging ? 0 : Math.sin(clock*2.4)*1.6; return { x:tunnelXs(moleWY()), y:moleWY() - MH*SPX/2 + hopY + bob }; }
+function moleCenter(){ const bob = digging ? 0 : Math.sin(clock*2.4)*1.6; return { x:tunnelXs(moleWY()) + (window.V10B ? V10B.dx() : 0), y:moleWY() - MH*SPX/2 + hopY + bob }; }
 function crumbs(n){ const L = LAYERS[layerAt(moleD)], x0 = tunnelXs(moleWY()), y = moleWY() - SPX*3;
   for (let i = 0; i < n; i++) parts.push({ x:x0 + (Math.random() - .5)*SPX*14, y, vx:(Math.random() - .5)*PX*80, vy:-(PX*30 + Math.random()*PX*70), g:PX*240, life:.55 + Math.random()*.35, col:L.pal[1 + (Math.random()*3|0)] }); }
 function burst(col, n){ const c = moleCenter();
@@ -2240,7 +2259,7 @@ function update(dt){
   if (tw) { tw.t += dt; const p = Math.min(1, tw.t / tw.dur), e = p < .5 ? 4*p*p*p : 1 - Math.pow(-2*p + 2, 3)/2;   // acelera e freia suave
     moleD = tw.from + (tw.to - tw.from)*e; digging = true;
     if (p >= 1) { const d = tw.done; tw = null; digging = false; d && d(); } }
-  if (mode === "tour") { tourT += dt; if (moleD < TOUR_END) { moleD = Math.min(TOUR_END, moleD + Math.min(1300, 220 + tourT*160)*dt); digging = true; } }
+  if (mode === "tour") { tourT += dt; if (moleD < TOUR_END) { moleD = Math.min(TOUR_END, moleD + Math.min(1300, 220 + tourT*160)*dt*(window.V10B ? V10B.tourK() : 1)); digging = true; } }
   if (digging && Math.random() < .9) crumbs(2);
   if (digging) { digSom -= dt; if (digSom <= 0) { digSom = .09; SOM.cava(); } }
   // molas: gira de cabeça pra baixo ao cavar, balança, achata ao chegar e dá um pulinho
@@ -2309,7 +2328,8 @@ function draw(){
   for (let ci = Math.max(0, Math.floor(camY / CH)); ci*CH < camY + H; ci++) ctx.drawImage(chunk(ci), 0, ci*CH);
   // túnel (largo o bastante pra toupeira deitada de cabeça pra baixo)
   const mwy = moleWY(), half = SPX*12;
-  if (started) {
+  if (started && window.V10B) { V10B.tunel(camY); blob(ctx, W/2 - half - PX*7, PX, 6, 2.6, DIRT); blob(ctx, W/2 + half + PX*7, PX, 6, 2.6, DIRT); }
+  else if (started) {
     for (let wy = Math.max(0, Math.floor(camY / B)*B); wy < mwy - SPX*4; wy += B) {
       const L = LAYERS[layerIdx(wy / MPX - SURF, W/2)], cx = snap(tunnelXs(wy));
       ctx.fillStyle = L.tun; ctx.fillRect(cx - half, wy, half*2, B);
@@ -2348,7 +2368,7 @@ function draw(){
     ctx.fillStyle = T.col === "rainbow" ? `hsl(${clock*120 % 360} 90% 65%)` : T.col; ctx.font = `${narrow ? 10 : 12}px Silkscreen, monospace`; ctx.textAlign = "right"; ctx.textBaseline = "bottom";
     ctx.fillText(`${L10("tiers")[k]} · +${T.pts}`, x1, y - 4); ctx.globalAlpha = 1; });
   // toupeira: gira, balança e achata com molas (movimento macio)
-  if (!moleGone) {   // na festa da naja a toupeira se esconde
+  if (!moleGone && !(window.V10B && V10B.desenha(C))) {   // na festa da naja a toupeira se esconde (v10b: o V10B desenha)
   const spr = digging ? (Math.floor(clock*12) % 2 ? SP.dig : SP.idle) : ((clock % 3.4) < .13 ? SP.blink : SP.idle);
   ctx.save(); ctx.translate(C.x, C.y); ctx.rotate(ang); ctx.scale(1 + sq, 1 - sq);
   ctx.drawImage(spr, -spr.width/2, MH*SPX/2 - spr.height); ctx.restore();
@@ -2903,8 +2923,90 @@ var V6 = (() => {
     g.forEach((row, y) => row.forEach((ch, x) => { if (pal[ch]) { x2.fillStyle = pal[ch]; x2.fillRect(x*s, y*s, s, s); } }));
     return c;
   }
-  function veste(){   // troca os desenhos que o jogo usa (parada, piscando, cavando)
-    try { SP = { idle:bicho(undefined, SPX), blink:bicho("blink", SPX), dig:bicho("dig", SPX) }; MOLEIMG = null; } catch (e) {}
+  /* ---------- v10b (22/11): POSE DE CAVAR DE VERDADE, por espécie ----------
+     Cada bicho ganha um desenho novo, visto de costas, com a cabeça para cima e as patas da frente esticadas (4 quadros).
+     O jogo usa esse desenho de ponta-cabeça para descer (mergulho) e em pé para subir (escalada). Não é o desenho em pé girado.
+     Passa pelo mesmo caminho dos outros desenhos: chapéu/capacete na cabeça, roupa no tronco, mochila/capa/asas/jato nas costas. */
+  const MERG = {
+    toupeira:{ p:"toup", f:0, m:2, bw:11, hr:8.5, cauda:"toco", ore:"", est:"crawl", garra:1 },
+    tatu:    { p:"tatu", f:0, m:3, bw:12, hr:7, cauda:"fina", ore:"ponta", est:"crawl", garra:1, pad:"cintas" },
+    coelho:  { p:"coel", f:0, m:0, bw:10, hr:8, cauda:"pom", ore:"longa", est:"crawl" },
+    raposa:  { p:"rapo", f:0, m:2, bw:10, hr:8, cauda:"peluda", ore:"ponta", est:"crawl", garra:1 },
+    texugo:  { p:"texu", f:0, m:2, bw:12, hr:8.5, cauda:"toco", ore:"redonda", est:"crawl", garra:1, pad:"faixa" },
+    pinguim: { p:"ping", f:0, m:2, bw:11, hr:8, cauda:"toco", ore:"", est:"flap" },
+    capivara:{ p:"capi", f:0, m:2, bw:13.5, hr:9, cauda:"", ore:"redonda", est:"heavy" },
+    gato:    { p:"gato", f:0, m:1, bw:10, hr:8, cauda:"longa", ore:"ponta", est:"crawl", garra:1, pad:"listras" },
+    caramelo:{ p:"cara", f:0, m:1, bw:10.5, hr:8, cauda:"longa", ore:"caida", est:"crawl", garra:1 },
+    sapo:    { p:"sapo", f:0, m:0, bw:11.5, hr:8.5, cauda:"", ore:"olhos", est:"frog", pad:"pintas" },
+    coruja:  { p:"coru", f:0, m:4, bw:11, hr:9, cauda:"penas", ore:"tufo", est:"flap", pad:"pintas" },
+    jabuti:  { p:"jabu", f:1, m:1, bw:13, hr:6, cauda:"toco", ore:"", est:"drill", pad:"casco" },
+    panda:   { p:"pand", f:0, m:1, bw:13, hr:9.5, cauda:"pom", ore:"redonda", est:"heavy" },
+    dino:    { p:"dino", f:0, m:3, bw:11, hr:8, cauda:"dino", ore:"", est:"bite", garra:1, pad:"espinhos" }
+  };
+  function merg8(b, f, k, uso){
+    const R = MERG[b && b.fino] || MERG[emUso("bicho", uso)] || MERG.toupeira, P = PAL8[R.p], F = P[R.f], M = P[R.m], C = 26, s = fNovo();
+    const ch = emUso("chapeu", uso), ro = emUso("roupa", uso), ex = emUso("extra", uso);
+    const BR = ["#f5f5f0", "#ffffff", "#cfcfc8"], ESC = P[P.length > 2 ? 2 : 1], vai = [1, 0, -1, 0][f], par = f < 2 ? 1 : -1;
+    const junto = R.est === "heavy" || R.est === "frog" || R.est === "flap";
+    const sobeE = junto ? par : vai, sobeD = junto ? par : -vai, lado = par;
+    const cy = 33, cabY = 18, hr = R.hr, bw = R.bw;
+    // ----- rabo
+    if (R.cauda === "toco") fE(s, C, 45, 2, 2.6, M);
+    else if (R.cauda === "pom") fE(s, C, 44.5, 3.2, 3, BR);
+    else if (R.cauda === "fina") fCurva(s, [[C, 43], [C + lado, 46], [C + lado * 3, 48], [C + lado * 5, 49]], 1.7, .8, ESC);
+    else if (R.cauda === "longa") fCurva(s, [[C, 43], [C + lado * 5, 47], [C + lado * 10, 44], [C + lado * 11, 38]], 1.7, 1.3, F);
+    else if (R.cauda === "peluda") { fCurva(s, [[C, 42], [C + lado * 8, 48], [C + lado * 15, 44], [C + lado * 14, 34]], 3, 4.4, F); fE(s, C + lado * 14, 33, 3.4, 3.4, BR); }
+    else if (R.cauda === "penas") [-4, 0, 4].forEach(d => fTri(s, [C + d - 2, 42], [C + d + 2, 42], [C + d + lado, 49], P[3]));
+    else if (R.cauda === "dino") fCurva(s, [[C, 41], [C + lado * 3, 46], [C + lado * 8, 49], [C + lado * 13, 47]], 4.2, 1.2, F);
+    // ----- patas de trás (empurram para cima; no sapo dobram e esticam juntas)
+    if (R.est === "frog") { const d = par > 0 ? 0 : 3; [-1, 1].forEach(l => { fE(s, C + l * (bw + 1), 41 + d, 4.6, 3.6 + d * .4, F); fR(s, C + l * (bw + 2) - 3, 45 + d, C + l * (bw + 2) + 3, 47 + d, 1, [F[2], F[0], F[2]]); }); }
+    else if (R.est !== "drill") { fR(s, C - 9, 43 + (vai > 0 ? 2 : 0), C - 4, 47 + (vai > 0 ? 2 : 0), 1, R.p === "ping" ? P[2] : R.p === "pand" ? P[1] : M); fR(s, C + 4, 43 + (vai < 0 ? 2 : 0), C + 9, 47 + (vai < 0 ? 2 : 0), 1, R.p === "ping" ? P[2] : R.p === "pand" ? P[1] : M); }
+    else [-1, 1].forEach(l => fR(s, C + l * 9 - 2, 43, C + l * 9 + 2, 46, 1, M));
+    // ----- tronco (marcado como tronco: a roupa pinta aqui)
+    fE(s, C, cy, bw, 12.5, F, 1);
+    if (R.pad === "cintas") for (let y = 23; y <= 43; y += 4) for (let x = C - 14; x <= C + 14; x++) { const dx = (x + .5 - C) / bw, dy = (y + .5 - cy) / 12.5; if (dx * dx + dy * dy < .92) sSet(s, x, y, P[2][0]); }
+    if (R.pad === "listras") for (let y = 25; y <= 41; y += 4) for (let x = C - 6; x <= C + 6; x++) sSet(s, x, y + (Math.abs(x - C) >> 2), F[2]);
+    if (R.pad === "pintas") [[C - 5, 28], [C + 4, 31], [C - 2, 37], [C + 6, 39], [C - 7, 35]].forEach(([x, y]) => fP(s, [[x, y], [x + 1, y], [x, y + 1]], F[2]));
+    if (R.pad === "casco") { fE(s, C, cy, bw, 13, P[0], 1); const d = f; for (let y = 22; y <= 44; y++) for (let x = C - 13; x <= C + 13; x++) { const dx = (x + .5 - C) / bw, dy = (y + .5 - cy) / 13; if (dx * dx + dy * dy > .9) continue;
+        if ((x + d * 2 + (((y / 6) | 0) % 2) * 4) % 8 === 0 || y % 6 === 0) sSet(s, x, y, P[0][2]); } fE(s, C - 3, cy - 5, 3, 2, [P[0][1], P[0][1], P[0][0]]); }
+    if (R.pad === "espinhos") for (let y = 23; y <= 41; y += 4) fTri(s, [C - 2, y + 3], [C + 2, y + 3], [C, y - 1], P[2]);
+    if (ROUPA8[ro]) fRoupa(s, ROUPA8[ro]);
+    // ----- o que vai nas costas (de costas, aparece por cima do tronco)
+    const a = { costas:[C - 3, 26], pescoco:[24, C - 7, C + 7], peito:[C, 30], frente:true, chapeu:[C - 15, Math.round(cabY - hr * .85 - 7)], olhos:[], nariz:[C, 10], boca:[C, 12] };
+    if (ex === "capa") { for (let k2 = 0; k2 <= 19; k2++) for (let x = Math.round(C - 5 - k2 * .35); x <= Math.round(C + 5 + k2 * .35); x++) sSet(s, x, 25 + k2, k2 > 16 ? "#9c1f1a" : (x + k2) % 7 === 0 ? "#ff6a5c" : "#e0332a"); }
+    else if (ATRAS8[ex]) ATRAS8[ex](s, a);
+    if (ex === "cachecol") EXTRA8.cachecol(s, a);
+    // ----- patas da frente (ou asas): alternam, cavando para a frente da cabeça
+    const braco = R.p === "pand" ? P[1] : R.p === "texu" ? P[2] : R.p === "rapo" ? P[2] : F;
+    if (R.est === "flap") { const W8 = R.p === "ping" ? F : P[3]; [-1, 1].forEach(l => { const ab = par > 0 ? 0 : 1; fE(s, C + l * (bw + 4 + ab * 2), 27 + ab * 4, 3.6 + ab * 1.6, 10 - ab * 3, W8); }); }
+    else if (R.est === "drill") [-1, 1].forEach(l => fR(s, C + l * 10 - 2, 21, C + l * 10 + 2, 24, 1, M));
+    else [[-1, sobeE], [1, sobeD]].forEach(([l, sobe]) => { const ox = C + l * (bw - 1), mx = C + l * (bw + 3), my = (R.est === "bite" ? 19 : 13) - sobe * (R.est === "heavy" ? 5 : 4);
+      fCurva(s, [[ox, 27], [ox + l * 4, 24], [mx, my + 6], [mx, my + 2]], R.est === "heavy" ? 3.4 : 2.7, R.est === "heavy" ? 3 : 2.3, braco);
+      fE(s, mx, my, R.est === "heavy" ? 3.6 : 3, 2.8, R.p === "pand" ? P[1] : M);
+      if (R.garra) fP(s, [[mx - 2, my - 3], [mx, my - 4], [mx + 2, my - 3]], "#fff3ea"); });
+    // ----- cabeça (vista de trás) e orelhas
+    const cab = R.p === "jabu" ? P[1] : F;
+    if (R.ore === "longa") [-1, 1].forEach(l => { fE(s, C + l * 5, 7, 2.6, 8, F); fE(s, C + l * 5, 8, 1.1, 5.5, P[2]); });
+    fE(s, C, cabY, hr, hr * .85, cab);
+    if (R.ore === "redonda") [-1, 1].forEach(l => fE(s, C + l * (hr - 1.5), cabY - hr * .6, 2.6, 2.6, R.p === "pand" ? P[1] : F));
+    if (R.ore === "ponta") [-1, 1].forEach(l => { fTri(s, [C + l * (hr - 5), cabY - hr * .5], [C + l * (hr + 1), cabY - hr * .2], [C + l * (hr - 1), cabY - hr - 4], F); if (R.p === "rapo") fP(s, [[C + l * (hr - 1), cabY - hr - 4], [C + l * (hr - 1), cabY - hr - 3]], P[2][0]); });
+    if (R.ore === "caida") [-1, 1].forEach(l => fE(s, C + l * (hr + 1), cabY + 1, 2.6, 5.5, P[2]));
+    if (R.ore === "tufo") [-1, 1].forEach(l => fTri(s, [C + l * (hr - 5), cabY - hr * .6], [C + l * (hr - 1), cabY - hr * .5], [C + l * (hr - 1), cabY - hr - 3], P[3]));
+    if (R.ore === "olhos") [-1, 1].forEach(l => { fE(s, C + l * 5.5, cabY - hr * .75, 3.6, 3.4, F); fE(s, C + l * 5.5, cabY - hr * .8, 2, 1.6, P[2]); });
+    if (R.pad === "faixa") for (let y = Math.round(cabY - hr * .85); y <= cabY + 3; y++) for (let x = C - 1; x <= C + 1; x++) if (sGet(s, x, y)) sSet(s, x, y, P[1][0]);
+    if (R.est === "bite") fP(s, [[C - 6, cabY - 7], [C - 5, cabY - 8], [C + 5, cabY - 8], [C + 6, cabY - 7]], "#fff8e0");        // dentes aparecendo dos lados da boca
+    // ----- chapéu / capacete
+    const pal = { ...MCOL, ...COR, ...(CASCO[ch] || {}) }, [hx, hy] = a.chapeu;
+    if (CHAPEU[ch]) fChapeu(s, CHAPEU[ch], pal, hx, hy); else fCapacete(s, pal, hx, hy);
+    sOutline(s, FCONT);
+    const c = document.createElement("canvas"); c.width = Math.round(FW * k); c.height = Math.round(FH * k); const g2 = c.getContext("2d");
+    s.p.forEach((cor, i) => { if (!cor) return; const x = i % FW, y = (i / FW) | 0, x0 = Math.round(x * k), y0 = Math.round(y * k); g2.fillStyle = cor; g2.fillRect(x0, y0, Math.max(1, Math.round((x + 1) * k) - x0), Math.max(1, Math.round((y + 1) * k) - y0)); });
+    c.v10 = { est:R.est, cab:[C, cabY - hr], k };
+    return c;
+  }
+  const mergulho = (s, uso) => [0, 1, 2, 3].map(f => merg8(BICHO[emUso("bicho", uso)], f, s / 2, uso));
+  function veste(){   // troca os desenhos que o jogo usa (parada, piscando, cavando e, no v10b, a pose de mergulho)
+    try { SP = { idle:bicho(undefined, SPX), blink:bicho("blink", SPX), dig:bicho("dig", SPX) }; try { SP.mer = mergulho(SPX); } catch (e2) { window.V10ERRO = String(e2); } MOLEIMG = null; } catch (e) {}
   }
   function najaVestida(s, uso){
     const cor = NAJA_COR[emUso("najaCor", uso)], topo = NAJA_TOPO[emUso("najaTopo", uso)];
@@ -2975,7 +3077,7 @@ var V6 = (() => {
     S.uso[grupo] = id; salva(); veste(); pintaNaja(); abreLoja();
   }
 
-  return { S, salva, calmo, bicho, veste, naja0, najaVestida, pintaNaja, moedasUI, ganha, toast, CONQ, confereConq, abreConq, abreLoja, clicaItem, emUso, nomeItem, gemas, GRUPOS, previa };
+  return { mergulho, S, salva, calmo, bicho, veste, naja0, najaVestida, pintaNaja, moedasUI, ganha, toast, CONQ, confereConq, abreConq, abreLoja, clicaItem, emUso, nomeItem, gemas, GRUPOS, previa };
 })();
 /* ================= v6 (parte 2): régua de desempenho, imagem de compartilhar, volta à superfície, intro, tutorial, cenário e animações ================= */
 (() => {
@@ -3110,7 +3212,7 @@ var V6 = (() => {
     const m = V6.bicho(undefined, 5); lg.appendChild(m); const sm = document.createElement("small"); sm.textContent = tr("tagline"); lg.appendChild(sm);
     cort.classList.remove("espera"); cort.classList.add("intro");
     let abriu = false; const abre = () => { if (abriu) return; abriu = true; cortina(false); removeEventListener("pointerdown", abre, true); removeEventListener("keydown", abre, true); };
-    addEventListener("pointerdown", abre, true); addEventListener("keydown", abre, true); setTimeout(abre, 1750);
+    addEventListener("pointerdown", abre, true); addEventListener("keydown", abre, true); window.v10abre = abre; window.v10abreT = setTimeout(abre, 1750);
   }
   // sair de uma cavada: o bicho sobe até a grama, a cortina fecha e o jogo recomeça
   V6.voltar = function(){
@@ -3210,7 +3312,7 @@ var V6 = (() => {
       // baús ainda fechados, ao lado do túnel
       const m0 = camY / MPX - SURF, m1 = m0 + H / MPX;
       for (let k = Math.max(1, Math.floor(m0 / 420) - 1); bauEm(k) < m1 + 40; k++) { const m = bauEm(k); if (m < m0 - 40 || abertos.has(k) || m <= moleD) continue; const wy = wyOf(m), x = snap(tunnelXs(wy) + SPX*12 + PX*4);
-        mapa(ctx, BAU, x, snap(wy - PX*5), { h:"#6b4424", g:"#ffd257", b:"#9a6a3a" }); if (!calmo() && Math.sin(clock*4 + k) > .6) { ctx.fillStyle = "#fff6d0"; ctx.fillRect(x + PX*6, snap(wy - PX*7), PX, PX); } }
+        if (window.V10C) V10C.bau(ctx, x, snap(wy - PX*5)); else mapa(ctx, BAU, x, snap(wy - PX*5), { h:"#6b4424", g:"#ffd257", b:"#9a6a3a" }); if (!calmo() && Math.sin(clock*4 + k) > .6) { ctx.fillStyle = "#fff6d0"; ctx.fillRect(x + PX*6, snap(wy - PX*7), PX, PX); } }
       // brilhos que piscam nas cavernas, no gelo, na rocha-mãe e no núcleo
       if (!calmo()) { const cel = 96, cx0 = snap(tunnelXs(moleWY())), meio = SPX*13; for (let gy = Math.floor(camY / cel); gy*cel < camY + H; gy++) for (let gx = 0; gx*cel < W; gx++) { if (h(gx, gy + 900) > .3) continue;
         const x = gx*cel + h(gx, gy + 1)*cel, y = gy*cel + h(gx + 7, gy)*cel; if (y < PX*20 || Math.abs(x - cx0) < meio) continue; const nome = LAYERS[layerIdx(y / MPX - SURF, x)].name;
@@ -3972,6 +4074,294 @@ var V10 = (function () {
   const cavando = () => { try { return started && mode !== "title" && mode !== "up" && !document.body.classList.contains("party") && !document.body.classList.contains("toca") && !document.querySelector("#menu:not(.hide), #cfg:not(.hide), #themes:not(.hide), #pEnd:not(.hide), #v6loja:not(.hide), #bBack:not(.hide)") && !window.v10passeio && !(window.V6 && V6.saindo) && !race && !(typeof ON !== "undefined" && ON && ON.jogo) && !["end", "tour", "raceFim"].includes(mode) && document.getElementById("end").classList.contains("hide"); } catch (e) { return false; } };
   try { const draw10 = draw; draw = function () { draw10(); const c = cavando(); if (c !== ult) { ult = c; document.body.classList.toggle("v10cav", c); if (!c) rotulo(false); } if (c && (++nq % 12 === 1)) lugar(); if (CFG.lang !== ultL) { ultL = CFG.lang; rotulo(b.classList.contains("certeza")); } }; } catch (e) {}
   return { tempoComp, pulaComp, cavando };
+})();
+/* ================= v10b (22/11): cavada de verdade, túnel irregular, bicho vivo na tela inicial, passeio mais lento, guarda-roupa suave ================= */
+var V10B = (function () {
+  const calmo = () => { try { return V6.calmo(); } catch (e) { return false; } };
+  const I = { x: 0, alvo: 0, dir: 1, est: "espera", t: 1.6, tilt: 0, passo: 0 };          // o bicho na tela inicial
+  let ult = 0, fundo = 0, dAnt = 0, vel = 0, fAnt = -1, saltoT = 0;
+  const dx = () => I.x;
+
+  /* ---------- tela inicial: anda, pula, olha para o céu, fareja a toca ---------- */
+  function vida(dt) {
+    const b = document.body.classList, livre = mode === "title" && !started && !tw && !b.contains("v8indo") && !b.contains("v8vest") && !calmo() && !window.V10PARADO;
+    if (!livre) { I.x += (0 - I.x) * Math.min(1, dt * 14); if (Math.abs(I.x) < .6) I.x = 0; I.tilt += (0 - I.tilt) * Math.min(1, dt * 12); I.est = "espera"; I.t = 1.2; if (mode !== "title") I.dir = 1; return; }
+    I.t -= dt;
+    if (I.est === "anda") { const v = SPX * 7 * dt, d = I.alvo - I.x; I.passo += dt;
+      if (Math.abs(d) <= v) { I.x = I.alvo; I.est = "espera"; I.t = .8 + Math.random() * 1.8; }
+      else { I.x += Math.sign(d) * v; I.dir = Math.sign(d);
+        if (Math.random() < dt * 8) parts.push({ x: tunnelXs(moleWY()) + I.x - I.dir * SPX * 3, y: moleWY() - PX, vx: -I.dir * PX * (10 + Math.random() * 16), vy: -PX * (8 + Math.random() * 14), g: PX * 60, life: .35 + Math.random() * .2, col: DIRT[Math.random() * 3 | 0] }); } }
+    else if (I.est === "olha" || I.est === "fareja") { I.tilt += ((I.est === "olha" ? -.24 : .3) - I.tilt) * Math.min(1, dt * 6); if (I.t <= 0) { I.est = "espera"; I.t = .6 + Math.random() * 1.4; } }
+    else { I.tilt += (0 - I.tilt) * Math.min(1, dt * 6);
+      if (I.t <= 0) { const r = Math.random();
+        if (r < .5) { I.est = "anda"; const lim = Math.min(SPX * 13, W * .2); I.alvo = Math.max(-lim, Math.min(lim, I.x + (Math.random() * 2 - 1) * lim)); if (Math.abs(I.alvo - I.x) < SPX * 3) I.alvo = -Math.sign(I.x || 1) * lim * .6; }
+        else if (r < .68) { hopV = -300; I.t = 1; }
+        else if (r < .84) { I.est = "olha"; I.t = 1.3; }
+        else { I.est = "fareja"; I.dir = 1; I.t = 1.1; } } }
+  }
+
+  /* ---------- efeitos de cavar: terra dos lados, faíscas na rocha, tremor ---------- */
+  function fx(C, d, est, f, dt) {
+    if (calmo()) return;
+    const li = layerAt(Math.max(0, moleD)), L = LAYERS[li], duro = li >= 1, px = C.x + d[0] * SPX * 9, py = C.y + d[1] * SPX * 9, sub = d[1] < 0;
+    vel += (Math.min(1, Math.abs(moleD - dAnt) / Math.max(.001, dt) / 900) - vel) * .2; dAnt = moleD;
+    tremor = Math.max(tremor, .7 + vel * 1.6);
+    const n = est === "heavy" ? 1 : 2;
+    for (let i = 0; i < n; i++) { const l = Math.random() < .5 ? -1 : 1;
+      parts.push({ x: px + l * SPX * (3 + Math.random() * 3), y: py, vx: l * PX * (30 + Math.random() * 70), vy: -d[1] * PX * (50 + Math.random() * 110), g: PX * 220, life: .4 + Math.random() * .35, col: L.pal[1 + (Math.random() * 3 | 0)] }); }
+    if ((duro || est === "drill") && Math.random() < (est === "drill" ? .8 : .35)) { const a = Math.random() * 6.283, v = PX * (60 + Math.random() * 90);
+      parts.push({ x: px + (Math.random() - .5) * SPX * 6, y: py, vx: Math.cos(a) * v, vy: Math.sin(a) * v - (sub ? 0 : PX * 30), g: 0, life: .14 + Math.random() * .16, col: Math.random() < .5 ? "#fff3c4" : "#ffc24a" }); }
+    if (est === "heavy" && f === 0 && fAnt !== 0) { tremor = Math.max(tremor, 3.2);                    // patada pesada: onda de terra para os dois lados
+      for (let i = 0; i < 12; i++) { const l = i % 2 ? 1 : -1; parts.push({ x: px + l * SPX * 4, y: py + (Math.random() - .5) * SPX * 2, vx: l * PX * (90 + Math.random() * 90), vy: -PX * (10 + Math.random() * 40), g: PX * 120, life: .3 + Math.random() * .2, col: L.pal[3] }); } }
+    if (est === "bite" && f % 2 === 0 && fAnt !== f) for (let i = 0; i < 4; i++) parts.push({ x: px + (Math.random() - .5) * SPX * 8, y: py, vx: (Math.random() - .5) * PX * 120, vy: -d[1] * PX * (90 + Math.random() * 60), g: PX * 200, life: .35, col: L.pal[2] });
+    fAnt = f;
+  }
+
+  /* ---------- o desenho do bicho (devolve true: o jogo não desenha o de antes) ---------- */
+  function desenha(C) {
+    const dt = Math.min(.05, Math.max(0, clock - ult)); ult = clock; vida(dt);
+    const mer = SP.mer, sub = !!(window.V6 && V6.subindo);
+    if (mer && Math.abs(ang) > .75) {                                                          // cavando (ou subindo): a pose nova
+      const est = mer[0].v10.est, fps = est === "heavy" ? 9 : est === "frog" ? 8 : 14, f = Math.floor(clock * fps) % 4, spr = mer[f];
+      let rot = sub ? ang + Math.PI / 2 : Math.PI + (ang - Math.PI / 2), sx = 1, sy = 1, av = 0;
+      if (est === "frog") { sy = 1 + Math.sin(clock * 8 * Math.PI / 2) * .1; av = Math.sin(clock * 8 * Math.PI / 2) * SPX * 1.2; }      // impulsos de rã
+      if (est === "drill") { sx = Math.cos(clock * 17); if (Math.abs(sx) < .28) sx = sx < 0 ? -.28 : .28; }                              // casco girando como broca
+      if (est === "heavy") av = (f === 0 ? SPX * 1.4 : 0);
+      if (est === "bite") rot += Math.sin(clock * 21) * .06;
+      const d = [Math.sin(rot), -Math.cos(rot)];                                               // para onde a cabeça aponta
+      if (digging && !calmo() && !sub) {                                                       // facho da lanterna iluminando o fundo do túnel
+        const hx = C.x + d[0] * spr.height * .3, hy = C.y + d[1] * spr.height * .3, len = SPX * 30, ab = .34, a0 = Math.atan2(d[1], d[0]);
+        ctx.save(); ctx.globalCompositeOperation = "lighter"; const lg = ctx.createRadialGradient(hx, hy, SPX, hx, hy, len);
+        lg.addColorStop(0, "rgba(255,226,140,.34)"); lg.addColorStop(1, "rgba(255,226,140,0)"); ctx.fillStyle = lg;
+        ctx.beginPath(); ctx.moveTo(hx, hy); ctx.arc(hx, hy, len, a0 - ab, a0 + ab); ctx.closePath(); ctx.fill(); ctx.restore(); }
+      { ctx.save(); ctx.globalCompositeOperation = "lighter"; const gl = ctx.createRadialGradient(C.x, C.y, SPX * 2, C.x, C.y, SPX * 15);      // claridade em volta: o bicho não some no escuro do túnel
+        gl.addColorStop(0, "rgba(255,214,150,.2)"); gl.addColorStop(1, "rgba(255,214,150,0)"); ctx.fillStyle = gl; ctx.fillRect(C.x - SPX * 15, C.y - SPX * 15, SPX * 30, SPX * 30); ctx.restore(); }
+      ctx.save(); ctx.translate(C.x + d[0] * av, C.y + d[1] * av); ctx.rotate(rot); ctx.scale(sx * (1 + sq), sy * (1 - sq));
+      ctx.drawImage(spr, -spr.width / 2, -spr.height / 2); ctx.restore();
+      if (digging) fx(C, d, est, f, dt);
+      return true;
+    }
+    // parado, andando ou pulando: o desenho de sempre (virado para o lado que anda)
+    const anda = I.est === "anda";
+    const spr = digging ? (Math.floor(clock * 12) % 2 ? SP.dig : SP.idle) : anda ? (Math.floor(I.passo * 9) % 2 ? SP.dig : SP.idle) : ((clock % 3.4) < .13 ? SP.blink : SP.idle);
+    let extra = 0;                                                                              // salto mortal ao sair da toca
+    if (window.V6 && V6.saindo && !V6.subindo && hopY < 0 && !calmo()) { if (!saltoT) saltoT = clock; extra = Math.min(1, (clock - saltoT) / .46) * Math.PI * 2; }
+    const dir = I.dir < 0 ? -1 : 1, bob = anda ? -Math.abs(Math.sin(I.passo * 13)) * SPX * .45 : 0, a = ang + I.tilt + extra;
+    ctx.save(); ctx.translate(C.x, C.y + bob); ctx.scale(dir, 1); ctx.rotate(a); ctx.scale(1 + sq, 1 - sq);
+    ctx.drawImage(spr, -spr.width / 2, MH * SPX / 2 - spr.height); ctx.restore();
+    const ca = Math.cos(a), sa = Math.sin(a), v8s = spr.v8, ox = v8s ? (v8s.lamp[0] + .5 - v8s.w / 2) * v8s.k : (LAMPXY[0] - MW / 2) * SPX, oy = v8s ? MH * SPX / 2 - (v8s.h - v8s.lamp[1] - .5) * v8s.k : (LAMPXY[1] - MH / 2) * SPX;
+    const lx = C.x + dir * (ox * ca - oy * sa), ly = C.y + bob + ox * sa + oy * ca;
+    ctx.globalCompositeOperation = "lighter"; const lg2 = ctx.createRadialGradient(lx, ly, 0, lx, ly, SPX * 7);
+    lg2.addColorStop(0, "rgba(255,220,120,.5)"); lg2.addColorStop(1, "rgba(255,220,120,0)"); ctx.fillStyle = lg2; ctx.fillRect(lx - SPX * 7, ly - SPX * 7, SPX * 14, SPX * 14);
+    ctx.globalCompositeOperation = "source-over";
+    return true;
+  }
+
+  /* ---------- túnel: paredes irregulares, sombra, pedrinhas, marcas de garra e fundo arredondado ---------- */
+  function tunel(camY) {
+    if (!started) { fundo = 0; return; }
+    fundo = Math.max(fundo, moleWY());
+    const fim = fundo + SPX * 3, half = SPX * 11, rad = half * 1.05;
+    for (let wy = Math.max(0, Math.floor(camY / B) * B); wy < Math.min(fim, camY + H + B); wy += B) {
+      const li = wy / B | 0, L = LAYERS[layerIdx(wy / MPX - SURF, W / 2)], cx = snap(tunnelXs(wy));
+      let hl = half + snap((h(li, 21) - .5) * PX * 3 + Math.sin(li * .37) * PX * 1.5), hr = half + snap((h(li, 22) - .5) * PX * 3 + Math.sin(li * .29 + 2) * PX * 1.5);
+      if (wy < PX * 8) { const k = 1 - wy / (PX * 8); hl += snap(k * PX * 4); hr += snap(k * PX * 4); }                    // boca da toca mais larga
+      const dd = fim - wy; if (dd < rad) { const k = Math.sqrt(Math.max(0, 1 - Math.pow(1 - dd / rad, 2))); hl = Math.max(PX, snap(hl * k)); hr = Math.max(PX, snap(hr * k)); }   // fundo redondo
+      ctx.fillStyle = L.tun; ctx.fillRect(cx - hl, wy, hl + hr, B);
+      ctx.fillStyle = "rgba(0,0,0,.2)"; ctx.fillRect(cx - hl, wy, PX * 2, B); ctx.fillRect(cx + hr - PX * 2, wy, PX * 2, B);
+      ctx.fillStyle = L.rim; ctx.fillRect(cx - hl - PX, wy, PX, B); ctx.fillRect(cx + hr, wy, PX, B);
+      if (h(li, 3) < .3) { ctx.fillStyle = L.pal[3]; ctx.fillRect(cx - hl + snap(h(wy, 4) * (hl + hr - PX)), wy, PX, PX); }
+      if (h(li, 5) < .16) { ctx.fillStyle = L.rim; const e = h(li, 6) < .5, x0 = e ? cx - hl + PX * 2 : cx + hr - PX * 5; for (let k = 0; k < 3; k++) ctx.fillRect(x0 + k * PX, wy + (e ? k : 2 - k) * (PX >> 1), PX, PX); }
+      if (h(li, 7) < .1) { ctx.fillStyle = L.pal[2]; ctx.fillRect(h(li, 8) < .5 ? cx - hl - PX * 2 : cx + hr + PX, wy, PX, PX); }
+    }
+  }
+
+  /* ---------- "ver as camadas": 1/3 da velocidade, e ainda mais devagar ao entrar numa camada nova ---------- */
+  function tourK() { const d = moleD; for (let i = 1; i < LAYERS.length; i++) { const a = LAYERS[i].from; if (d > a - 80 && d < a + 420) return .4 / 3; } return 1 / 3; }
+
+  /* ---------- guarda-roupa: troca de aba com deslize, e uma animação para cada tipo de item ---------- */
+  try {
+    const abas = document.getElementById("v6abas"), box = document.getElementById("v6itens");
+    let ocupado = 0;
+    abas.onclick = e => { const b = e.target.closest("[data-aba]"); if (!b) return; const novo = +b.dataset.aba, on = abas.querySelector(".on"), velho = on ? +on.dataset.aba : -1;
+      if (novo === velho) return; try { SOM.clique(); } catch (e2) {}
+      if (calmo()) return V6.abreLoja(novo);
+      const dir = novo > velho ? 1 : -1, vez = ++ocupado;
+      box.style.transition = "opacity .09s ease, transform .09s ease"; box.style.opacity = "0"; box.style.transform = "translateX(" + (-dir * 14) + "px)";
+      setTimeout(() => { if (vez !== ocupado) return; V6.abreLoja(novo); box.style.transition = "none"; box.style.transform = "translateX(" + (dir * 22) + "px)"; void box.offsetWidth;
+        box.style.transition = "opacity .22s cubic-bezier(.22,1,.36,1), transform .22s cubic-bezier(.22,1,.36,1)"; box.style.opacity = "1"; box.style.transform = "none"; }, 90);
+    };
+    const clica0 = V6.clicaItem;
+    V6.clicaItem = function (id) {
+      const antes = JSON.stringify(V6.S.uso), on = abas.querySelector(".on"), aba = on ? +on.dataset.aba : 0;
+      clica0(id);
+      if (JSON.stringify(V6.S.uso) === antes || calmo()) return;
+      const prev = document.getElementById("v6prev"), prevN = document.getElementById("v6prevN"), alvo = aba >= 5 ? prevN : prev, cls = aba === 1 ? "v10cai" : aba === 3 || aba === 4 ? "v10gira" : aba >= 5 ? "v10bote" : "";
+      if (!alvo) return;
+      ["v10cai", "v10gira", "v10bote"].forEach(c => { prev && prev.classList.remove(c); prevN && prevN.classList.remove(c); });
+      if (cls) { alvo.classList.add(cls); setTimeout(() => alvo.classList.remove(cls), 1200); }
+      if (aba === 3 || aba === 4) setTimeout(() => { const r = alvo.getBoundingClientRect(), loja = document.getElementById("v6loja"); if (!r.width || !loja) return;      // estrelinhas em volta
+        for (let i = 0; i < 9; i++) { const s = document.createElement("i"); s.className = "v10estrela"; s.textContent = "✦"; const a = i / 9 * 6.283, d = r.width * (.55 + (i % 3) * .12);
+          s.style.left = (r.left + r.width / 2 + Math.cos(a) * d) + "px"; s.style.top = (r.top + r.height / 2 + Math.sin(a) * d * .8) + "px"; s.style.animationDelay = (i * 35) + "ms"; loja.appendChild(s); setTimeout(() => s.remove(), 1000); } }, 300);
+    };
+  } catch (e) { /* sem guarda-roupa: segue */ }
+
+  /* ---------- abertura cinemática (2,1 s, dá para pular com clique ou tecla) ----------
+     1) no escuro da terra, a luz da lanterna sobe; 2) o bicho (o que estiver vestido) cava para cima; 3) fura a grama, salta
+     girando e as letras TOUPIX estouram; 4) pousa embaixo do nome e a tela abre. Devolve a duração em ms. */
+  function cine(cort, abre) {
+    try {
+      if (calmo() || !SP.mer || !cort) return 1750;
+      const K = 3, cw = Math.ceil(innerWidth / K), chh = Math.ceil(innerHeight / K), cv = document.createElement("canvas"); cv.id = "v10cine"; cv.width = cw; cv.height = chh;
+      const g = cv.getContext("2d"); g.imageSmoothingEnabled = false; cort.insertBefore(cv, cort.querySelector("#v6logo")); cort.classList.add("cine");
+      const DUR = 2100, T1 = 400, T2 = 1000, T3 = 1450, t0 = performance.now(), chao = Math.round(chh * .5 + 40), cx = Math.round(cw / 2), sw = SP.idle.width / K, sh = SP.idle.height / K;
+      const ease = x => x < .5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2, pt = [], est = Array.from({ length: 40 }, (_, i) => [h(i, 31) * cw, h(i, 32) * chao * .9, h(i, 33)]);
+      const terra = i => LAYERS[Math.max(0, Math.min(LAYERS.length - 1, i))].pal;
+      let estourou = false, fim = false;
+      const para = () => { if (fim) return; fim = true; cv.style.transition = "opacity .25s linear"; cv.style.opacity = "0"; setTimeout(() => { cv.remove(); cort.classList.remove("cine"); }, 280); };
+      (function quadro() {
+        if (fim) return;
+        if (!cort.classList.contains("intro")) return para();                                // pulou (ou a tela já abriu)
+        const t = performance.now() - t0, u = Math.min(1, t / T2), sup = Math.round(-chh * 1.5 + (chao + chh * 1.5) * ease(u));   // onde está a linha da grama na tela
+        // céu (acima da grama) e terra (abaixo), em blocos
+        const sg = g.createLinearGradient(0, 0, 0, Math.max(1, sup)); sg.addColorStop(0, "#0b0814"); sg.addColorStop(.7, "#1f1220"); sg.addColorStop(1, "#4a2a18"); g.fillStyle = sg; g.fillRect(0, 0, cw, Math.max(0, sup));
+        if (sup > 0) est.forEach(e => { if (e[1] < sup - 3) { g.fillStyle = "rgba(245,233,214," + (.4 + .6 * Math.abs(Math.sin(t / 400 + e[2] * 9))).toFixed(2) + ")"; g.fillRect(e[0] | 0, e[1] | 0, 1, 1); } });
+        for (let y = Math.max(0, sup); y < chh; y += 2) { const prof = (y - sup) / 2, pal = terra(prof > 130 ? 1 : 0); for (let x = 0; x < cw; x += 2) { g.fillStyle = pal[(h(x, ((y - sup) / 2) | 0) * 4) | 0]; g.fillRect(x, y, 2, 2); } }
+        if (sup > -4 && sup < chh) { for (let x = 0; x < cw; x += 2) { g.fillStyle = (x >> 1) % 3 ? "#5e8f35" : "#7fb24a"; g.fillRect(x, sup - 2 - ((h(x, 5) * 2) | 0), 2, 3 + ((h(x, 5) * 2) | 0)); } }
+        // o bicho: sobe cavando, salta girando, pousa
+        let by, rot = 0, spr, salto = 0;
+        if (t < T2) { by = chh + sh - (chh + sh - chao + sh * .2) * ease(Math.max(0, (t - T1 * .4) / (T2 - T1 * .4))); spr = SP.mer[Math.floor(t / 70) % 4]; }
+        else if (t < T3) { const v = (t - T2) / (T3 - T2); salto = Math.sin(v * Math.PI); by = chao - sh * .5 - salto * chh * .1; rot = v * Math.PI * 2; spr = SP.idle; }
+        else { by = chao - sh * .5; spr = (t - T3) % 900 < 90 ? SP.blink : SP.idle; }
+        const topoTunel = Math.max(sup, by - sh * .1);
+        if (t < T3 + 200) { g.fillStyle = "#120b08"; g.fillRect(cx - 12, topoTunel, 24, chh - topoTunel); for (let y = Math.max(0, topoTunel | 0); y < chh; y += 2) { g.fillRect(cx - 13 - ((h(y, 3) * 3) | 0), y, 2, 2); g.fillRect(cx + 11 + ((h(y, 4) * 3) | 0), y, 2, 2); } }
+        if (t < T2 && by < chh + sh) { const gl = g.createRadialGradient(cx, by - sh * .3, 2, cx, by - sh * .3, 46); gl.addColorStop(0, "rgba(255,220,130,.5)"); gl.addColorStop(1, "rgba(255,220,130,0)"); g.fillStyle = gl; g.fillRect(cx - 46, by - sh * .3 - 46, 92, 92);
+          if (Math.random() < .8) pt.push({ x: cx + (Math.random() - .5) * 22, y: by - sh * .4, vx: (Math.random() - .5) * 50, vy: 20 + Math.random() * 60, l: .5, c: terra(0)[1 + (Math.random() * 3 | 0)] }); }
+        if (t >= T2 && !estourou) { estourou = true; for (let i = 0; i < 34; i++) { const a = -Math.PI * Math.random(), v = 50 + Math.random() * 110; pt.push({ x: cx, y: chao, vx: Math.cos(a) * v, vy: Math.sin(a) * v, l: .7 + Math.random() * .4, c: i % 4 ? terra(0)[1 + (i % 3)] : "#7fb24a" }); } try { SOM.camada(); } catch (e) {} }
+        g.save(); g.translate(cx, by); g.rotate(rot); g.drawImage(spr, -sw / 2, -sh / 2, sw, sh); g.restore();
+        if (t >= T2 && t < T2 + 140) { g.fillStyle = "rgba(255,240,200," + (.5 * (1 - (t - T2) / 140)).toFixed(2) + ")"; g.fillRect(0, 0, cw, chh); }
+        for (let i = pt.length - 1; i >= 0; i--) { const p = pt[i]; p.l -= 1 / 60; if (p.l <= 0) { pt.splice(i, 1); continue; } p.vy += 260 / 60; p.x += p.vx / 60; p.y += p.vy / 60; g.fillStyle = p.c; g.fillRect(p.x | 0, p.y | 0, 2, 2); }
+        if (t < DUR + 400) requestAnimationFrame(quadro);
+      })();
+      return DUR;
+    } catch (e) { return 1750; }
+  }
+
+  try {                                                                                   // a abertura antiga já começou (este código carrega depois): troca pela cinemática
+    const cort = document.getElementById("v6cort");
+    if (window.v10abre && cort && cort.classList.contains("intro")) { const d = cine(cort, window.v10abre); if (d !== 1750) { clearTimeout(window.v10abreT); window.v10abreT = setTimeout(window.v10abre, d); } }
+  } catch (e) { /* fica a abertura antiga */ }
+  return { desenha, tunel, tourK, dx, I, cine };
+})();
+/* ================= v10c (22/11): relíquias com recompensa, fósseis/cristais/baús redesenhados e subsolo mais vivo ================= */
+var V10C = (function () {
+  const calmo = () => { try { return V6.calmo(); } catch (e) { return false; } };
+  /* ---------- desenhos em resolução dobrada (cada letra = meio "pixel" do jogo), com contorno, 3 tons e brilho ---------- */
+  const SPR = {
+    amonite: ["....oooooo......", "..oobbbbaaoo....", ".obbaaaaaaaco...", ".obaaooooaaaco..", "obaaoobbaoaacco.", "obaaobaaaboaaco.", "obaaobaoaboaaco.", "obaaobaabboaaco.", "obaaaobbbooaaco.", ".obaaaooooaaaco.", ".obbaaaaaaaacco.", "..obbaaaaaaccoo.", "...oobbaaccooo..", ".....oooooo....."],
+    cranio: ["....ooooooooo.....", "..oobbbbbbbbboo...", ".obbaaaaaaaaaabo..", "obaaoooaaaaaaaabo.", "obaaoooaaaaaaaaabo", "obaaaaaaaaaaaaccao", ".oaaaaaaaaaaccooo.", "..ooaaacacacao....", "....oaoaoaoaoo....", "....ooooooooo....."],
+    costela: [".oo..oo..oo..oo.", "obaoobaoobaoobao", "oacooacooacooaco", "oacooacooacooaco", "oacooacooacooaco", "oacooacooacooaco", ".oaaaaaaaaaaaao.", "..oooooooooooo.."],
+    pegada: ["..k...k...k.", "..k...k...k.", ".kk..kk..kk.", ".kkkkkkkkkk.", "..kkddddkk..", "..kkddddkk..", "...kkddkk...", "...kkkkkk...", "....kkkk...."],
+    cristal: ["......oo......", ".....ohlo.....", ".....olmo.oo..", "..oo.olmoolho.", ".ohlo.lmkolmo.", ".olmoolmkolmko", ".olmkolmkolmko", ".olmkolmkkmmko", "oolmkkmmkkmkko", "okmmkkmkkkkkoo", ".okkkkkkkkkoo.", "..ooooooooo..."],
+    bau: ["..oooooooooooo..", ".owwwwwwwwwwwwo.", "owwdwwwwwwwwdwwo", "oggggggyyggggggo", "owwdwwogyowwdwwo", "owwdwwoggowwdwwo", "owwdwwwoowwwdwwo", "owwdwwwwwwwwdwwo", "oddddddddddddddo", ".oooooooooooooo."],
+    bauAberto: ["..oooooooooooo..", ".owwwwwwwwwwwwo.", ".owdwwwwwwwwdwo.", ".oggggggggggggo.", "..oooooooooooo..", "..yy.yyyy.yy.y..", "oooyyyyyyyyyyooo", "owwdoooooooodwwo", "owwdwwwwwwwwdwwo", "owwdwwwwwwwwdwwo", "oddddddddddddddo", ".oooooooooooooo."],
+    pilar: [".oooooooo.", "ollllllllo", "osssssssso", ".osllssko.", ".osllssko.", ".osllssko.", ".oslossko.", ".osllosko.", ".osllssko.", ".osllssko.", ".osllssko.", ".osllssko.", ".osllssko.", "osssssssso", "okkkkkkkko", ".oooooooo."],
+    totem: ["..oooooooo..", ".ollllllllo.", "olsssssssslo", "olsgssssgslo", "olsssssssslo", "olsskkkksslo", "olssskksssko", "okssssssssko", ".okkkkkkkko.", "..osssssso..", "..osllssko..", "..osllssko..", ".osssssssso.", ".okkkkkkkko.", "..oooooooo.."]
+  };
+  const O = "#1a1412";
+  const PAL = {
+    OSSO: { o: O, a: "#e2d6b8", b: "#f7efd8", c: "#b3a480" }, PEG: { k: "#2e2823", d: "#1f1a16" },
+    QUAR: { o: O, m: "#cfe6f2", l: "#ffffff", k: "#8fb2c4", h: "#ffffff" }, AMET: { o: O, m: "#a35cff", l: "#d4b0ff", k: "#6a2fb8", h: "#ffffff" },
+    ESME: { o: O, m: "#2fbf71", l: "#8ff0b8", k: "#1a7a45", h: "#ffffff" }, RUBI: { o: O, m: "#e0334a", l: "#ff8a96", k: "#9c1f2e", h: "#ffffff" },
+    NUCL: { o: O, m: "#ffb347", l: "#fff0b0", k: "#c9781c", h: "#ffffff" },
+    BAU: { o: O, w: "#9a6a3a", d: "#6b4424", g: "#ffd257", y: "#fff0a0" }, RUNA: { o: O, w: "#5a6470", d: "#3a424c", g: "#4de0d0", y: "#c8fff6" },
+    PEDRA: { o: O, s: "#8a8f98", l: "#b3b9c2", k: "#5a6068", g: "#4de0d0" }
+  };
+  const cel = () => Math.max(1, Math.round(PX / 2));
+  function poe(g, nome, pal, x, y, c) { const m = SPR[nome]; c = c || cel(); for (let j = 0; j < m.length; j++) { const lin = m[j]; for (let i = 0; i < lin.length; i++) { const cor = pal[lin[i]]; if (cor) { g.fillStyle = cor; g.fillRect(x + i * c, y + j * c, c, c); } } } }
+  const tam = (nome, c) => [SPR[nome][0].length * (c || cel()), SPR[nome].length * (c || cel())];
+  const celR = () => Math.max(2, Math.round(PX * .75));   // as relíquias que pagam são um pouco maiores que os enfeites
+  /* ---------- o que existe em cada camada: [desenho, cores, nome pt, nome en] ---------- */
+  const TIPOS = [
+    [["bau", "BAU", "Baú de madeira", "Wooden chest"]],
+    [["amonite", "OSSO", "Amonite", "Ammonite"], ["cranio", "OSSO", "Crânio antigo", "Ancient skull"], ["costela", "OSSO", "Costelas antigas", "Old ribs"], ["pegada", "PEG", "Pegada petrificada", "Fossil footprint"]],
+    [["cristal", "AMET", "Ametista", "Amethyst"], ["cristal", "ESME", "Esmeralda", "Emerald"]],
+    [["cristal", "QUAR", "Quartzo de gelo", "Ice quartz"]],
+    [["cristal", "RUBI", "Rubi", "Ruby"]],
+    [["totem", "PEDRA", "Totem da toca", "Burrow totem"], ["pilar", "PEDRA", "Pilar antigo", "Old pillar"], ["bau", "RUNA", "Baú rúnico", "Runic chest"]],
+    [["cristal", "NUCL", "Cristal do núcleo", "Core crystal"]]
+  ];
+  /* ---------- relíquias ao lado do túnel: brilham de perto e dão moedas quando o bicho passa (1 vez por dia cada) ---------- */
+  const prof = k => 150 + 230 * k + Math.floor(h(k, 71) * 110);
+  const tipoDe = k => { const li = Math.min(TIPOS.length - 1, layerAt(prof(k))), l = TIPOS[li]; return { t: l[Math.floor(h(k, 72) * l.length) % l.length], li }; };
+  const valor = k => 2 + tipoDe(k).li + Math.floor(h(k, 73) * 3);
+  const CH10 = "digV10", vistos = new Set(), fx = [];
+  const TETO = 60;   // no máximo 60 moedas de relíquia por dia
+  let S10 = { dia: -1, pagas: [], soma: 0 }, dAnt = 0;
+  try { const j = JSON.parse(localStorage.getItem(CH10) || "null"); if (j && typeof j === "object") S10 = { dia: +j.dia || -1, pagas: Array.isArray(j.pagas) ? j.pagas.filter(x => Number.isInteger(x)).slice(0, 400) : [], soma: Math.max(0, +j.soma || 0) }; } catch (e) {}
+  const grava10 = () => { try { localStorage.setItem(CH10, JSON.stringify(S10)); } catch (e) {} };
+  const vale = () => started && mode === "dig" && !race && !(typeof comp !== "undefined" && comp) && !(typeof ON !== "undefined" && ON && ON.jogo);   // só Cavada do Dia e Livre
+  function tique(dt) {
+    const d = moleD;
+    if (!started) { vistos.clear(); dAnt = d; return; }
+    if (vale() && d > dAnt) for (let k = Math.max(0, Math.floor((dAnt - 260) / 230) - 1); prof(k) <= d; k++) { const m = prof(k); if (m <= dAnt || vistos.has(k)) continue;
+      vistos.add(k); const info = tipoDe(k), nome = info.t[CFG.lang === "pt" ? 2 : 3], C = moleCenter();
+      if (typeof hoje !== "undefined" && S10.dia !== hoje) { S10.dia = hoje; S10.pagas = []; S10.soma = 0; }
+      let txt = nome;
+      if (!S10.pagas.includes(k) && S10.soma < TETO) { const n = Math.min(valor(k), TETO - S10.soma); S10.pagas.push(k); S10.soma += n; grava10(); try { V6.ganha(n); } catch (e) {} txt = "+" + n + " 🪙 " + nome; try { SOM.veio(3); } catch (e) {} }
+      fx.push({ t: 0, x: C.x - SPX * 15, y: wyOf(m), txt, k });
+      if (!calmo()) for (let i = 0; i < 12; i++) { const a = Math.random() * 6.283, v = PX * (25 + Math.random() * 50); parts.push({ x: C.x - SPX * 14, y: wyOf(m), vx: Math.cos(a) * v, vy: Math.sin(a) * v - PX * 20, g: PX * 90, life: .5 + Math.random() * .4, col: i % 3 ? "#ffd257" : "#fff6d0" }); } }
+    for (let i = fx.length - 1; i >= 0; i--) { fx[i].t += dt; if (fx[i].t > 1.4) fx.splice(i, 1); }
+    dAnt = d;
+  }
+  function pinta() {
+    if (!started) return;
+    const camY = Math.round((camD + SURF) * MPX), m0 = camY / MPX - SURF, m1 = m0 + H / MPX, c = cel(), anim = !calmo();
+    ctx.save(); ctx.translate(0, -camY); ctx.imageSmoothingEnabled = false;
+    // lava viva nas bordas do magma
+    if (anim) for (let wy = Math.max(0, Math.floor(camY / B) * B); wy < camY + H; wy += B) { if (LAYERS[layerIdx(wy / MPX - SURF, 0)].name !== "MAGMA") continue;
+      const li = wy / B | 0, w = PX * (2 + Math.round((Math.sin(li * .23 + clock * 1.3) + Math.sin(li * .071 - clock * .7) + 2) * 1.2));
+      ctx.globalAlpha = .9; ctx.fillStyle = "#b8281a"; ctx.fillRect(0, wy, w + PX, B); ctx.fillRect(W - w - PX, wy, w + PX, B);
+      ctx.fillStyle = "#ff6a2a"; ctx.fillRect(0, wy, w, B); ctx.fillRect(W - w, wy, w, B);
+      ctx.fillStyle = "#ffb840"; ctx.fillRect(0, wy, Math.max(PX, w - PX * 2), B); ctx.fillRect(W - Math.max(PX, w - PX * 2), wy, Math.max(PX, w - PX * 2), B);
+      if (h(li, Math.floor(clock * 2.5)) > .93) { ctx.fillStyle = "#fff0a8"; ctx.fillRect(PX, wy, PX, PX); ctx.fillRect(W - PX * 2, wy, PX, PX); } }
+    ctx.globalAlpha = 1;
+    // minhocas se mexendo na terra de cima
+    if (anim && m0 < 480) { const g2 = 150, cx0 = tunnelXs(moleWY()); for (let gy = Math.floor(camY / g2); gy * g2 < camY + H; gy++) for (let gx = 0; gx * g2 < W; gx++) { if (h(gx + 300, gy) > .22) continue;
+        const x = gx * g2 + h(gx, gy + 40) * (g2 - 40), y = gy * g2 + h(gx + 9, gy) * (g2 - 20), m = y / MPX - SURF; if (m < 12 || m > 470 || Math.abs(x - cx0) < SPX * 14) continue;
+        for (let s = 0; s < 8; s++) { ctx.fillStyle = s === 7 ? "#f2b6c0" : s % 2 ? "#e89aa8" : "#c96a7c"; ctx.fillRect(Math.round(x + s * c), Math.round(y + Math.round(Math.sin(clock * 3 + s * .9 + gx * 3 + gy) * 1.6) * c), c, c); } } }
+    // relíquias que ainda não foram pegas nesta cavada
+    for (let k = Math.max(0, Math.floor((m0 - 260) / 230) - 1); prof(k) < m1 + 40; k++) { const m = prof(k); if (m < m0 - 40 || vistos.has(k) || m <= moleD) continue;
+      const info = tipoDe(k), cr = celR(), [sw, shh] = tam(info.t[0], cr), wy = wyOf(m), x = snap(tunnelXs(wy) - SPX * 12 - PX * 5) - sw, y = Math.round(wy - shh / 2), perto = Math.max(0, 1 - Math.abs(m - moleD) / 160);
+      if (anim) { ctx.globalCompositeOperation = "lighter"; const a = .1 + .08 * Math.sin(clock * 3 + k) + perto * .3, r = Math.max(sw, shh) * (1 + perto * .5), gl = ctx.createRadialGradient(x + sw / 2, y + shh / 2, 1, x + sw / 2, y + shh / 2, r);
+        gl.addColorStop(0, "rgba(255,226,140," + a.toFixed(2) + ")"); gl.addColorStop(1, "rgba(255,226,140,0)"); ctx.fillStyle = gl; ctx.fillRect(x + sw / 2 - r, y + shh / 2 - r, r * 2, r * 2); ctx.globalCompositeOperation = "source-over"; }
+      poe(ctx, info.t[0], PAL[info.t[1]], x, y, cr);
+      if (anim && Math.sin(clock * 4 + k * 1.7) > .55) { ctx.fillStyle = "#ffffff"; ctx.fillRect(x + sw - cr * 3, y + cr, cr, cr); } }
+    // texto subindo e baú abrindo
+    fx.forEach(f => { const p = f.t / 1.4, info = tipoDe(f.k);
+      if (info.t[0] === "bau" && f.t < .9) { const cr = celR(), [sw, shh] = tam("bauAberto", cr); poe(ctx, "bauAberto", PAL[info.t[1]], Math.round(f.x - sw / 2), Math.round(f.y - shh / 2), cr); }
+      ctx.globalAlpha = Math.min(1, 2 - p * 2); ctx.font = (W < 700 ? 12 : 15) + "px Silkscreen, monospace"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.lineWidth = 3; ctx.strokeStyle = "#120c08";
+      ctx.strokeText(f.txt, f.x, f.y - SPX * 4 - p * 40); ctx.fillStyle = "#ffd257"; ctx.fillText(f.txt, f.x, f.y - SPX * 4 - p * 40); ctx.globalAlpha = 1; });
+    ctx.restore();
+  }
+  /* ---------- enfeites fixos de cada camada (fósseis, cristais, ruínas), pintados uma vez em cada bloco de terra ---------- */
+  function enfeita(g, ci) {
+    const r = rng(ci * 911 + 5), n = W < 700 ? 1 : 3, meio = W / 2, folga = SPX * 18;
+    for (let i = 0; i < n; i++) { const x = PX * 6 + r() * (W - PX * 40), y = 30 + r() * (CH - 110), wy = ci * CH + y, m = wy / MPX - SURF, q = r();
+      if (m < 60 || Math.abs(x - meio) < folga || Math.abs(x + 60 - meio) < folga) continue;
+      const li = Math.min(TIPOS.length - 1, layerIdx(m, x)); if (li === 0) continue;
+      const l = TIPOS[li].filter(t => t[0] !== "bau"), t = l[Math.floor(q * l.length) % l.length];
+      if (li === 4) { g.fillStyle = "#0e0a0c"; for (let b = 0; b < 26; b++) g.fillRect(snap(x + (h(b, ci + i) - .5) * PX * 16), Math.round(y + (h(b + 9, ci + i) - .2) * PX * 12), PX * 2, PX);      // obsidiana rachada com brilho laranja
+        g.fillStyle = "#ff8a3a"; for (let b = 0; b < 7; b++) g.fillRect(snap(x + (h(b + 30, ci + i) - .5) * PX * 14), Math.round(y + (h(b + 40, ci + i) - .2) * PX * 10), PX, Math.max(1, PX >> 1)); }
+      poe(g, t[0], PAL[t[1]], snap(x), Math.round(y));
+      if (t[0] === "cristal" && q > .5) poe(g, "cristal", PAL[t[1]], snap(x) + cel() * 12, Math.round(y) + cel() * 4); }                                // aglomerado: um segundo cristal encostado
+  }
+  /* ---------- baú enterrado (o de sempre) com o desenho novo ---------- */
+  function bau(g, x, y) { const [sw, shh] = tam("bau"); poe(g, "bau", PAL.BAU, x, y + PX * 5 - shh); return sw; }
+  try { const up = update; update = function (dt) { up(dt); try { tique(dt); } catch (e) {} }; } catch (e) {}
+  try { const dr = draw; draw = function () { dr(); try { pinta(); } catch (e) {} }; } catch (e) {}
+  try { const ch0 = chunk; chunk = function (ci) { const novo = !cache.has(ci), c = ch0(ci); if (novo) { try { enfeita(c.getContext("2d"), ci); } catch (e) {} } return c; }; cache.clear(); } catch (e) {}
+  return { SPR, PAL, TIPOS, TETO, prof, tipoDe, valor, vale, bau, poe, tam, vistos, fx, get S() { return S10; } };
 })();
 </script>
 <script type="module">

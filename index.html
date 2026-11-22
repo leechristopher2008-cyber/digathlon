@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Digathlon</title>
+<title>Toupix</title>
 <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Pixelify+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   /* v4: 1.000+ perguntas, conferência online e interface nova · v3: cavada do dia (uma por dia, com sequência e compartilhar), banco grande de perguntas, temas, coleção, som e o núcleo da Terra */
@@ -559,6 +559,18 @@
   body.v9t #v9bCen { display:inline-block; }
   body:has(#v6tut:not(.hide)) #v9bCen { display:none; }
   @media (max-width:560px) { #v9bCen span { display:none; } }
+
+  /* ================= v10 (21/11): TOUPIX, cancelar cavada, título do guarda-roupa no centro ================= */
+  #v6loja .v6top { position:relative; }
+  #v6loja .v6top h2 { position:absolute; left:50%; top:50%; transform:translate(-50%, -50%); flex:none; white-space:nowrap; pointer-events:none; }
+  #v10cancela { display:none; position:fixed; left:10px; top:10px; z-index:60; padding:8px 10px; background:rgba(20,12,8,.82); border:2px solid #6b4a2e; color:var(--cream); font-family:var(--display); font-size:10px; letter-spacing:1px; white-space:nowrap; cursor:pointer; opacity:.8; }
+  #v10cancela:hover, #v10cancela:focus-visible, #v10cancela.certeza { opacity:1; }
+  body.v10cav #v10cancela { display:inline-block; }
+  #v10cancela.certeza { border-color:#ff6a5c; color:#ffb4a8; }
+  @media (max-width:900px) { #v10cancela:not(.certeza) span { display:none; } #v10cancela { left:6px; top:6px; padding:7px 9px; font-size:11px; } }
+  #hud.v10dano, #bar.v10dano { animation:v10dano .45s; }
+  @keyframes v10dano { 0%, 100% { transform:none; filter:none; } 20% { transform:translateX(-6px); filter:brightness(1.6) saturate(1.6); } 40% { transform:translateX(6px); } 60% { transform:translateX(-4px); } 80% { transform:translateX(3px); } }
+  @media (prefers-reduced-motion:reduce) { #hud.v10dano, #bar.v10dano { animation:none; } }
 </style>
 </head>
 <body>
@@ -572,7 +584,7 @@
 <div id="banner"></div>
 
 <div id="title">
-  <h1 class="logo">DIGATHLON</h1>
+  <h1 class="logo">TOUPIX</h1>
   <div class="sub" data-t="tagline">the weirder the answer, the deeper you dig</div>
   <div class="dayline" id="dayline"></div>
   <div id="howto">
@@ -611,7 +623,7 @@
   <p class="help" data-t="accessibleHelp"></p>
   <label><span><span data-t="fontSize">Text size</span>: <b id="vFs"></b></span><input type="range" id="cFs" min="14" max="36" step="1"></label>
   <label><span data-t="font">Font</span>
-    <select id="cFf"><option value="pixel">Pixel (Digathlon)</option><option value="system-ui, sans-serif">System</option><option value="Verdana, sans-serif">Verdana</option><option value="Arial, sans-serif">Arial</option><option value="Georgia, serif">Georgia</option></select></label>
+    <select id="cFf"><option value="pixel">Pixel (Toupix)</option><option value="system-ui, sans-serif">System</option><option value="Verdana, sans-serif">Verdana</option><option value="Arial, sans-serif">Arial</option><option value="Georgia, serif">Georgia</option></select></label>
   <label><span><span data-t="time">Time to answer</span>: <b id="vTempo"></b></span><input type="range" id="cTempo" min="10" max="90" step="5"></label>
   <div class="check"><input type="checkbox" id="cContr"><label for="cContr" data-t="contrast">High contrast</label></div>
   <p class="help" data-t="saved"></p>
@@ -775,7 +787,7 @@
   <p class="help" id="v6shMsg" aria-live="polite"></p>
 </div>
 <div id="v6cort" class="fechada espera" aria-hidden="true"><i></i><i></i><div id="v6logo"></div></div>
-<div class="draft">v9</div>
+<div class="draft">v10</div>
 
 
 <script src="dados.js"></script>
@@ -1425,7 +1437,7 @@ function labelQ(){ $("qTag").textContent = etiqueta(curQ);
   $("qLabel").textContent = v ? t + " · " + tr("voltou") : t; $("hDig").textContent = t; nota(curQ); }
 // botão pular: livre = à vontade; competitivo e corrida = 3 por partida
 function pulaBotao(){ const pode = free || race, b = $("bSkip"), lim = comp || race; show("bSkip", pode); $("bar").classList.toggle("pula", pode);
-  b.textContent = lim ? `⏭ ${pulos}` : "⏭"; b.disabled = lim && pulos <= 0; b.title = tr("skip"); b.setAttribute("aria-label", tr("skip")); }
+  b.textContent = lim ? `⏭ ${pulos}` + (comp ? " · −1❤" : "") : "⏭"; b.disabled = lim && pulos <= 0; b.title = tr("skip"); b.setAttribute("aria-label", tr("skip")); }
 // respostas já usadas (livre, competitivo e corrida): a pergunta pode voltar, a resposta não
 const usada = (id, a) => { const s = USADAS.get(id); return !!s && a.chaves.some(k => s.has(k)); };
 function marcaUsada(id, a){ if (!USADAS.has(id)) USADAS.set(id, new Set()); a.chaves.forEach(k => USADAS.get(id).add(k)); }
@@ -1449,7 +1461,7 @@ function ask(resta){
 }
 function timeout(){
   if (race) return corridaAcabou();
-  if (comp) { vidas = 0; SOM.sem(); vib([80, 60, 160]); return compFim(tr("timeUp")); }   // competitivo: acabou o tempo = acabou o jogo
+  if (comp) return V10.tempoComp();   // v10: no competitivo, tempo esgotado custa 1 coração; o jogo só acaba quando os corações zeram
   mode = "card"; show("bar", false); show("cdown", false); SOM.sem(); vib(60);
   pintaSq(qi, null); log.push(null); salvaDia(); mostraCard(null, false);
 }
@@ -1529,7 +1541,7 @@ function falta(){ const ag = new Date(), am = new Date(ag); am.setHours(24, 0, 0
   return [s / 3600 | 0, (s % 3600) / 60 | 0, s % 60].map(v => String(v).padStart(2, "0")).join(":"); }
 const EMO = ["⬜","🟦","🟪","🟥","🟨","🌈"];
 function textoShare(){
-  const cab = comp ? `DIGATHLON · ${tr("compShare")}` : free ? `DIGATHLON · ${tr("freeEnd", { n:log.length })}` : `DIGATHLON #${DIA_N}`, s = seqAtual();
+  const cab = comp ? `TOUPIX · ${tr("compShare")}` : free ? `TOUPIX · ${tr("freeEnd", { n:log.length })}` : `TOUPIX #${DIA_N}`, s = seqAtual();
   return `${cab} · ${fmtL(score*10)} m${!free && s > 1 ? ` · 🔥${s}` : ""}\n${log.map(l => l ? EMO[l.t] : "⬛").join("")}`;
 }
 /* ================= A NAJA (preto e amarelo, de lado, olhando pra direita) ================= */
@@ -2136,9 +2148,9 @@ $("bStart").onclick = cavaDoDia;
 $("bFree").onclick = abreTemas;
 $("bSurface").onclick = () => comp ? compFim() : endGame();
 $("bComp").onclick = () => { free = true; comp = true; tema = "all"; saco = []; vidas = 3; pulos = 3; USADAS.clear(); VISTAS = []; VOLTOU = false; $("squares").innerHTML = ""; start(() => desce(0, nextQ)); };
-$("bSkip").onclick = () => { if (mode !== "ask") return; if ((comp || race) && pulos <= 0) return; if (comp || race) pulos--;
+$("bSkip").onclick = () => { if (mode !== "ask") return; if ((comp || race) && pulos <= 0) return; if (comp && !V10.pulaComp()) return; if (comp || race) pulos--;
   SOM.clique(); show("bar", false); if (race) { corridaPublica(); return corridaProx(); } nextQ(); };
-$("bTour").onclick = () => { $("squares").innerHTML = ""; $("hDig").textContent = tr("tourLbl"); start(() => desce(0, tour)); };
+$("bTour").onclick = () => { window.v10passeio = 1; $("squares").innerHTML = ""; $("hDig").textContent = tr("tourLbl"); start(() => desce(0, tour)); };
 $("bTour2").onclick = () => { $("hDig").textContent = tr("tourLbl"); tour(); };
 $("bAgain").onclick = $("bBack").onclick = () => (window.V6 && V6.voltar ? V6.voltar() : location.reload());
 $("bar").addEventListener("submit", submit);
@@ -3039,7 +3051,7 @@ var V6 = (() => {
       for (let x = 0; x < W2; x += B2) { g.fillStyle = y < 230 + B2 ? MOSS[(h(x, y)*3) | 0] : L.pal[Math.min(3, (h(x / B2 | 0, y / B2 | 0)*4) | 0)]; g.fillRect(x, y, B2, B2); } }
     g.fillStyle = "#0b0814b8"; g.fillRect(0, 230, W2, H2 - 230);
     g.textAlign = "center"; g.textBaseline = "middle";
-    g.font = F(104, 700); [["#2e1d10", 12], ["#5b3a1f", 8], ["#8a5a2b", 4], ["#f5e9d6", 0]].forEach(([cor, dy]) => { g.fillStyle = cor; g.fillText("DIGATHLON", W2/2, 92 + dy); });
+    g.font = F(104, 700); [["#2e1d10", 12], ["#5b3a1f", 8], ["#8a5a2b", 4], ["#f5e9d6", 0]].forEach(([cor, dy]) => { g.fillStyle = cor; g.fillText("TOUPIX", W2/2, 92 + dy); });
     g.font = F(34); g.fillStyle = "#f2a93b"; g.fillText(comp ? tr("v6ImgComp") : free ? tr("v6ImgFree", { n:log.length }) : tr("v6Img1", { n:DIA_N }), W2/2, 186);
     // cartão
     const px = 60, py = 262, pw = W2 - 120, ph = H2 - py - 70; g.fillStyle = "#241912ee"; g.fillRect(px, py, pw, ph); g.strokeStyle = "#4a3424"; g.lineWidth = 6; g.strokeRect(px + 3, py + 3, pw - 6, ph - 6);
@@ -3063,7 +3075,7 @@ var V6 = (() => {
     g.textAlign = "left"; g.font = F(26); g.fillStyle = "#a8927a"; const s = seqAtual(), rod = [];
     if (!free && s > 1) rod.push("🔥 " + tr("v6ImgStreak", { n:s })); if (d.novoRec) rod.push("★ " + tr("v6RecNew")); rod.push("💎 " + V6.gemas());
     g.fillText(rod.join("   "), px + 150, H2 - 70 - 84);
-    g.font = F(22); g.fillStyle = "#f2a93b"; g.fillText((location.host + location.pathname).replace(/index\.html$/, "").replace(/\/$/, "") || "digathlon", px + 150, H2 - 70 - 44);
+    g.font = F(22); g.fillStyle = "#f2a93b"; g.fillText((location.host + location.pathname).replace(/index\.html$/, "").replace(/\/$/, "") || "toupix", px + 150, H2 - 70 - 44);
     return await new Promise(ok => c.toBlob(ok, "image/png"));
   }
   let BLOB = null, URLIMG = "";
@@ -3076,7 +3088,7 @@ var V6 = (() => {
     let pode = false; try { pode = !!navigator.canShare && navigator.canShare({ files:[arquivo()] }); } catch (e) {}
     show("v6shEnv", pode); show("v6shCopia", !!(navigator.clipboard && window.ClipboardItem)); show("v6share", true); $("v6share").scrollTop = 0;
   }
-  const arquivo = () => new File([BLOB], "digathlon.png", { type:"image/png" });
+  const arquivo = () => new File([BLOB], "toupix.png", { type:"image/png" });
   function copiaTexto(onde){ const t = textoShare(), diz = k => { $(onde).textContent = tr(k); };
     try { navigator.clipboard.writeText(t).then(() => diz("v6Copied"), () => { const box = $("shareTxt"); box.value = t; box.hidden = false; show("v6share", false); box.focus(); box.select(); $("shareMsg").textContent = tr("copyFail"); }); }
     catch (e) { const box = $("shareTxt"); box.value = t; box.hidden = false; show("v6share", false); box.focus(); box.select(); $("shareMsg").textContent = tr("copyFail"); } }
@@ -3084,7 +3096,7 @@ var V6 = (() => {
   $("v6shX").onclick = () => show("v6share", false);
   $("v6shTxt").onclick = () => copiaTexto("v6shMsg");
   $("v6shEnv").onclick = async () => { try { await navigator.share({ files:[arquivo()], text:textoShare() }); } catch (e) {} };
-  $("v6shBaixa").onclick = () => { const a = document.createElement("a"); a.href = URLIMG; a.download = "digathlon.png"; document.body.appendChild(a); a.click(); a.remove(); $("v6shMsg").textContent = tr("v6Saved"); };
+  $("v6shBaixa").onclick = () => { const a = document.createElement("a"); a.href = URLIMG; a.download = "toupix.png"; document.body.appendChild(a); a.click(); a.remove(); $("v6shMsg").textContent = tr("v6Saved"); };
   $("v6shCopia").onclick = async () => { try { await navigator.clipboard.write([new ClipboardItem({ "image/png":BLOB })]); $("v6shMsg").textContent = tr("v6Copied"); } catch (e) { $("v6shMsg").textContent = tr("v6NoCopy"); } };
 
   /* ---------- cortina de terra: intro (abrir o jogo), saída e volta ---------- */
@@ -3094,7 +3106,7 @@ var V6 = (() => {
     let veioDeVolta = false; try { veioDeVolta = sessionStorage.getItem("digV6volta") === "1"; sessionStorage.removeItem("digV6volta"); } catch (e) {}
     if (calmo() || new URLSearchParams(location.search).get("sala")) { cort.classList.remove("espera", "fechada"); return; }
     if (veioDeVolta) { requestAnimationFrame(() => requestAnimationFrame(() => cortina(false))); return; }
-    const lg = $("v6logo"); lg.innerHTML = [..."DIGATHLON"].map((ch, i) => `<b style="--i:${i}">${ch}</b>`).join("");
+    const lg = $("v6logo"); lg.innerHTML = [..."TOUPIX"].map((ch, i) => `<b style="--i:${i}">${ch}</b>`).join("");
     const m = V6.bicho(undefined, 5); lg.appendChild(m); const sm = document.createElement("small"); sm.textContent = tr("tagline"); lg.appendChild(sm);
     cort.classList.remove("espera"); cort.classList.add("intro");
     let abriu = false; const abre = () => { if (abriu) return; abriu = true; cortina(false); removeEventListener("pointerdown", abre, true); removeEventListener("keydown", abre, true); };
@@ -3923,6 +3935,43 @@ var V9 = (function () {
   try { const draw9 = draw; draw = function () { draw9(); try { vida(); } catch (e) {} }; } catch (e) {}
   try { cache.clear(); } catch (e) {}
   return API;
+})();
+</script>
+<script>
+/* ================= v10 (21/11): TOUPIX — consertos do Competitivo e botão de cancelar a cavada ================= */
+var V10 = (function () {
+  Object.assign(STR.en, { v10Canc: "CANCEL DIG", v10Cert: "SURE? TAP AGAIN", v10SkipUlt: "Skipping costs 1 ❤ — you only have 1 left", v10Tempo: "TIME'S UP · −1 ❤", v10Pulou: "SKIPPED · −1 ❤" });
+  Object.assign(STR.pt, { v10Canc: "CANCELAR CAVADA", v10Cert: "CERTEZA? TOQUE DE NOVO", v10SkipUlt: "Pular custa 1 ❤ e você só tem 1", v10Tempo: "ACABOU O TEMPO · −1 ❤", v10Pulou: "PULOU · −1 ❤" });
+  const dano = () => { ["hud", "bar"].forEach(id => { const e = document.getElementById(id); if (!e) return; e.classList.remove("v10dano"); void e.offsetWidth; e.classList.add("v10dano"); }); };
+  // Competitivo: o tempo acabou -> perde 1 coração e vai para a próxima; só acaba quando os corações zeram
+  function tempoComp() {
+    vidas = Math.max(0, vidas - 1); labelQ(); SOM.sem(); vib([80, 60, 160]); dano();
+    if (vidas <= 0) return compFim(tr("timeUp"));
+    try { V6.toast(tr("v10Tempo")); } catch (e) {}
+    show("bar", false); show("cdown", false); nextQ();
+  }
+  // Competitivo: pular custa 1 coração (e não deixa gastar o último). -> true se pode seguir
+  function pulaComp() {
+    if (vidas <= 1) { try { V6.toast(tr("v10SkipUlt")); } catch (e) {} return false; }
+    vidas--; labelQ(); vib([60, 40, 60]); dano(); try { V6.toast(tr("v10Pulou")); } catch (e) {}
+    return true;
+  }
+  // botão de cancelar a cavada (do dia ou livre): dois toques, volta para a tela inicial sem recarregar a página
+  let t = null, ult = null, ultL = null;
+  const b = document.createElement("button"); b.id = "v10cancela"; b.type = "button";
+  const rotulo = certeza => { b.innerHTML = "✕<span> " + tr(certeza ? "v10Cert" : "v10Canc") + "</span>"; b.title = tr("v10Canc"); b.setAttribute("aria-label", tr(certeza ? "v10Cert" : "v10Canc")); b.classList.toggle("certeza", !!certeza); };
+  b.onclick = () => {
+    if (!b.classList.contains("certeza")) { rotulo(true); clearTimeout(t); t = setTimeout(() => rotulo(false), 3000); return; }
+    clearTimeout(t); rotulo(false);
+    try { if (window.V6 && V6.voltar) V6.voltar(); else location.reload(); } catch (e) { location.reload(); }
+  };
+  try { document.body.appendChild(b); rotulo(false); } catch (e) {}
+  let nq = 0;
+  // no celular o topo é todo do placar: o botão desce para logo abaixo da pergunta (ou do placar)
+  const lugar = () => { try { if (innerWidth > 900) { b.style.top = ""; return; } let y = 6; ["hud", "qp"].forEach(id => { const e = document.getElementById(id); if (e && !e.classList.contains("hide")) { const r = e.getBoundingClientRect(); if (r.height) y = Math.max(y, r.bottom + 6); } }); b.style.top = Math.round(Math.min(y, innerHeight * .45)) + "px"; } catch (e) {} };
+  const cavando = () => { try { return started && mode !== "title" && mode !== "up" && !document.body.classList.contains("party") && !document.body.classList.contains("toca") && !document.querySelector("#menu:not(.hide), #cfg:not(.hide), #themes:not(.hide), #pEnd:not(.hide), #v6loja:not(.hide), #bBack:not(.hide)") && !window.v10passeio && !(window.V6 && V6.saindo) && !race && !(typeof ON !== "undefined" && ON && ON.jogo) && !["end", "tour", "raceFim"].includes(mode) && document.getElementById("end").classList.contains("hide"); } catch (e) { return false; } };
+  try { const draw10 = draw; draw = function () { draw10(); const c = cavando(); if (c !== ult) { ult = c; document.body.classList.toggle("v10cav", c); if (!c) rotulo(false); } if (c && (++nq % 12 === 1)) lugar(); if (CFG.lang !== ultL) { ultL = CFG.lang; rotulo(b.classList.contains("certeza")); } }; } catch (e) {}
+  return { tempoComp, pulaComp, cavando };
 })();
 </script>
 <script type="module">

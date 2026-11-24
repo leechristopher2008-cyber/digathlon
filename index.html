@@ -1793,14 +1793,20 @@ const VEZ_S = 25, ERRO_S = 3;
 // a pergunta viaja pelo banco como CÓDIGO (ex.: fronteira_afg), então todo celular vê a mesma
 // só o líder sorteia: tira de um "saco" (não repete pergunta na partida) e pula pergunta com menos de MIN_RESP respostas,
 // senão as respostas acabam com 6-8 jogadores
+const USOU_K = "digNajaUsou", USOU_MAX = 900;   // perguntas já jogadas na Naja Party (guardadas no celular do líder)
 const MIN_RESP = 20, O_TEMAS = ["all","geek","cultura","bichos","geo","ciencia","comida","brasil"];
 function oSorteia(){
   const tema = ON.tema || "all", fonte0 = () => pool().filter(d => (d.fam !== "palavras" || d.pad.lang === CFG.lang) && (tema === "all" || d.tags.includes(tema))),
     fonte = () => { const f = fonte0(), sem = f.filter(d => !/_\dl_/.test(d.id)); return sem.length >= 30 ? sem : f; };
-  ON.usou = ON.usou || new Set();
+  // 24/11: o celular do líder LEMBRA as perguntas jogadas (de um dia pro outro), senão toda noite voltavam as mesmas.
+  // Só repete quando acabarem as novas do tema escolhido; aí aquele tema recomeça do zero.
+  if (!ON.usou) { let ant = []; try { ant = JSON.parse(localStorage.getItem(USOU_K) || "[]"); } catch (e) {} ON.usou = new Set(Array.isArray(ant) ? ant.filter(x => typeof x === "string") : []); }
+  const grava = () => { try { localStorage.setItem(USOU_K, JSON.stringify([...ON.usou].slice(-USOU_MAX))); } catch (e) {} };
   for (let k = 0; k < 3000; k++) {
-    if (!ON.saco || !ON.saco.length) { const f = fonte(), novas = f.filter(d => !ON.usou.has(d.id)); ON.saco = misturaFamilias(novas.length > 20 ? novas : f); }
-    const id = ON.saco.pop(), Q = getQ(id); if (Q && Q.lista.length >= MIN_RESP && !ON.usou.has(id)) { ON.usou.add(id); return id; } }
+    if (!ON.saco || !ON.saco.length) { const f = fonte(); let novas = f.filter(d => !ON.usou.has(d.id) && (getQ(d.id) || { lista:[] }).lista.length >= MIN_RESP);
+      if (novas.length < 8) { f.forEach(d => ON.usou.delete(d.id)); grava(); novas = f; }   // acabaram as novas deste tema: recomeça
+      ON.saco = misturaFamilias(novas); }
+    const id = ON.saco.pop(), Q = getQ(id); if (Q && Q.lista.length >= MIN_RESP && !ON.usou.has(id)) { ON.usou.delete(id); ON.usou.add(id); grava(); return id; } }
   const p = fonte(); return p[Math.random()*p.length | 0].id; }
 function oRelogio(seg){ const g = ON.room && ON.room.game; ON.t0 = performance.now(); ON.dur = (seg || (g && g.cfg && g.cfg.tempo) || VEZ_S)*1000; ON.biting = false; oGarante(); }
 // o juiz (celular do líder) confere tudo a cada 250 ms, em qualquer modo

@@ -188,7 +188,7 @@
   /* 3A: a toca da naja (cenário só da Naja Party) */
   #toca { position:fixed; inset:0; z-index:2; background:#1c120c; }
   #toca canvas { position:absolute; inset:0; width:100%; height:100%; image-rendering:pixelated; }
-  #toca::after { content:""; position:absolute; inset:0; pointer-events:none; background:radial-gradient(ellipse at 50% 55%, transparent 45%, #000c 100%); }
+  #toca::after { content:""; position:absolute; inset:0; pointer-events:none; background:radial-gradient(ellipse at 50% 55%, transparent 58%, #000a 100%); }
   #toca .torch { position:absolute; top:40%; width:10px; height:30px; margin-left:-5px; background:#6b4423; box-shadow:2px 0 0 #3f2816 inset; }
   #toca .torch::before { content:""; position:absolute; left:-4px; bottom:100%; width:18px; height:22px; background:linear-gradient(#ffe27a, #ff8a1f 55%, #ff3b1f);
     clip-path:polygon(50% 0, 80% 40%, 100% 75%, 70% 100%, 30% 100%, 0 75%, 20% 40%); animation:flame .5s steps(2) infinite; transform-origin:50% 100%; }
@@ -196,9 +196,10 @@
     background:radial-gradient(circle, #ffb04a40, #ff8a1f14 45%, transparent 70%); animation:glow 1.6s ease-in-out infinite alternate; pointer-events:none; }
   @keyframes flame { 0% { transform:scaleY(1) skewX(0); } 100% { transform:scaleY(1.15) skewX(-6deg); } }
   @keyframes glow { 0% { opacity:.75; } 100% { opacity:1; } }
+  #toca .torch { display:none; }   /* tochas agora são desenhadas no tocaC/tocaFx, com luz de verdade */
   body.toca #den { background:none; }
   body.toca #den::before { inset:auto; left:30%; right:30%; top:42%; height:15%; border:none; border-radius:50%;
-    background:radial-gradient(ellipse, #000 0 50%, #0a0604 64%, #3f2816 70%, transparent 72%); }
+    background:none; }   /* o buraco agora é desenhado no tocaC */
   #najaC { position:relative; z-index:1; }
   body.toca .seat { z-index:2; }   /* toupeiras e balões na frente da naja */
   body.toca .seat.up { display:flex; flex-direction:column; align-items:center; } body.toca .seat.up .bal { order:-1; margin:0 0 3px; }   /* toupeira de cima: balão em cima, longe da naja */
@@ -635,7 +636,7 @@
   </div>
 </div>
 <!-- 3A: cenário próprio da Naja Party (a toca da naja) -->
-<div id="toca" class="hide" aria-hidden="true"><canvas id="tocaC"></canvas><i class="torch" style="left:13%"></i><i class="torch" style="left:87%"></i></div>
+<div id="toca" class="hide" aria-hidden="true"><canvas id="tocaC"></canvas><canvas id="tocaFx"></canvas><i class="torch" style="left:13%"></i><i class="torch" style="left:87%"></i></div>
 <div id="cfg" class="panel hide" role="dialog" aria-labelledby="cfgT">
   <h2 id="cfgT" data-t="settings">SETTINGS</h2>
   <div class="check"><input type="checkbox" id="cAcess"><label for="cAcess" data-t="accessible">Accessible mode</label></div>
@@ -870,8 +871,8 @@ const STR = {
     howT:"HOW TO PLAY", howGo:"GOT IT ▼", how4:"Free dig: endless prompts by theme. Cobra Party: one phone, everyone in a circle, pass the cobra before it strikes.",
     cred:"Prompts: hand-written lists plus open data — GeoNames (CC BY 4.0), mledoze/countries (ODbL), Brazilian municipalities from IBGE via kelvins/municipios-brasileiros (MIT), word frequencies from wordfreq (CC BY-SA 4.0), dictionaries VERO pt-BR (LGPL/MPL) and SCOWL en-US. Online check: Claude (inside claude.ai) or Wikipedia (when you open the file directly).",
     colTot2:"{a} answers in {b} prompts", colNone:"Nothing here yet. Every answer you dig up is kept here.", nBank:"{n} prompts in the burrow",
-    layers:["TOPSOIL","STONE LAYER","DARK CAVES","ICE LAYER","MAGMA","BEDROCK","CORE"],
-    facts:["earthworms rarely go below here","lost house keys found: 3,412","an old tree root says hi","stone layer · bring a stronger snout","a pirate buried something here. not your problem","dark caves · lamp on","the crystals hum if you keep quiet","ice layer · −12 °C","a frozen mammoth waves hello","magma · 1,100 °C · do not lick","nobody comes back with eyebrows","bedrock · the oldest stone in the game","the bedrock is getting thin · something glows down there","core · 5,400 °C · about as hot as the surface of the Sun","the pressure here is millions of times stronger than at the surface","a mole on the other side of the planet waves back","end of the map. for now."] },
+    layers:["TOPSOIL","STONE LAYER","FOSSILS","DARK CAVES","UNDERGROUND RIVER","ICE LAYER","CRYSTAL GARDEN","MAGMA","BEDROCK","CORE","THE OTHER SIDE"],
+    facts:["earthworms rarely go below here","lost house keys found: 3,412","an old tree root says hi","stone layer · bring a stronger snout","a pirate buried something here. not your problem","fossil layer · a dinosaur says it got here first","a trilobite older than the dinosaurs","dark caves · lamp on","the crystals hum if you keep quiet","underground river · this water never saw the Sun","a blind fish asks who turned on the lamp","ice layer · −12 °C","a frozen mammoth waves hello","crystal garden · each crystal took a million years to grow","do not touch. this is a museum","magma · 1,100 °C · do not lick","nobody comes back with eyebrows","bedrock · the oldest stone in the game","the bedrock is getting thin · something glows down there","core · 5,400 °C · about as hot as the surface of the Sun","the pressure here is millions of times stronger than at the surface","the other side · the sky is down here and the ground is up there","a mole on the other side of the planet waves back","end of the map. for now."] },
   pt: { tagline:"quanto mais esquisita a resposta, mais fundo você cava", daily:"▼ CAVADA DO DIA ▼", free:"CAVADA LIVRE ∞", tour:"VER AS CAMADAS",
     depth:"PROFUNDIDADE", score:"PONTOS", hint:"▼ resposta esquisita cava mais fundo ▼", dig:"CAVAR ▼", ph:"digite uma resposta…",
     count:"cavando · o relógio começa em <b>{n}</b>", timesUp:"ACABOU O TEMPO · <b>PRÓXIMA</b>", wrong:"não tem na toca · tenta outra",
@@ -929,8 +930,8 @@ const STR = {
     howT:"COMO JOGAR", howGo:"ENTENDI ▼", how4:"Cavada livre: perguntas sem fim do tema que você escolher. Festa da Naja: um celular só, todo mundo em roda, passe a naja antes do bote.",
     cred:"Perguntas: listas escritas à mão + dados abertos — GeoNames (CC BY 4.0), mledoze/countries (ODbL), municípios do IBGE via kelvins/municipios-brasileiros (MIT), frequência de palavras do wordfreq (CC BY-SA 4.0), dicionários VERO pt-BR (LGPL/MPL) e SCOWL en-US. Conferência online: Claude (dentro do claude.ai) ou Wikipédia (quando o arquivo é aberto direto no navegador).",
     colTot2:"{a} respostas em {b} perguntas", colNone:"Ainda vazio. Toda resposta que você desenterra fica guardada aqui.", nBank:"{n} perguntas na toca",
-    layers:["TERRA","PEDRA","CAVERNAS ESCURAS","GELO","MAGMA","ROCHA-MÃE","NÚCLEO"],
-    facts:["minhoca quase nunca passa daqui","chaves de casa perdidas: 3.412","uma raiz velha manda um oi","camada de pedra · precisa de focinho forte","um pirata enterrou algo aqui. não é problema seu","cavernas escuras · lanterna ligada","os cristais cantarolam se você ficar quieto","camada de gelo · −12 °C","um mamute congelado dá tchau","magma · 1.100 °C · não lamba","ninguém volta com sobrancelha","rocha-mãe · a pedra mais velha do jogo","a rocha-mãe está ficando fina · tem algo brilhando lá embaixo","núcleo · 5.400 °C · quase tão quente quanto a superfície do Sol","a pressão aqui é milhões de vezes maior que na superfície","uma toupeira do outro lado do planeta acena de volta","fim do mapa. por enquanto."] },
+    layers:["TERRA","PEDRA","FÓSSEIS","CAVERNAS ESCURAS","RIO SUBTERRÂNEO","GELO","JARDIM DE CRISTAIS","MAGMA","ROCHA-MÃE","NÚCLEO","OUTRO LADO"],
+    facts:["minhoca quase nunca passa daqui","chaves de casa perdidas: 3.412","uma raiz velha manda um oi","camada de pedra · precisa de focinho forte","um pirata enterrou algo aqui. não é problema seu","camada de fósseis · um dinossauro diz que chegou primeiro","um trilobita mais velho que os dinossauros","cavernas escuras · lanterna ligada","os cristais cantarolam se você ficar quieto","rio subterrâneo · essa água nunca viu o Sol","um peixe cego pergunta quem acendeu a lanterna","camada de gelo · −12 °C","um mamute congelado dá tchau","jardim de cristais · cada cristal levou um milhão de anos pra crescer","não encosta. isso aqui é museu","magma · 1.100 °C · não lamba","ninguém volta com sobrancelha","rocha-mãe · a pedra mais velha do jogo","a rocha-mãe está ficando fina · tem algo brilhando lá embaixo","núcleo · 5.400 °C · quase tão quente quanto a superfície do Sol","a pressão aqui é milhões de vezes maior que na superfície","outro lado · aqui o céu fica embaixo e o chão lá em cima","uma toupeira do outro lado do planeta acena de volta","fim do mapa. por enquanto."] },
 };
 const PADRAO    = { acess:false, fs:18, ff:"pixel", tempo:25, contr:false };
 const ACESSIVEL = { acess:true,  fs:24, ff:"Verdana, sans-serif", tempo:45, contr:true };
@@ -951,7 +952,7 @@ const TIERS = [
   { pts:80,  name:"LEGENDARY", col:"#ffb020", say:"Gold-grade dirt." },
   { pts:120, name:"ULTRA",     col:"rainbow", say:"Even the bedrock is impressed." },
 ];
-TIERS.forEach(T => T.m = T.pts * 10);
+TIERS.forEach(T => T.m = T.pts * 15);   // 15 m por ponto: dá pra chegar ao Outro lado (10.000 m) na cavada do dia
 const fmt = n => Math.round(n).toLocaleString("en-US");
 // as perguntas ficam em BANCO/BANCO2 (escritas à mão) e GERADAS/PADROES/MUNI_P (geradas de bases abertas, banco.js).
 // Nenhuma é montada no começo: cada uma vira lista pronta só quando aparece (o celular agradece).
@@ -1165,19 +1166,20 @@ async function confereOnline(Q, v){
 }
 let QS = [];
 const LAYERS = [
-  { name:"TOPSOIL",     from:0,    pal:["#5b3a22","#6e4629","#4a2f1b","#7d5532"] },
-  { name:"STONE LAYER", from:500,  pal:["#56504a","#635c55","#46413c","#706860"] },
-  { name:"DARK CAVES",  from:1200, pal:["#2b2030","#342738","#221a27","#3d2e44"] },
-  { name:"ICE LAYER",   from:2200, pal:["#4b5b67","#566a7a","#3f4d59","#6a8292"] },
-  { name:"MAGMA",       from:3300, pal:["#3a1a14","#4a2016","#2c130f","#5a2618"] },
-  { name:"BEDROCK",     from:4500, pal:["#18151b","#1f1b23","#121015","#28232c"] },
-  { name:"CORE",        from:5800, pal:["#7a2a10","#913516","#62200b","#a8441a"] },
+  { name:"TOPSOIL",     from:0,     b:0, pal:["#5b3a22","#6e4629","#4a2f1b","#7d5532"] },
+  { name:"STONE LAYER", from:600,   b:1, pal:["#56504a","#635c55","#46413c","#706860"] },
+  { name:"FOSSILS",     from:1350,  b:1, pal:["#6b5d4a","#7a6b56","#5a4d3c","#8a7a62"] },
+  { name:"DARK CAVES",  from:2250,  b:2, pal:["#2b2030","#342738","#221a27","#3d2e44"] },
+  { name:"UNDERGROUND RIVER", from:3150, b:3, pal:["#1f3a48","#264655","#18303c","#2e5566"] },
+  { name:"ICE LAYER",   from:4050,  b:3, pal:["#4b5b67","#566a7a","#3f4d59","#6a8292"] },
+  { name:"CRYSTAL GARDEN", from:4950, b:2, pal:["#3a2450","#462c60","#2e1c40","#563670"] },
+  { name:"MAGMA",       from:5850,  b:4, pal:["#3a1a14","#4a2016","#2c130f","#5a2618"] },
+  { name:"BEDROCK",     from:6900,  b:5, pal:["#18151b","#1f1b23","#121015","#28232c"] },
+  { name:"CORE",        from:8250,  b:6, pal:["#7a2a10","#913516","#62200b","#a8441a"] },
+  { name:"OTHER SIDE",  from:10000, b:7, pal:["#5b8fc7","#6a9dd3","#4c7fb8","#7aaee0"] },
 ];
-const FACTS = [[60,"earthworms rarely go below here"],[250,"lost house keys found: 3,412"],[420,"an old tree root says hi"],
-  [600,"stone layer · bring a stronger snout"],[900,"a pirate buried something here. not your problem"],[1330,"dark caves · lamp on"],
-  [1800,"the crystals hum if you keep quiet"],[2330,"ice layer · −12 °C"],[2800,"a frozen mammoth waves hello"],
-  [3430,"magma · 1,100 °C · do not lick"],[4000,"nobody comes back with eyebrows"],[4630,"bedrock · the oldest stone in the game"],[5550,"bedrock thins"],[5930,"core"],[6700,"pressure"],[7500,"other side"],[8400,"end of the map. for now."]];
-const TOUR_END = 8500, WOB = 40;   // WOB = quanto a divisa entre camadas ondula (m)
+const FACTS = [[90,"earthworms rarely go below here"],[300,"lost house keys found: 3,412"],[480,"an old tree root says hi"],[700,"stone layer · bring a stronger snout"],[1050,"a pirate buried something here. not your problem"],[1450,"fossil layer · a dinosaur says it got here first"],[1900,"a trilobite older than the dinosaurs"],[2350,"dark caves · lamp on"],[2800,"the crystals hum if you keep quiet"],[3250,"underground river · this water never saw the Sun"],[3700,"a blind fish asks who turned on the lamp"],[4150,"ice layer · −12 °C"],[4600,"a frozen mammoth waves hello"],[5050,"crystal garden · each crystal took a million years to grow"],[5500,"do not touch. this is a museum"],[5950,"magma · 1,100 °C · do not lick"],[6400,"nobody comes back with eyebrows"],[7000,"bedrock · the oldest stone in the game"],[7900,"the bedrock is getting thin · something glows down there"],[8350,"core · 5,400 °C · about as hot as the surface of the Sun"],[9100,"the pressure here is millions of times stronger than at the surface"],[10100,"the other side · the sky is down here and the ground is up there"],[10400,"a mole on the other side of the planet waves back"],[10700,"end of the map. for now."]];
+const TOUR_END = 10800, WOB = 40;   // WOB = quanto a divisa entre camadas ondula (m)
 let SURF = 70;   // distância (m) entre a grama e o "0 m" do jogo (= altura da toupeira; recalculada no resize)
 
 /* ================= UTILIDADES ================= */
@@ -1303,6 +1305,7 @@ function blob(g, cx, cy, rx, ry, tones, line = true){
 function walk(g, x, y, n, col, r, diag){ g.fillStyle = col; for (let i = 0; i < n; i++) { pxl(g, x, y); y += PX; const p = r(); x += diag ? (p < .5 ? -PX : PX) : (p < .25 ? -PX : p < .5 ? PX : 0); } }
 function mapDraw(g, map, x, y, col){ map.forEach((row, j) => [...row].forEach((ch, i) => { if (ch === "0") return; g.fillStyle = ch === "2" ? "#2a1d14" : col; g.fillRect(snap(x) + i*PX, snap(y) + j*PX, PX, PX); })); }
 function feature(g, L, x, y, r){
+  L = LAYERS[L] ? LAYERS[L].b : L;   // camadas novas usam o desenho base de uma parecida
   const p = r();
   if (L === 0) { if (p < .5) blob(g,x,y,1+r()*2,1+r()*1.5,ROCKT); else if (p < .78) walk(g,x,y,8+r()*14|0,"#8a6a44",r); else if (p < .9) { g.fillStyle="#e889a0"; for (let i=0;i<5;i++) pxl(g,x+i*PX,y+(i%2)*PX); g.fillStyle="#c25a76"; pxl(g,x+5*PX,y+PX); } else mapDraw(g,BONE,x,y,"#e6d8b8"); }
   else if (L === 1) { if (p < .55) blob(g,x,y,3+r()*5,2+r()*4,ROCKT2); else if (p < .9) blob(g,x,y,1+r()*2,1+r()*1.5,ROCKT); else mapDraw(g,BONE,x,y,"#d8caa8"); }
@@ -1314,6 +1317,10 @@ function feature(g, L, x, y, r){
   else if (L === 4) { if (p < .45) { let vx = x, vy = y; const n = 10 + r()*16|0; for (let i = 0; i < n; i++) { g.fillStyle = r() < .3 ? "#ffd257" : "#ff5a36"; pxl(g,vx,vy); vy += PX; vx += r() < .5 ? -PX : PX; } }
     else if (p < .7) blob(g,x,y,2+r()*3,1.5+r()*2,LAVAT); else blob(g,x,y,1+r()*2,1+r()*1.5,ROCKDARK); }
   else if (L === 5) { if (p < .6) { g.fillStyle = "#ffd257"; pxl(g,x,y); if (r() < .5) pxl(g,x+PX,y); } else blob(g,x,y,2+r()*4,1.5+r()*3,ROCKDARK); }
+  else if (L === 7) {   // outro lado: céu de cabeça pra baixo (nuvens, passarinhos, estrelas), sem pedra nem minhoca
+    if (p < .5) { const w = 4 + (r()*6|0); g.fillStyle = "#eef6ff"; for (let i = 0; i < w; i++) { pxl(g, x + i*PX, y); if (i > 0 && i < w - 1) pxl(g, x + i*PX, y + PX); } g.fillStyle = "#cfe3f7"; for (let i = 1; i < w - 1; i++) pxl(g, x + i*PX, y + 2*PX); }
+    else if (p < .8) { g.fillStyle = "#2c4a6e"; pxl(g, x, y); pxl(g, x + PX, y - PX); pxl(g, x + 2*PX, y); pxl(g, x + 3*PX, y - PX); pxl(g, x + 4*PX, y); }
+    else { g.fillStyle = "#fff6a0"; pxl(g, x, y); pxl(g, x - PX, y); pxl(g, x + PX, y); pxl(g, x, y - PX); pxl(g, x, y + PX); } }
   else { if (p < .45) blob(g,x,y,1.5+r()*3,1+r()*2,COREB); else if (p < .8) walk(g,x,y,8+r()*12|0,r() < .5 ? "#ffd27a" : "#ff9b3d",r,true); else { g.fillStyle = "#fff6d0"; pxl(g,x,y); pxl(g,x+PX,y+PX); } }
 }
 const cache = new Map();
@@ -1593,7 +1600,7 @@ function naja(){
 sPaint($("najaC"), naja(), 4);
 
 /* ================= RODA DA TOCA (offline, um aparelho só) ================= */
-const PARTY_D = 1350;   // a toca da naja fica nas cavernas escuras
+const PARTY_D = 2400;   // a toca da naja fica nas cavernas escuras
 let PT = null, deep = false, moleGone = false, DEN = null, lastSpd = "";
 const esc = s => s.replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]));
 // igual às regras do solo, mas também diz se a resposta já foi dita nesta rodada
@@ -1648,7 +1655,9 @@ function layoutDen(){
     const h = Math.round(Math.max(140, (Bt - T - 2*meia) / .8)), w = Math.round(Math.max(Math.min(W - 40, 260), Math.min(W - 120, h*1.8, 820))), cy = Math.round((T + Bt)/2);
     if (DEN && DEN.w === w && DEN.h === h && DEN.cy === cy) return;
     DEN = { s:Math.min(w, h), w, h, cy }; den.style.width = w + "px"; den.style.height = h + "px"; den.style.left = Math.round((W - w)/2) + "px"; den.style.top = (cy - h/2) + "px";
-    den.style.setProperty("--ds", Math.round(Math.min(w, h*.8)) + "px"); den.style.setProperty("--dh", h + "px"); return; }   // naja um pouco menor que a roda, pra não cobrir a toupeira de baixo
+    den.style.setProperty("--ds", Math.round(Math.min(w, h*.8)) + "px"); den.style.setProperty("--dh", h + "px");
+    if (!$("toca").classList.contains("hide")) { clearTimeout(tocaTO); tocaTO = setTimeout(drawToca, 60); }   // a arena da toca acompanha a roda
+    return; }   // naja um pouco menor que a roda, pra não cobrir a toupeira de baixo
   const s = Math.round(Math.max(200, Math.min(W - 80, bot - top, 460))), cy = Math.round((top + bot)/2);
   if (DEN && DEN.s === s && DEN.cy === cy && !DEN.w) return;
   DEN = { s, cy }; den.style.width = den.style.height = s + "px"; den.style.left = Math.round((W - s)/2) + "px"; den.style.top = (cy - s/2) + "px";
@@ -1705,7 +1714,7 @@ async function oEntra(code, name, criar){
     if (criar) {
       for (let i = 0; i < 6; i++) { code = Array.from({ length:4 }, () => LETRAS[Math.random()*LETRAS.length | 0]).join(""); if (!(await FB.get(oRef(code + "/meta"))).exists()) break; }
       await FB.set(oRef(code + "/meta"), { host:uid, state:"lobby", lives:3, created:Date.now() });
-      FB.onDisconnect(oRef(code)).update({ meta:null, game:null });   // o líder fechou a aba = a sala fecha
+      // o líder fechou a aba: a sala NÃO fecha; o jogador mais antigo vira líder (oAssume)
     } else {
       const s = await FB.get(oRef(code)); if (!s.exists() || !s.child("meta").exists()) return oSay("oSetupMsg", "oErrCode");
       const pl = s.child("players").val() || {}; if (!pl[uid] && Object.keys(pl).length >= 8) return oSay("oSetupMsg", "oErrFull");
@@ -1714,6 +1723,7 @@ async function oEntra(code, name, criar){
     await FB.set(eu, { name, joined:Date.now() }); FB.onDisconnect(eu).remove();   // fechou a aba = sai da sala
     const lv = oRef(`${code}/live/${uid}`); await FB.set(lv, { t:"", s:0 }); FB.onDisconnect(lv).remove();
     ON = { code, uid, host:null, seen:{} };
+    ON.vigia = setInterval(oVigia, 2000);   // confere se o líder ainda está vivo (sumiu = outro assume)
     history.replaceState(null, "", "?sala=" + code);
     oSay("oSetupMsg"); ["oSetup","tools","title","titleBtns"].forEach(id => show(id, false)); show("oLobby", true);
     $("oCodeBig").textContent = code; $("oLink").value = location.origin + location.pathname + "?sala=" + code;
@@ -1723,7 +1733,10 @@ async function oEntra(code, name, criar){
 function oDesenha(r){
   if (!ON) return;
   if (!r || !r.meta) return oSai(true);
+  const antes = ON.host;
   ON.room = r; ON.host = r.meta.host; const pl = r.players || {}, lider = ON.host === ON.uid;
+  if (ON.host && pl[ON.uid] && (!pl[ON.host] || oLiderParado(r))) oAssume(pl, ON.host);   // o líder saiu ou parou de dar sinal: o mais antigo assume
+  else if (lider && antes && antes !== ON.uid && r.meta.state === "play" && r.game) oViraJuiz(r.game);   // acabei de virar líder no meio da partida
   if (r.meta.state === "play" && r.game && r.game.order) return oPartida(r);
   if (ON.jogo) oLimpaCena();
   show("oFim", false); show("oLobby", true);
@@ -1737,10 +1750,22 @@ function oDesenha(r){
   $("oMsg").textContent = lider ? (ids.length < 2 ? tr("oNeed2") : "") : tr("oWait", { a:pl[ON.host] ? pl[ON.host].name : "?" });
   oLobbyModo(r, lider);
 }
+// troca de líder: quem entrou primeiro entre os que ficaram se coloca como líder (as regras do Firebase só deixam se o líder antigo saiu)
+// o líder grava game/hb (sinal de vida) a cada 3 s durante a partida; 12 s sem sinal = sumiu (recarregou a página, celular trancou, caiu a internet)
+const oLiderParado = r => !!(r && r.meta && r.meta.state === "play" && r.game && r.game.hb && r.game.phase !== "fim" && FB.now() - r.game.hb > 12000);
+function oVigia(){ if (!ON || !ON.room || !ON.room.meta || ON.host === ON.uid) return; const pl = ON.room.players || {}; if (pl[ON.uid] && (!pl[ON.host] || oLiderParado(ON.room))) oAssume(pl, ON.host); }
+function oAssume(pl, velho){
+  const ids = Object.keys(pl).filter(u => u !== velho).sort((a, b) => pl[a].joined - pl[b].joined);
+  if (ids[0] !== ON.uid || ON.assumindo || (ON.tentouT && performance.now() - ON.tentouT < 8000)) return; ON.assumindo = true; ON.tentouT = performance.now();
+  FB.set(oRef(ON.code + "/meta/host"), ON.uid).then(() => { ON && (ON.tentouT = 0); }).catch(() => {}).finally(() => { if (ON) ON.assumindo = false; });   // recusado = o Firebase ainda vê o líder (tenta de novo em 8 s)
+}
+// o novo líder vira o juiz: liga o relógio do bote; se o líder caiu no meio de um bote, começa a rodada nova
+function oViraJuiz(g){ oMarca(ON.room.live); if (g.phase === "bite") { ON.biting = true; setTimeout(() => oRodada(g.bit), 2500); } else oRelogio(); }
 async function oSai(fechou){
-  if (!ON) return; if (ON.jogo) oLimpaCena(false); show("bVida", false); const o = ON; ON = null; if (o.off) o.off(); if (o.tick) clearInterval(o.tick);
+  if (!ON) return; if (ON.jogo) oLimpaCena(false); show("bVida", false); show("oFim", false); show("vRes", false);   // o ranking final fica na tela depois da partida (ON.jogo já é false): fecha sempre const o = ON; ON = null; if (o.off) o.off(); if (o.tick) clearInterval(o.tick); if (o.vigia) clearInterval(o.vigia);
   try { await FB.remove(oRef(`${o.code}/players/${o.uid}`)); await FB.remove(oRef(`${o.code}/live/${o.uid}`));
-    if (!fechou && o.host === o.uid) await FB.update(oRef(o.code), { meta:null, game:null }); } catch (e) {}
+    const sobra = Object.keys(((o.room || {}).players) || {}).filter(u => u !== o.uid).length;
+    if (!fechou && o.host === o.uid && !sobra) await FB.update(oRef(o.code), { meta:null, game:null }); } catch (e) {}   // líder sozinho saiu = apaga a sala
   history.replaceState(null, "", location.pathname);
   if (mode === "online") mode = deep ? "wait" : "title";
   show("oLobby", false); onlineSetup(); show("tools", true); oSay("oSetupMsg", fechou ? "oClosed" : null);
@@ -1769,6 +1794,7 @@ function oRelogio(seg){ const g = ON.room && ON.room.game; ON.t0 = performance.n
 // o juiz (celular do líder) confere tudo a cada 250 ms, em qualquer modo
 function oGarante(){ if (!ON.tick) ON.tick = setInterval(oTickGeral, 250); }
 function oTickGeral(){ const g = ON && ON.room && ON.room.game; if (!g || ON.host !== ON.uid || ON.room.meta.state !== "play" || g.phase === "fim") return;
+  if (!ON.hbT || performance.now() - ON.hbT > 3000) { ON.hbT = performance.now(); FB.update(oGame(), { hb:FB.now() }).catch(() => {}); }   // sinal de vida do líder
   if (g.modo === "corrida") return corridaTick(g); if (g.modo === "vel1" || g.modo === "vel2") return velTick(g); oTick(); }
 const najaVivos = g => g.order.filter(u => (ON.room.players || {})[u] && !(g.out || {})[u]);
 // próximo da roda no sentido horário que ainda está na sala
@@ -1852,28 +1878,202 @@ function oEntraNaToca(){
   document.body.classList.add("party", "toca"); show("oQuit", true);
   drawToca(); show("toca", true); mode = "online"; oTela(ON.room);
 }
-/* ----- 3A: a toca da naja: câmara redonda debaixo da terra, chão de terra batida, raízes no teto, tochas ----- */
+/* ----- 3A: a toca da naja: arena de pedra no fundo da caverna, com luz de tocha em degraus (pixel art) ----- */
+// tocaC = cenário parado (só é redesenhado quando a tela ou a roda mudam); tocaFx = o que se mexe, por cima.
+// A arena fica exatamente onde está a roda de toupeiras (#den); o buraco da naja bate com o lugar do desenho dela.
+let TOCA = null, tocaRaf = 0, tocaTO = 0;
+const TOCA_B4 = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];   // pontilhado 4x4 (dither) entre um degrau de luz e outro
+const tocaHex = s => [1, 3, 5].map(i => parseInt(s.slice(i, i + 2), 16));
+const TOCA_RAMPA = {   // do escuro (sombra fria) pro claro (luz de tocha)
+  rocha:["#07050a","#110b14","#1c1319","#2a1c1d","#3d2921","#553826","#714b2e","#946338"],
+  chao: ["#0a0709","#161012","#241a17","#36271d","#4c3624","#66482c","#845e35","#a8783f"],
+  runa: ["#0b0708","#181012","#28201c","#3a2f27","#4f4134","#695642","#866e52","#a68a66"],
+  coluna:["#08070a","#121116","#1c1a20","#29262b","#3a3534","#4f4740","#6a5e52","#8a7a68"],
+  molh: ["#06070c","#0c1018","#141a24","#1d2632","#283444","#344458","#41566e","#506a86"],
+};
+for (const k in TOCA_RAMPA) TOCA_RAMPA[k] = TOCA_RAMPA[k].map(tocaHex);
+const TOCA_GLIFOS = [["x.x",".x.","x.x"], [".x.","xxx",".x."], ["xx.",".x.",".xx"], ["x..","xxx","..x"], [".x.","x.x",".x."], ["xxx","..x","xxx"], ["x.x","xxx","x.x"]];
+const TOCA_CRIS = ["..w.....", ".lm.....", ".lmd..w.", "llmd.lm.", "lmmd.lmd", "lmmdllmd", "lmmdlmmd", "dddddddd"];
 function drawToca(){
   const c = $("tocaC"), w = innerWidth, h = innerHeight, b = Math.max(4, Math.round(Math.min(w, h) / 140)), cw = Math.ceil(w / b), ch = Math.ceil(h / b);
-  c.width = cw; c.height = ch; const g = c.getContext("2d"), img = g.createImageData(cw, ch), d = img.data;
-  const R = (x, y, s) => { const v = Math.sin(x*12.9898 + y*78.233 + s*37.719)*43758.5453; return v - Math.floor(v); };
-  const hex = s => [1, 3, 5].map(i => parseInt(s.slice(i, i + 2), 16));
-  const WALL = ["#1c120c","#2b1b11","#140d08"].map(hex), CAM = ["#2e1d12","#3a2516","#26180f"].map(hex), RIM = hex("#120b07"), FLOOR = ["#4a2f1a","#5a3a20","#3f2816"].map(hex);
-  const cx = cw/2, cy = ch*.52, rx = cw*.5, ry = ch*.5, fy = ch*.82, frx = cw*.44, fry = ch*.16;
+  c.width = cw; c.height = ch; const g = c.getContext("2d"), img = g.createImageData(cw, ch), d = img.data, sx = cw / w, sy = ch / h;
+  const R = (x, y, s) => { let q = Math.imul(x | 0, 374761393) ^ Math.imul(y | 0, 668265263) ^ Math.imul(s | 0, 1274126177); q = Math.imul(q ^ (q >>> 13), 1274126177); return ((q ^ (q >>> 16)) >>> 0) / 4294967296; };   // sorteio rápido (sem seno)
+  // distância aproximada (em pixels) até a borda de uma elipse: negativa = dentro
+  const elD = (x, y, E) => { const dx = x - E.x, dy = y - E.y, f = (dx/E.rx)**2 + (dy/E.ry)**2 - 1; return f / Math.max(1e-6, Math.hypot(2*dx/(E.rx*E.rx), 2*dy/(E.ry*E.ry))); };
+  // pedras irregulares (células): e = distância até a junta, t = tom da pedra, v = altura dentro da pedra (-: parte de cima)
+  const pedra = (x, y, S, s) => { const gx = Math.floor(x / S), gy = Math.floor(y / S); let d1 = 1e9, d2 = 1e9, t = 0, cy0 = 0;
+    for (let j = -1; j <= 1; j++) for (let i = -1; i <= 1; i++) { const qx = (gx + i + .15 + R(gx + i, gy + j, s)*.7)*S, qy = (gy + j + .15 + R(gx + i, gy + j, s + 1)*.7)*S, dd = (x - qx)**2 + (y - qy)**2;
+      if (dd < d1) { d2 = d1; d1 = dd; t = R(gx + i, gy + j, s + 2); cy0 = qy; } else if (dd < d2) d2 = dd; }
+    return { e:Math.sqrt(d2) - Math.sqrt(d1), t, v:(y - cy0) / S }; };
+  // geometria
+  const D = DEN && DEN.w ? DEN : null, dw = D ? D.w : w*.7, dh = D ? D.h : h*.5, dcy = D ? D.cy : h*.55;
+  const A = { x:cw/2, y:dcy*sy, rx:(dw*.54 + 12)*sx, ry:(dh*.52 + 12)*sy }, lip = Math.max(3, Math.round(A.ry*.09));
+  const P = { x:cw/2, y:(dcy - dh*.005)*sy, rx:Math.max(4, dw*.2*sx), ry:Math.max(2.5, dh*.075*sy) }, banda = Math.max(3, Math.round(Math.min(cw, ch)*.028));
+  const teto = x => ch*(.07 + .13*((x - A.x)/(cw/2))**2) + (R(x >> 2, 1, 40) - .5)*4;
+  const pw = Math.max(7, Math.round(cw*.055)), colX = [A.x - A.rx - pw*.8, A.x + A.rx + pw*.8];
+  const tochas = colX.map(x => [Math.round(Math.min(cw - 4, Math.max(3, x))), Math.round(A.y - A.ry*.4)]);
+  const fresta = Math.round(A.x + A.rx*.42), mancha = [A.x + A.rx*.16, A.y + A.ry*.08], wf = Math.round(A.x - A.rx*.62);
+  const luzes = [...tochas.map(([x, y]) => [x, y - 4, Math.max(cw*.32, ch*.42) + 8, 1.1]), [mancha[0], mancha[1], Math.min(cw, ch)*.24, .42], [A.x, A.y, Math.max(A.rx, A.ry)*1.2, .38]];
+  const luz = (x, y) => { let L = .05; for (const [lx, ly, r, i] of luzes) { const q = 1 - Math.hypot(x - lx, y - ly)/r; if (q > 0) L += i*q**1.6; } return Math.min(1, L); };
+  const S = Math.max(6, Math.round(Math.min(cw, ch)*.065)), k = Math.min(2.4, Math.max(1, A.rx / A.ry))*.85, RP = TOCA_RAMPA;
   for (let y = 0; y < ch; y++) for (let x = 0; x < cw; x++) {
-    const e = ((x - cx)/rx)**2 + ((y - cy)/ry)**2, f = ((x - cx)/frx)**2 + ((y - fy)/fry)**2, r = R(x, y, 1), k = r < .1 ? 1 : r < .18 ? 2 : 0;
-    const col = f < 1 ? FLOOR[k] : e < 1 ? CAM[k] : e < 1.1 ? RIM : WALL[k], i = (y*cw + x)*4;
-    d[i] = col[0]; d[i + 1] = col[1]; d[i + 2] = col[2]; d[i + 3] = 255; }
+    const fD = elD(x, y, A), pD = elD(x, y, P), i = (y*cw + x)*4; let ramp = RP.rocha, off = 0, L = luz(x, y);
+    if (pD < 0) {   // o buraco da naja: escuro no fundo, a parede de trás do buraco aparece um pouco
+      const q = -pD / Math.max(1, P.ry), col = y < P.y && q < .45 ? [34, 20, 14] : q < .35 ? [20, 11, 9] : q < .7 ? [10, 5, 5] : [4, 2, 3];
+      d[i] = col[0]; d[i + 1] = col[1]; d[i + 2] = col[2]; d[i + 3] = 255; continue; }
+    const ci = Math.abs(x - colX[0]) < Math.abs(x - colX[1]) ? 0 : 1, ext = y < teto(colX[ci]) + 5 || y > A.y + A.ry*.75 ? 2 : 0, colQ = Math.abs(x - colX[ci]) - pw/2 - ext - (R(0, y >> 1, 41) - .5)*1.2;   // < 0 = dentro de uma coluna
+    if (fD < 0) {   // em cima da arena
+      if (pD < 2) { const p = pedra(x*1.3, y*2, 3, 60); ramp = RP.runa; L = Math.max(L, .3); off = p.e < .8 ? -2 : (p.t - .5)*1.4 + (p.v < -.2 ? 1 : 0); }   // borda do buraco
+      else if (pD < 2 + banda) { const m = pD - 2; ramp = RP.runa; off = (m < .9 || m > banda - .9) ? -2 : .5 + (R(x, y, 61) - .5)*.6; }   // faixa das runas
+      else if (fD > -2.4) { const fi = Math.atan2((y - A.y)/A.ry, (x - A.x)/A.rx)/(Math.PI*2)*44 + 44, fr = fi - Math.floor(fi); ramp = RP.runa;   // meio-fio
+        off = fr < .1 ? -2 : (R(Math.floor(fi), 0, 62) - .5)*1.2 + (fD < -1.2 ? 1 : -.5); }
+      else { const p = pedra(x, (y - A.y)*k + A.y, S*.8, 70); ramp = RP.chao; off = p.e < .9 ? -2 : (p.t - .5)*1.6 + (p.v < -.3 ? .8 : p.v > .3 ? -.6 : 0) + (R(x, y, 71) < .04 ? -1 : 0); }   // lajotas
+    }
+    else if (y > A.y && elD(x, y - lip, A) < 0) { const p = pedra(x*.8, y*1.8, 4, 80); off = -1.3 + (p.e < .8 ? -1.5 : (p.t - .5)) + (elD(x, y - 1, A) < 0 ? -1 : 0); }   // parede da frente da arena
+    else if (colQ < 0) { const lx = x - colX[ci] + pw/2 + ext, row = Math.floor(y / 4), bl = pw*.5, q = lx + (row % 2)*bl*.5, bx = ((q % bl) + bl) % bl; ramp = RP.coluna;   // colunas de blocos empilhados
+      off = (y % 4 === 0 || bx < 1) ? -1.4 : (R(row, Math.floor(q / bl), 91) - .5)*1.2 + (y % 4 === 1 ? .6 : 0) - .5; off += colQ > -1.3 ? -1.6 : 0; if (ext && y % 4 === 1) off += .5;
+      const cobra = x - colX[ci] - Math.sin(y*.21 + ci*2)*pw*.28; if (!ext && Math.abs(cobra) < 1.4) off = 1.4 + ((y + (ci ? 1 : 0)) % 3 === 0 ? -.8 : 0); else if (!ext && cobra >= 1.4 && cobra < 2.4) off -= 1.2; }   // cobra esculpida subindo a coluna
+    else if (y < teto(x)) { const p = pedra(x, y, S*1.4, 100); off = -1.6 + (p.e < .9 ? -1.2 : (p.t - .5)); }   // teto
+    else if (y > A.y) { const p = pedra(x, y*1.3, Math.max(3, S*.5), 110); off = -1.2 + (p.e < .7 ? -1.2 : (p.t - .5)*1.4); }   // cascalho fora da arena
+    else {   // parede do fundo, com camadas de rocha
+      const p = pedra(x, y, S*1.5, 120), cam = Math.sin(y*.42 + Math.sin(x*.07)*2) > .93 ? -1 : 0, racha = p.e < .75 && R(x >> 1, y >> 1, 122) > .3;
+      off = (racha ? -1.6 : (p.t - .5)*1.1 + (p.v < -.32 ? .8 : p.v > .38 ? -.6 : 0)) + cam - .6 - Math.max(0, 1 - y/Math.max(1, A.y - A.ry))*1.1;
+      if (Math.abs(x - wf) < 3 + R(0, y, 121)*1.5) ramp = RP.molh;   // pedra molhada atrás da cachoeira
+    }
+    const n = Math.max(0, Math.min(7, Math.floor(L*7 + off + TOCA_B4[(y & 3)*4 + (x & 3)]/16))), col = ramp[n];
+    d[i] = col[0]; d[i + 1] = col[1]; d[i + 2] = col[2]; d[i + 3] = 255;
+  }
   g.putImageData(img, 0, 0);
-  for (let k = 0; k < 11; k++) {   // raízes penduradas no teto
-    let x = cx - rx*.75 + k*(rx*1.5/10) + (R(k, 3, 2) - .5)*6; const y = Math.max(0, cy - ry*Math.sqrt(Math.max(0, 1 - ((x - cx)/rx)**2))) - 1, len = ch*(.08 + R(k, 9, 3)*.2);
-    for (let s = 0; s < len; s++) { g.fillStyle = s % 5 === 0 ? "#6b4423" : "#5a3a22"; g.fillRect(Math.round(x), Math.round(y + s), s < len*.6 ? 2 : 1, 1); x += (R(k, s, 4) - .5)*.9;
-      if (R(k, s, 5) < .05) { g.fillStyle = "#4a2f1a"; g.fillRect(Math.round(x) + (R(k, s, 6) < .5 ? -2 : 2), Math.round(y + s), 2, 1); } } }
-  for (let k = 0; k < 14; k++) {   // pedrinhas e ossinhos na beira do chão
-    const a = R(k, 1, 7)*Math.PI*2, q = .85 + R(k, 2, 8)*.25, x = cx + Math.cos(a)*frx*q, y = fy + Math.sin(a)*fry*q;
-    g.fillStyle = k % 4 ? "#6e6058" : "#e8dcc8"; g.fillRect(Math.round(x), Math.round(y), k % 4 ? 2 : 3, k % 4 ? 2 : 1); }
+  // enfeites (pintados com a luz do lugar onde estão)
+  const sombra = (hx, x, y) => { const [r, gg, bb] = tocaHex(hx), f = Math.min(1.15, .3 + .85*luz(x, y)); return `rgb(${r*f | 0},${gg*f | 0},${bb*f | 0})`; };
+  const pinta = (x, y, hx, proprio) => { g.fillStyle = proprio ? hx : sombra(hx, x, y); g.fillRect(Math.round(x), Math.round(y), 1, 1); };
+  const spr = (m, x, y, pal, proprio) => m.forEach((row, j) => [...row].forEach((c2, i2) => { if (pal[c2]) pinta(x + i2, y + j, pal[c2], proprio); }));
+  const naArena = (fi, e) => [A.x + Math.cos(fi)*A.rx*e, A.y + Math.sin(fi)*A.ry*e];
+  // musgo nas colunas
+  colX.forEach((cx2, ci) => { for (let y = Math.floor(teto(cx2)) + 6; y < ch; y++) for (const lado of [-1, 1]) if (R(y, ci*2 + lado, 175) < .09) { const x = Math.round(cx2 + lado*(pw/2 - .5)); pinta(x, y, "#3d6034"); if (R(y, ci, 176) < .5) pinta(x, y + 1, "#2c4628"); } });
+  // estalactites (as compridas pingam)
+  const tips = [];
+  for (let x = 1 + (R(1, 2, 3)*3 | 0); x < cw; x += 2 + (R(x, 3, 130)*5 | 0)) { const y0 = Math.floor(teto(x)) - 1, n = 3 + (R(x, 4, 131)*(x % 3 ? 6 : 13) | 0), lg0 = n > 9 ? 4 : 3;
+    for (let s = 0; s < n; s++) { const lg = Math.max(1, Math.ceil((n - s)/n*lg0)); g.fillStyle = sombra(s % 4 ? "#4a362c" : "#5a4434", x, y0 + s); g.fillRect(x - (lg >> 1), y0 + s, lg, 1);
+      if (lg > 1) { pinta(x - (lg >> 1), y0 + s, "#8a6a50"); pinta(x - (lg >> 1) + lg - 1, y0 + s, "#2a1c18"); } }
+    if (n > 6 && x > 3 && x < cw - 3) tips.push([x, y0 + n]); }
+  // cipós com frutinhas que brilham
+  const bagas = [];
+  for (let k2 = 0; k2 < 6; k2++) { let x = Math.round(cw*(.1 + k2*.16 + (R(k2, 5, 140) - .5)*.05)); const y0 = Math.floor(teto(x)), len = Math.round(ch*(.07 + R(k2, 6, 141)*.15));
+    for (let s = 0; s < len; s++) { pinta(x, y0 + s, s % 3 ? "#2c4628" : "#3d6034"); if (R(k2, s, 142) < .2) pinta(x + (R(k2, s, 143) < .5 ? -1 : 1), y0 + s, "#4f7a3e");
+      if (R(k2, s, 144) < .08 && s > 2) bagas.push([x + (R(k2, s, 145) < .5 ? -1 : 1), y0 + s]); if (R(k2, s, 146) < .15) x += R(k2, s, 147) < .5 ? -1 : 1; } }
+  bagas.forEach(([x, y]) => pinta(x, y, "#7dffb0", true));
+  // fresta no teto (de onde vem o raio de luz) e buraco de onde sai a cachoeira
+  const frestaY = Math.floor(teto(fresta)) - 1;
+  g.fillStyle = "#0a0a12"; g.fillRect(fresta - 2, frestaY - 1, 6, 2); pinta(fresta - 1, frestaY - 1, "#cfe6ff", true); pinta(fresta, frestaY - 1, "#ffffff", true); pinta(fresta + 1, frestaY - 1, "#cfe6ff", true);
+  const wfY0 = Math.floor(teto(wf)) + 1, wfY1 = A.y - A.ry*Math.sqrt(Math.max(0, 1 - ((wf - A.x)/A.rx)**2));
+  g.fillStyle = "#05060a"; g.fillRect(wf - 1, wfY0 - 1, 4, 2);
+  // morcegos dormindo de cabeça pra baixo
+  [[.24, 0], [.57, 1], [.8, 2]].forEach(([fx, k2]) => { const x = Math.round(cw*fx), y = Math.floor(teto(x)) + 1; spr(["b.b", "bbb", "bbb", ".b."], x - 1, y, { b:"#0c080e" }, true); pinta(x - 1, y + 1, "#5a2020", true); pinta(x + 1, y + 1, "#5a2020", true); });
+  // suporte das tochas nas colunas
+  tochas.forEach(([x, y]) => { g.fillStyle = sombra("#5a5a66", x, y); g.fillRect(x - 2, y + 3, 5, 1); g.fillRect(x - 2, y + 2, 1, 1); g.fillRect(x + 2, y + 2, 1, 1); pinta(x, y, "#7a5230"); g.fillStyle = sombra("#5a3a22", x, y); g.fillRect(x, y + 1, 1, 5); });
+  // cristais (na parede e no chão, dos dois lados)
+  const cris = [];
+  [[A.x - A.rx*.92, A.y - A.ry*1.02, 0], [A.x + A.rx*.84, A.y - A.ry*.98, 1], [A.x - A.rx*1.04, A.y + A.ry*.8, 1], [A.x + A.rx*1.02, A.y + A.ry*.86, 0]].forEach(([x, y, tipo]) => {
+    x = Math.round(x) - 4; y = Math.round(y) - 7; if (x < -2 || x > cw - 4) return;
+    spr(TOCA_CRIS, x, y, tipo ? { d:"#0f4f52", m:"#1fb5a8", l:"#7ff0e0", w:"#ffffff" } : { d:"#3b1f6b", m:"#7a3fd0", l:"#b98cff", w:"#ffffff" }, true);
+    cris.push([x + 4, y + 4, tipo ? "77,224,208" : "163,92,255"]); });
+  // cogumelos que brilham, na frente da arena e no pé das colunas
+  const cogs = [];
+  for (let k2 = 0; k2 < 10; k2++) { const u = -1.08 + k2*.24 + (R(k2, 1, 160) - .5)*.08; if (Math.abs(u) < .38) continue;
+    const x = Math.round(A.x + u*A.rx), y = Math.round(Math.abs(u) < 1 ? A.y + A.ry*Math.sqrt(1 - u*u) + lip + 2 + R(k2, 2, 161)*2 : A.y + A.ry*(.2 + R(k2, 3, 162)*.5));
+    if (y >= ch - 1) continue; const cor = k2 % 2 ? "#4de0d0" : "#8fd8ff";
+    pinta(x, y, "#e8dcc8"); pinta(x, y - 1, "#e8dcc8"); pinta(x - 1, y - 2, cor, true); pinta(x, y - 2, cor, true); pinta(x + 1, y - 2, cor, true); pinta(x, y - 3, cor, true); pinta(x, y - 2, "#ffffff", true); cogs.push([x, y - 2]); }
+  // no chão da arena: ossos e caveira, moedas, ninho com ovos de cobra
+  { const [x, y] = naArena(Math.PI*.74, .6); spr([".www.", "wkwkw", "wwwww", ".w.w."], Math.round(x) - 2, Math.round(y) - 3, { w:"#e8dcc8", k:"#1a1010" }); spr(["w...w", ".www.", "w...w"], Math.round(x) + 4, Math.round(y) - 1, { w:"#d8ccb4" }); }
+  const moedas = [];
+  { const [x0, y0] = naArena(Math.PI*.27, .62), x = Math.round(x0) - 3, y = Math.round(y0) - 3; spr(["...y...", "..yYy..", ".yYyYy.", "yYyYyYy"], x, y, { y:"#a8792a", Y:"#ffd257" }); moedas.push([x + 3, y], [x + 1, y + 2], [x + 5, y + 3]); }
+  { const [x0, y0] = naArena(Math.PI*1.27, .95), x = Math.round(x0) - 3, y = Math.round(y0) - 3;
+    spr([".o.o.o.", "osoOsoo", "ooooooo", "nnnnnnn", ".nNnNn."], x, y, { o:"#f2ead8", O:"#ffffff", s:"#9a8a6a", n:"#8a6a3a", N:"#6b4e28" }); }
+  // anel de runas em volta do buraco (o brilho delas fica na tocaFx e muda com a naja)
+  const glifos = [], ra = P.rx + 2 + banda/2, rb = P.ry + 2 + banda/2, per = Math.PI*(3*(ra + rb) - Math.sqrt((3*ra + rb)*(ra + 3*rb))), ng = Math.max(10, Math.round(per / 6));
+  for (let k2 = 0; k2 < ng; k2++) { const fi = k2/ng*Math.PI*2, gx = Math.round(P.x + Math.cos(fi)*ra) - 1, gy = Math.round(P.y + Math.sin(fi)*rb) - 1, m = TOCA_GLIFOS[(R(k2, 7, 170)*TOCA_GLIFOS.length) | 0];
+    m.forEach((row, j) => [...row].forEach((c2, i2) => { if (c2 !== "x") return; const x = gx + i2, y = gy + j, q = elD(x, y, P); if (q < 2 || q >= 2 + banda) return; pinta(x, y, "#20170f", true); glifos.push([x, y]); })); }
+  // pedras grandes na frente, nos cantos de baixo (dão profundidade)
+  const pedrao = (cx3, cy3, rx3, ry3) => { for (let y = Math.max(0, Math.floor(cy3 - ry3)); y < Math.min(ch, cy3 + ry3); y++) for (let x = Math.max(0, Math.floor(cx3 - rx3)); x < Math.min(cw, cx3 + rx3); x++) {
+    const q = ((x - cx3)/rx3)**2 + ((y - cy3)/ry3)**2 + (R(x >> 1, y >> 1, 150) - .5)*.12; if (q > 1) continue;
+    g.fillStyle = q > .8 && y < cy3 - ry3*.25 ? "#33231f" : R(x, y, 151) < .1 ? "#0e0a10" : "#070509"; g.fillRect(x, y, 1, 1); } };
+  pedrao(cw*.02, ch*1.05, Math.max(10, cw*.13), Math.max(8, ch*.16)); pedrao(cw*.985, ch*1.06, Math.max(9, cw*.11), Math.max(7, ch*.14));
+  TOCA = { cw, ch, A, P, tochas, tips, bagas, cris, cogs, moedas, glifos, fresta, frestaY, mancha, wf, wfY:[wfY0, wfY1], po:[], acc:0, tAnt:0, boteR:null, boteT:null };
+  tocaFx();
+}
+// o que se mexe: tochas, cachoeira, gotas, raio de luz com poeira, brilho dos cristais, vaga-lumes, morcego voando,
+// e as runas: âmbar com a naja calma, vermelho quando ela está pra dar o bote; no bote, clarão e poeira caindo do teto.
+// Com "reduzir movimento" ou modo acessível: um quadro parado só.
+function tocaFx(){
+  cancelAnimationFrame(tocaRaf); const c = $("tocaFx"); if (!c || !TOCA) return;
+  c.width = TOCA.cw; c.height = TOCA.ch; const g = c.getContext("2d"), parado = matchMedia("(prefers-reduced-motion: reduce)").matches || !!CFG.acess;
+  const passo = ms => { if ($("toca").classList.contains("hide")) return; try { tocaQuadro(g, parado ? 2 : ms/1000, !parado); } catch (e) { console.error("[toca]", e); } if (!parado) tocaRaf = requestAnimationFrame(passo); };
+  tocaRaf = requestAnimationFrame(passo);
+}
+const TOCA_FOGO = [["..y..", ".yoy.", ".ywy.", "oywyo", "oyyyo", ".ror."], ["...y.", "..yo.", ".yww.", "oywyo", "ooyoo", ".ror."], [".y...", ".oy..", ".wwy.", "oywyo", "oyyoo", ".ror."]];
+const TOCA_FOGO_COR = { w:"#fff6c0", y:"#ffd257", o:"#ff8a1f", r:"#e0401f" };
+const TOCA_MORCEGO = [["b...b", "bb.bb", ".bbb.", "..b.."], ["..b..", ".bbb.", "bb.bb", "b...b"]];
+function tocaPo(T, forte){ const x = Math.random()*T.cw; return { x, y:T.ch*(.045 + .1*((x - T.cw/2)/(T.cw/2))**2), vx:(Math.random() - .5)*(forte ? 16 : 4), vy:forte ? Math.random()*24 : 0, v:1.2 + Math.random()*1.4, cor:Math.random() < .3 ? "#6a4e3c" : "#a08060", g:Math.random() < .25 }; }
+function tocaQuadro(g, t, anima){
+  const T = TOCA, R = (a, b2) => { const v = Math.sin(a*12.9898 + b2*78.233)*43758.5453; return v - Math.floor(v); }, dt = Math.min(.1, Math.max(0, t - (T.tAnt || t))); T.tAnt = t;
+  const G = ON && ON.room && ON.room.game, fase = G && G.phase, heat = fase === "go" ? Math.max(0, Math.min(3, G.heat || 0)) : 0;
+  if (fase === "bite" && T.boteR !== G.round) { T.boteR = G.round; T.boteT = t; if (anima) for (let i = 0; i < 46; i++) T.po.push(tocaPo(T, true)); }
+  const bote = T.boteT != null && t - T.boteT < 1.6 ? 1 - (t - T.boteT)/1.6 : 0;
+  g.clearRect(0, 0, T.cw, T.ch);
+  const brilho = (x, y, r, rgb, a) => { if (a <= 0 || r <= 0) return; const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, `rgba(${rgb},${Math.min(1, a)})`); gr.addColorStop(1, `rgba(${rgb},0)`); g.fillStyle = gr; g.fillRect(x - r, y - r, r*2, r*2); };
+  const px = (x, y, cor) => { g.fillStyle = cor; g.fillRect(Math.round(x), Math.round(y), 1, 1); };
+  // raio de luz pela fresta do teto, com poeira flutuando dentro
+  { const x0 = T.fresta, y0 = T.frestaY, [x1, y1] = T.mancha, a = .07 + .025*Math.sin(t*.7), gr = g.createLinearGradient(0, y0, 0, y1);
+    gr.addColorStop(0, `rgba(200,225,255,${a*1.4})`); gr.addColorStop(1, `rgba(200,225,255,${a*.35})`);
+    g.globalCompositeOperation = "lighter"; g.fillStyle = gr; g.beginPath(); g.moveTo(x0 - 1, y0); g.lineTo(x0 + 2, y0); g.lineTo(x1 + 10, y1); g.lineTo(x1 - 10, y1); g.closePath(); g.fill();
+    g.save(); g.translate(x1, y1); g.scale(1, .45); brilho(0, 0, 15, "190,220,255", .14 + .03*Math.sin(t*.7)); g.restore(); g.globalCompositeOperation = "source-over";
+    if (anima) { for (let i = 0; i < 12; i++) { const u = (R(i, 1) + t*.03*(1 + R(i, 2))) % 1, x = x0 + (x1 - x0)*u + (R(i, 3) - .5)*(3 + 16*u) + Math.sin(t + i)*1.5, y = y0 + (y1 - y0)*u;
+      g.globalAlpha = .3 + .45*Math.abs(Math.sin(t*1.3 + i)); px(x, y, "#e8f4ff"); } g.globalAlpha = 1; } }
+  // cachoeira caindo atrás da arena
+  { const x = T.wf, [y0, y1] = T.wfY; if (y1 > y0 + 4) { const cores = ["#a8d4ee", "#6f9fc4", "#4a7ba3", "#6f9fc4", "#3a6286"], mov = anima ? t*30 : 0; g.globalAlpha = .82;
+    for (let y = Math.ceil(y0); y < y1; y++) for (let j = 0; j < 2; j++) px(x + j, y, cores[(R(Math.floor(y - mov), j)*5) | 0]); g.globalAlpha = 1;
+    g.globalCompositeOperation = "lighter"; brilho(x + 1, y1, 7, "160,210,255", .12); g.globalCompositeOperation = "source-over";
+    if (anima) for (let i = 0; i < 5; i++) { const u = (t*1.8 + i/5) % 1; px(x + .5 + (i - 2)*u*2.2, y1 - Math.sin(u*Math.PI)*3.5, "#cfefff"); } } }
+  // gotas pingando das estalactites compridas
+  if (anima) T.tips.forEach(([x, y], j) => { if (R(j, 1) > .55) return; const per = 2.6 + R(j, 2)*3.4, u = (t + R(j, 3)*per) % per, chao = T.A.y + T.A.ry*(R(j, 4)*.7 - .2), yd = y + u*u*55;
+    if (yd < chao) { px(x, yd, "#8fd8ff"); px(x, yd + 1, "#5fb0e0"); }
+    else if (yd < chao + 9) { g.globalAlpha = .7; px(x - 2, chao - 1, "#8fd8ff"); px(x + 2, chao - 1, "#8fd8ff"); px(x, chao - 2, "#cfefff"); g.globalAlpha = 1; } });
+  // tochas: chama em pixel, luz que treme e faíscas; com a naja nervosa o fogo cresce
+  T.tochas.forEach(([x, y], j) => { const fl = anima ? Math.floor(t*9 + j*5) % 3 : 0, tr2 = anima ? Math.sin(t*11 + j*2)*.5 + Math.sin(t*23 + j)*.3 : 0;
+    g.globalCompositeOperation = "lighter"; brilho(x, y - 3, 26 + tr2*3 + heat*2, heat >= 3 ? "255,120,60" : "255,170,70", .2 + .05*tr2 + heat*.03 + bote*.3); brilho(x, y - 3, 7, "255,230,150", .35); g.globalCompositeOperation = "source-over";
+    TOCA_FOGO[fl].forEach((row, r2) => [...row].forEach((c2, i2) => { const cor = TOCA_FOGO_COR[c2]; if (cor) px(x - 2 + i2, y - 6 + r2 - (heat >= 3 && r2 < 2 ? 1 : 0), cor); }));
+    if (anima) { const n = 3 + heat; for (let k = 0; k < n; k++) { const u = (t*.9 + k/n + j*.37) % 1; g.globalAlpha = 1 - u; px(x + Math.sin(u*8 + k*2 + j)*2, y - 7 - u*20, u < .4 ? "#ffe27a" : "#ff8a1f"); } g.globalAlpha = 1; } });
+  // cristais, cogumelos e frutinhas brilhando
+  g.globalCompositeOperation = "lighter";
+  T.cris.forEach(([x, y, rgb], j) => brilho(x, y, 16, rgb, .17 + .1*Math.sin(t*1.4 + j*1.9) + bote*.15));
+  T.cogs.forEach(([x, y], j) => brilho(x, y, 5, "120,230,240", .2 + .12*Math.sin(t*2.1 + j*1.3)));
+  T.bagas.forEach(([x, y], j) => brilho(x, y, 3.5, "125,255,176", .25 + .2*Math.sin(t*1.8 + j)));
+  g.globalCompositeOperation = "source-over";
+  if (anima) { T.cris.forEach(([x, y], j) => { const u = (t*.35 + R(j, 9)) % 1; if (u > .06) return; const tx = x + (R(j, Math.floor(t*.35)) - .5)*5, ty = y - 3;
+      px(tx, ty, "#ffffff"); g.globalAlpha = .6; px(tx - 1, ty, "#ffffff"); px(tx + 1, ty, "#ffffff"); px(tx, ty - 1, "#ffffff"); px(tx, ty + 1, "#ffffff"); g.globalAlpha = 1; });
+    T.moedas.forEach(([x, y], j) => { const s = Math.sin(t*2.2 + j*2.1); if (s < .85) return; px(x, y, "#fff6c0"); g.globalAlpha = .55; px(x - 1, y, "#ffd257"); px(x + 1, y, "#ffd257"); px(x, y - 1, "#ffd257"); g.globalAlpha = 1; }); }
+  // runas e brilho do buraco: acompanham a naja
+  { const cores = ["255,190,90", "255,150,60", "255,90,40", "255,40,30"], cor = bote > 0 ? "255,220,180" : cores[heat];
+    const a = Math.max(0, Math.min(1, .3 + .14*heat + (heat ? .18 : .1)*Math.sin(t*(1.5 + heat*2.2)) + bote));
+    g.fillStyle = `rgba(${cor},${a})`; T.glifos.forEach(([x, y]) => g.fillRect(x, y, 1, 1));
+    g.globalCompositeOperation = "lighter"; g.save(); g.translate(T.P.x, T.P.y); g.scale(1, Math.min(1, T.P.ry/T.P.rx*2));
+    brilho(0, 0, T.P.rx*1.25, heat >= 2 || bote ? "255,60,30" : "255,140,60", .06 + .06*heat + .45*bote); g.restore(); g.globalCompositeOperation = "source-over"; }
+  // vaga-lumes
+  if (anima) { for (let i = 0; i < 6; i++) { const x = T.cw*(.12 + .76*R(i, 7)) + Math.sin(t*.5 + i*2.3)*T.cw*.06, y = T.ch*(.22 + .3*R(i, 8)) + Math.cos(t*.7 + i)*T.ch*.05;
+    g.globalAlpha = .25 + .75*Math.abs(Math.sin(t*1.7 + i*1.1)); px(x, y, "#ffe27a"); } g.globalAlpha = 1; }
+  // morcego atravessando a caverna de vez em quando
+  if (anima) { const ciclo = Math.floor((t + 5)/16), u = ((t + 5) % 16)/2.8; if (u < 1) { const ida = ciclo % 2 === 0, x = ida ? -5 + u*(T.cw + 10) : T.cw + 5 - u*(T.cw + 10), y = T.ch*(.12 + .05*R(ciclo, 3)) + Math.sin(u*10)*3;
+    TOCA_MORCEGO[Math.floor(t*9) % 2].forEach((row, j) => [...row].forEach((c2, i2) => { if (c2 === "b") px(x - 2 + i2, y - 2 + j, "#0c080e"); })); } }
+  // naja nervosa: poeira caindo do teto; no bote, chuva de terra
+  if (anima) { const taxa = heat >= 3 ? 12 : heat === 2 ? 4 : 0; T.acc += taxa*dt; while (T.acc >= 1) { T.acc--; T.po.push(tocaPo(T, false)); }
+    for (let i = T.po.length - 1; i >= 0; i--) { const p = T.po[i]; p.vy += 90*dt; p.x += p.vx*dt; p.y += p.vy*dt; p.v -= dt; if (p.v <= 0 || p.y > T.ch) { T.po.splice(i, 1); continue; }
+      g.globalAlpha = Math.min(1, p.v*2); px(p.x, p.y, p.cor); if (p.g) px(p.x + 1, p.y, p.cor); } g.globalAlpha = 1; }
+  // tela avermelhada quando o bote está perto, e no bote
+  const verm = (heat >= 3 && anima ? .05 + .03*Math.sin(t*7) : 0) + bote*.18; if (verm > 0) { g.fillStyle = `rgba(255,40,20,${verm})`; g.fillRect(0, 0, T.cw, T.ch); }
 }
 addEventListener("resize", () => { if (!$("toca").classList.contains("hide")) drawToca(); });
+addEventListener("pagehide", () => { if (!ON || !window.FB) return; try { FB.remove(oRef(`${ON.code}/players/${ON.uid}`)); FB.remove(oRef(`${ON.code}/live/${ON.uid}`)); } catch (e) {} });
 /* ----- 3A: menu ☰ ----- */
 function menu(on){ show("menu", on); $("bMenu").setAttribute("aria-expanded", String(on)); if (on) { escondePaineis(); $("menuX").focus(); } }
 $("bMenu").onclick = () => menu($("menu").classList.contains("hide"));
@@ -1924,6 +2124,7 @@ function oTela(r){
   // a naja olha pra quem está com ela e cresce/agita conforme o relógio secreto avança
   const a = ang(Math.max(0, ord.indexOf(g.turn))), nj = $("najaC"), heat = g.heat || 0;
   nj.style.scale = Math.cos(a) < -.1 ? "-1 1" : "1 1"; nj.style.width = `calc(var(--ds, 300px) * ${(30 + heat*5) / 100})`;
+  nj.style.top = `calc(var(--dh, 300px) * .015 - var(--ds, 300px) * ${(30 + heat*5) / 200})`;   // a base da naja fica sempre no meio do buraco (no PC e no celular)
   nj.style.setProperty("--spd", [1.1, .7, .4, .18][heat] + "s"); nj.classList.toggle("shk", g.phase === "go");
   if (g.phase === "bite" && ON.bitR !== g.round) { ON.bitR = g.round; const s = DEN ? DEN.s : 300;   // o bote
     const bw = DEN && DEN.w || s, bh = DEN && DEN.h || s;
@@ -2342,11 +2543,12 @@ function draw(){
 
   // escuridão: quanto mais fundo, mais escuro; a lanterna da toupeira ilumina em volta
   const gdM = Math.max(0, moleD), Lm = layerAt(gdM), C = moleCenter();
-  let a = clamp((gdM - 250) / 2200, 0, .86); if (LAYERS[Lm].name === "MAGMA") a *= .62; if (LAYERS[Lm].name === "CORE") a *= .3;
+  let a = clamp((gdM - 250) / 2200, 0, .86); if (LAYERS[Lm].name === "MAGMA") a *= .62; if (LAYERS[Lm].name === "CORE") a *= .3; if (LAYERS[Lm].name === "OTHER SIDE") a *= .15;
   if (a > 0) { const rg = ctx.createRadialGradient(C.x, C.y - camY, SPX*8, C.x, C.y - camY, Math.min(W, H)*.55);
     rg.addColorStop(0, "rgba(6,4,3,0)"); rg.addColorStop(1, `rgba(6,4,3,${a})`); ctx.fillStyle = rg; ctx.fillRect(0, 0, W, H); }
   if (LAYERS[Lm].name === "MAGMA") { ctx.fillStyle = "rgba(255,90,40,.07)"; ctx.fillRect(0, 0, W, H); }
   else if (LAYERS[Lm].name === "CORE") { ctx.fillStyle = `rgba(255,${150 + Math.round(Math.sin(clock*2)*20)},60,.12)`; ctx.fillRect(0, 0, W, H); }
+  else if (LAYERS[Lm].name === "OTHER SIDE") { ctx.fillStyle = "rgba(150,205,255,.12)"; ctx.fillRect(0, 0, W, H); }
   if (started) { ctx.fillStyle = "#f5e9d6"; motes.forEach(m => { ctx.globalAlpha = .1; ctx.fillRect(snap(m.x), snap(m.y), PX/2 + 1, PX/2 + 1); }); ctx.globalAlpha = 1; }
 
   ctx.save(); ctx.translate(tx, ty - camY);
@@ -2481,7 +2683,7 @@ var V6 = (() => {
       nClassica:"Classic", nCoral:"Coral", nEsmeralda:"Emerald", nGelo:"Ice", nAlbina:"Albino", nReal:"Royal", nSem:"Nothing", nOculos:"Sunglasses", nCartola:"Top hat", nCoroa:"Crown" },
     v6Conqs:{ c1:["First dig","Finish one dig"], m1:["1,000 m","Dig 1,000 m in one go"], m3:["3,000 m","Dig 3,000 m in one go"], m5:["5,000 m","Dig 5,000 m in one go"], m7:["Other side","Dig 7,500 m in one go"],
       t4:["Legendary","Find a LEGENDARY answer"], t5:["Ultra","Find an ULTRA answer"], s3:["3 in a row","3-day streak"], s7:["A whole week","7-day streak"],
-      g50:["Collector","50 answers in your collection"], g200:["Museum","200 answers in your collection"], b5:["Treasure hunter","Open 5 buried chests"], l7:["To the core","Reach every layer"] }
+      g50:["Collector","50 answers in your collection"], g200:["Museum","200 answers in your collection"], b5:["Treasure hunter","Open 5 buried chests"], l7:["To the core","Reach the core"] }
   });
   Object.assign(STR.pt, {
     v6Loja:"🧥 GUARDA-ROUPA", v6Conq:"🏆 RECOMPENSAS", v6Tut:"🎓 TUTORIAL", v6Skip:"PULAR", v6Next:"PRÓXIMO ▸", v6Go:"▼ COMEÇAR A CAVAR",
@@ -2505,7 +2707,7 @@ var V6 = (() => {
       nClassica:"Clássica", nCoral:"Coral", nEsmeralda:"Esmeralda", nGelo:"Gelo", nAlbina:"Albina", nReal:"Real", nSem:"Nada", nOculos:"Óculos escuros", nCartola:"Cartola", nCoroa:"Coroa" },
     v6Conqs:{ c1:["Primeira cavada","Termine uma cavada"], m1:["1.000 m","Cave 1.000 m de uma vez"], m3:["3.000 m","Cave 3.000 m de uma vez"], m5:["5.000 m","Cave 5.000 m de uma vez"], m7:["Outro lado","Cave 7.500 m de uma vez"],
       t4:["Lendária","Ache uma resposta LENDÁRIA"], t5:["Ultra","Ache uma resposta ULTRA"], s3:["3 seguidas","3 dias seguidos"], s7:["Semana inteira","7 dias seguidos"],
-      g50:["Colecionador","50 respostas na coleção"], g200:["Museu","200 respostas na coleção"], b5:["Caça-tesouros","Abra 5 baús enterrados"], l7:["Até o núcleo","Chegue em todas as camadas"] }
+      g50:["Colecionador","50 respostas na coleção"], g200:["Museu","200 respostas na coleção"], b5:["Caça-tesouros","Abra 5 baús enterrados"], l7:["Até o núcleo","Chegue no núcleo"] }
   });
 
   /* ---------- itens ---------- */
@@ -3032,7 +3234,7 @@ var V6 = (() => {
   function confereConq(fundo, tiers){
     const seq = Math.max(EST.maxSeq || 0, seqAtual()), g = gemas();
     const vale = { c1:true, m1:fundo >= 1000, m3:fundo >= 3000, m5:fundo >= 5000, m7:fundo >= 7500, t4:tiers.includes(4) || (EST.tiers[4] || 0) > 0, t5:tiers.includes(5) || (EST.tiers[5] || 0) > 0,
-      s3:seq >= 3, s7:seq >= 7, g50:g >= 50, g200:g >= 200, b5:S.baus >= 5, l7:S.camadas >= LAYERS.length - 1 };
+      s3:seq >= 3, s7:seq >= 7, g50:g >= 50, g200:g >= 200, b5:S.baus >= 5, l7:S.camadas >= LAYERS.findIndex(L => L.name === "CORE") };
     const novas = [];
     CONQ.forEach(([id, , premio]) => { if (vale[id] && !S.conq[id]) { S.conq[id] = hoje; S.moedas += premio; novas.push([id, premio]); } });
     if (novas.length) { salva(); moedasUI(true); }
@@ -3084,7 +3286,7 @@ var V6 = (() => {
   const S = V6.S, calmo = V6.calmo, PAINEIS = ["v6loja","v6conqP","v6tut","v6share"];
   const suave = t => t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3)/2;
   const corCamada = i => LAYERS[Math.max(0, Math.min(LAYERS.length - 1, i))].pal[1];
-  const NUCLEO = LAYERS[LAYERS.length - 1].from;
+  const NUCLEO = LAYERS.find(L => L.name === "CORE").from;
 
   /* ---------- perguntas difíceis demais ficam de fora do sorteio (pool() pula quem tem x6) ---------- */
   const DIFICEIS = ["el_halogenios","el_lantanideos","el_pessoa","regiao_centralamerica","regiao_centralasia","lingua_swahili","lingua_malay","moeda_xof","moeda_xaf","moeda_xcd","letra_pt_l","letra_en_l"];
@@ -3261,24 +3463,28 @@ var V6 = (() => {
   const ENF = [
     [ [["..rrr..",".rwrrr.","rrrrrwr","..ppp..","..ppp.."], { r:"#d94a3a", w:"#fff0e0", p:"#e6d8b8" }], [[".bb....","bbbb...","bbbbbbb","bbbbbbb"], { b:"#5a3a22" }], [["yyyyyyy","ybbybby","yyyyyyy","ybbbbby","yyyyyyy"], { y:"#c9962e", b:"#6b4424" }], [["..aa..",".aaaa.","aaaaaa",".aaaa."], { a:"#3a2415" }] ],
     [ [[".ssss.","s.ss.s","ss..ss","s.ss.s",".ssss."], { s:"#c9bfa8" }], [["k.k..k",".kkk..","kkkkk.",".kk.k."], { k:"#1c1a1c" }], [["g..g.",".gg..","g.gg.","..g.g"], { g:"#ffd257" }], [["rrrrrrrr","t.t..t.t"], { r:"#8a8178", t:"#5a3a22" }] ],
+    [ [["o.....o","ooooooo","o.....o"], { o:"#e6d8b8" }], [[".aaa.","a...a","a.a.a","a..aa",".aaa."], { a:"#d8c8a0" }], [["r.r.r.r","r.r.r.r",".rrrrr."], { r:"#e6d8b8" }], [["..sss..",".s.s.ss","sssssss","s.s.s.."], { s:"#cbbd9f" }] ],
     [ [["..c..",".ccc.","ccccc",".ccc.","..s..","..s.."], { c:"#4de0d0", s:"#bfeee8" }], [["v.v.v","vvvvv",".vvv.","..v.."], { v:"#3d2e44" }], [["..p..",".ppp.","pp.pp",".ppp.","..p.."], { p:"#a35cff" }] ],
+    [ [[".ff..f","ffffff",".ff..f"], { f:"#8fd8ff" }], [[".o.","o.o",".o."], { o:"#bfeeff" }], [["w.w.w.",".w.w.w"], { w:"#4fa8d0" }] ],
     [ [["..w..","w.w.w",".www.","wwwww",".www.","w.w.w","..w.."], { w:"#e8f4fa" }], [[".bb.","b..b","b..b",".bb."], { b:"#cfe4ee" }], [["t.....",".tt...","...tt.",".....t"], { t:"#f5ead0" }] ],
+    [ [["..c..",".ccc.",".ccc.","ccccc"], { c:"#e0b0ff" }], [["p..p","pp.p","pppp"], { p:"#ff8ad8" }], [["..w..",".wcw.","ccccc"], { w:"#ffffff", c:"#a35cff" }] ],
     [ [["..o..",".ooo.","ooooo",".ooo."], { o:"#16101a" }], [["y.r.y",".ryr.","r.y.r"], { y:"#ffd257", r:"#ff5a36" }], [[".ll.","llll","llll",".ll."], { l:"#ff8a3a" }] ],
     [ [["d.d","ddd",".d."], { d:"#bff4ff" }], [["r.rr",".r.r","rr.r","r..r"], { r:"#3f8a9a" }], [["g"], { g:"#ffd257" }] ],
-    [ [["w.w",".w.","w.w"], { w:"#fff6d0" }], [["..y.",".yy.","yy..",".y.."], { y:"#ffd27a" }] ]
+    [ [["w.w",".w.","w.w"], { w:"#fff6d0" }], [["..y.",".yy.","yy..",".y.."], { y:"#ffd27a" }] ],
+    [ [[".wwww.","wwwwww","..ww.."], { w:"#f5f9ff" }], [["..y..","yyyyy","..y.."], { y:"#fff6a0" }], [["..t..","..t..","ggggg",".ggg.","..g.."], { t:"#5a3a22", g:"#4f8a3a" }] ]
   ];
   const feature0 = feature;
   feature = function(g, L, x, y, r){ feature0(g, L, x, y, r); if (r() < .22) { const lista = ENF[L] || ENF[0], [m, pal] = lista[(r()*lista.length) | 0]; mapa(g, m, x + (r() - .5)*PX*46, y + (r() - .5)*PX*22, pal); } };
   cache.clear();
 
   /* ---------- baús enterrados + prêmio de camada nova + barra da camada ---------- */
-  const bauEm = k => 420*k + Math.floor(h(k, 91)*240), abertos = new Set(); let bausRun = 0, dAnt = moleD, vel = 0;
+  const bauEm = k => 630*k + Math.floor(h(k, 91)*360), abertos = new Set(); let bausRun = 0, dAnt = moleD, vel = 0;
   const fx = [];   // anéis e textos que sobem
   function tique(dt){
     const d = moleD; vel = dt > 0 ? (d - dAnt) / dt : 0;
     if (started && d > 0) { const Li = layerAt(d), a = LAYERS[Li].from, b = LAYERS[Li + 1] ? LAYERS[Li + 1].from : TOUR_END, u = $("v6progU"); if (u) { u.style.width = Math.max(0, Math.min(100, (d - a) / (b - a) * 100)).toFixed(1) + "%"; u.style.background = corCamada(Li + 1); } }
     if (mode === "dig" && !race && d > dAnt) {
-      for (let k = Math.max(1, Math.floor(dAnt / 420) - 1); bauEm(k) <= d; k++) { const m = bauEm(k); if (m > dAnt && m <= d && !abertos.has(k)) { abertos.add(k); const n = 3 + Math.floor(h(k, 92)*6); bausRun += n; S.baus++; V6.ganha(n);
+      for (let k = Math.max(1, Math.floor(dAnt / 630) - 1); bauEm(k) <= d; k++) { const m = bauEm(k); if (m > dAnt && m <= d && !abertos.has(k)) { abertos.add(k); const n = 3 + Math.floor(h(k, 92)*6); bausRun += n; S.baus++; V6.ganha(n);
         const C = moleCenter(); fx.push({ t:0, x:C.x + SPX*17, y:wyOf(m), txt:"+" + n + " 🪙", col:"#ffd257" }); SOM.veio(4); } }
       const Li = layerAt(d); if (Li > S.camadas) { S.camadas = Li; V6.ganha(15); V6.toast("🪙 +15 · " + tr("v6Layer", { x:L10("layers")[Li] })); }
     }
@@ -3290,7 +3496,7 @@ var V6 = (() => {
   const burst0 = burst;
   burst = function(col, n){ burst0(col, n); if (!calmo() && n >= 20) { const C = moleCenter(); fx.push({ t:0, x:C.x, y:C.y, anel:true, col:col === "rainbow" ? "#ffd257" : col }); } };
   const crumbs0 = crumbs;
-  crumbs = function(n){ crumbs0(n); if (calmo() || Math.random() > .35) return; const nome = LAYERS[layerAt(Math.max(0, moleD))].name, cor = { "STONE LAYER":"#fff6a0", "BEDROCK":"#bff4ff", "ICE LAYER":"#e8f4fa", "MAGMA":"#ffb020", "CORE":"#fff0b0" }[nome]; if (!cor) return;
+  crumbs = function(n){ crumbs0(n); if (calmo() || Math.random() > .35) return; const nome = LAYERS[layerAt(Math.max(0, moleD))].name, cor = { "STONE LAYER":"#fff6a0", "BEDROCK":"#bff4ff", "ICE LAYER":"#e8f4fa", "MAGMA":"#ffb020", "CORE":"#fff0b0", "FOSSILS":"#e6d8b8", "UNDERGROUND RIVER":"#8fd8ff", "CRYSTAL GARDEN":"#e0b0ff", "OTHER SIDE":"#f5f9ff" }[nome]; if (!cor) return;
     const C = moleCenter(); parts.push({ x:C.x + (Math.random() - .5)*SPX*14, y:C.y + SPX*6, vx:(Math.random() - .5)*260, vy:-(120 + Math.random()*200), g:700, life:.45, col:cor }); };
 
   /* ---------- por cima do desenho do jogo: superfície enfeitada, baús, brilhos nas camadas, anéis, riscos de velocidade ---------- */
@@ -3311,12 +3517,12 @@ var V6 = (() => {
     if (started) {
       // baús ainda fechados, ao lado do túnel
       const m0 = camY / MPX - SURF, m1 = m0 + H / MPX;
-      for (let k = Math.max(1, Math.floor(m0 / 420) - 1); bauEm(k) < m1 + 40; k++) { const m = bauEm(k); if (m < m0 - 40 || abertos.has(k) || m <= moleD) continue; const wy = wyOf(m), x = snap(tunnelXs(wy) + SPX*12 + PX*4);
+      for (let k = Math.max(1, Math.floor(m0 / 630) - 1); bauEm(k) < m1 + 40; k++) { const m = bauEm(k); if (m < m0 - 40 || abertos.has(k) || m <= moleD) continue; const wy = wyOf(m), x = snap(tunnelXs(wy) + SPX*12 + PX*4);
         if (window.V10C) V10C.bau(ctx, x, snap(wy - PX*5)); else mapa(ctx, BAU, x, snap(wy - PX*5), { h:"#6b4424", g:"#ffd257", b:"#9a6a3a" }); if (!calmo() && Math.sin(clock*4 + k) > .6) { ctx.fillStyle = "#fff6d0"; ctx.fillRect(x + PX*6, snap(wy - PX*7), PX, PX); } }
       // brilhos que piscam nas cavernas, no gelo, na rocha-mãe e no núcleo
       if (!calmo()) { const cel = 96, cx0 = snap(tunnelXs(moleWY())), meio = SPX*13; for (let gy = Math.floor(camY / cel); gy*cel < camY + H; gy++) for (let gx = 0; gx*cel < W; gx++) { if (h(gx, gy + 900) > .3) continue;
         const x = gx*cel + h(gx, gy + 1)*cel, y = gy*cel + h(gx + 7, gy)*cel; if (y < PX*20 || Math.abs(x - cx0) < meio) continue; const nome = LAYERS[layerIdx(y / MPX - SURF, x)].name;
-        const cor = nome === "DARK CAVES" ? (h(gx, gy) < .5 ? "#4de0d0" : "#c79bff") : nome === "ICE LAYER" ? "#ffffff" : nome === "BEDROCK" ? "#ffd257" : nome === "CORE" ? "#fff6d0" : ""; if (!cor) continue;
+        const cor = nome === "DARK CAVES" ? (h(gx, gy) < .5 ? "#4de0d0" : "#c79bff") : nome === "ICE LAYER" ? "#ffffff" : nome === "BEDROCK" ? "#ffd257" : nome === "CORE" ? "#fff6d0" : nome === "CRYSTAL GARDEN" ? (h(gx, gy) < .5 ? "#e0b0ff" : "#ff8ad8") : nome === "UNDERGROUND RIVER" ? "#bfeeff" : nome === "OTHER SIDE" ? "#ffffff" : ""; if (!cor) continue;
         ctx.globalAlpha = .15 + .75*Math.abs(Math.sin(clock*(1 + h(gx, gy)*2) + gx*3 + gy)); ctx.fillStyle = cor; ctx.fillRect(snap(x), snap(y), PX, PX); } ctx.globalAlpha = 1; }
       // riscos de velocidade quando a cavada é funda
       if (!calmo() && digging && Math.abs(vel) > 260) { const C = moleCenter(), dir = vel > 0 ? -1 : 1, n = Math.min(9, 3 + Math.floor(Math.abs(vel) / 220)); ctx.fillStyle = "#f5e9d6";
@@ -3327,7 +3533,47 @@ var V6 = (() => {
     ctx.globalAlpha = 1; ctx.restore();
   }
   const draw0 = draw;
-  draw = function(){ draw0(); try { pinta(); } catch (e) {} };
+  draw = function(){ draw0(); try { pinta(); } catch (e) {} try { caverna(); } catch (e) {} };
+
+  /* ---------- Naja Party: caverna viva (anel de pedras, estalactites com gotas, tochas, cristais, pó no ar) ---------- */
+  // desenhado na tela (não no mundo), atrás da roda; com "reduzir movimento" fica tudo parado
+  function caverna(){
+    if (!moleGone || !DEN || !deep) return;
+    const anima = !calmo(), P = PX, cx = W/2, cy = DEN.cy, rw = (DEN.w || DEN.s)/2, rh = (DEN.h || DEN.s)/2;
+    ctx.save(); ctx.imageSmoothingEnabled = false;
+    // anel de pedras em volta da roda
+    for (let i = 0; i < 72; i++) { const a = i/72*Math.PI*2, r1 = 1.06 + h(i, 301)*.12, s = 2 + (h(i, 302)*3 | 0), x = snap(cx + Math.cos(a)*rw*r1 - s*P/2), y = snap(cy + Math.sin(a)*rh*r1 - s*P/2);
+      ctx.fillStyle = h(i, 303) < .5 ? "#2a2230" : "#382d40"; ctx.fillRect(x, y, s*P, s*P); ctx.fillStyle = "#4e4159"; ctx.fillRect(x, y, s*P, P); }
+    // estalactites no teto (pingando) e estalagmites no chão
+    const passo = Math.max(P*10, 48);
+    for (let i = 0, x = h(7, 7)*passo; x < W; i++, x += passo*(.7 + h(i, 311)*.6)) {
+      const n = 3 + (h(i, 312)*8 | 0), xx = snap(x);
+      for (let k = 0; k < n; k++) { const lg = Math.max(1, Math.round((n - k)*.6)); ctx.fillStyle = k % 3 ? "#3d2e44" : "#54425f"; ctx.fillRect(xx - (lg >> 1)*P, k*P, lg*P, P); }
+      if (anima && h(i, 313) < .5) { const per = 2.4 + h(i, 314)*2.6, t = (clock + h(i, 315)*per) % per, yd = n*P + t*t*240;
+        if (yd < H) { ctx.globalAlpha = .75; ctx.fillStyle = "#8fd8ff"; ctx.fillRect(xx, snap(yd), Math.max(2, P >> 1), P); ctx.globalAlpha = 1; } }
+      if (h(i, 316) < .55) { const m = 2 + (h(i, 317)*5 | 0); for (let k = 0; k < m; k++) { const lg = Math.max(1, Math.round((m - k)*.7)); ctx.fillStyle = k % 2 ? "#2e2236" : "#3d2e44"; ctx.fillRect(xx + P*3 - (lg >> 1)*P, H - (k + 1)*P, lg*P, P); } }
+    }
+    // cristais nos 4 cantos da roda, brilhando devagar
+    [[-.78, .62], [.78, .62], [-.86, -.5], [.86, -.5]].forEach(([fx, fy], j) => {
+      const x = snap(cx + fx*rw*1.12), y = snap(cy + fy*rh*1.12), cor = j % 2 ? "#4de0d0" : "#a35cff", br = anima ? .5 + .5*Math.sin(clock*1.6 + j*1.7) : .6;
+      [[0, 4], [P*2, 6], [P*4, 3]].forEach(([dx, hh]) => { ctx.fillStyle = cor; ctx.fillRect(x + dx, y - hh*P, P*2, hh*P); ctx.fillStyle = "#f3e2ff"; ctx.fillRect(x + dx, y - hh*P, P, P); });
+      ctx.globalCompositeOperation = "lighter"; const g2 = ctx.createRadialGradient(x + P*3, y - P*3, 0, x + P*3, y - P*3, P*14);
+      g2.addColorStop(0, j % 2 ? `rgba(77,224,208,${.22*br})` : `rgba(163,92,255,${.22*br})`); g2.addColorStop(1, "rgba(0,0,0,0)"); ctx.fillStyle = g2; ctx.fillRect(x - P*12, y - P*18, P*30, P*30); ctx.globalCompositeOperation = "source-over"; });
+    // tochas dos lados (só se couber fora da roda)
+    const dx = rw + Math.max(30, P*7), tochas = cx - dx > 18 ? [cx - dx, cx + dx] : [];
+    tochas.forEach((x0, j) => { const x = snap(x0), y = snap(cy - P*3), fl = anima ? Math.floor(clock*9 + j*5) % 3 : 0, tr2 = anima ? Math.sin(clock*13 + j)*.08 : 0;
+      ctx.fillStyle = "#8a8178"; ctx.fillRect(x - P, y + P, P*3, P); ctx.fillStyle = "#6b4424"; ctx.fillRect(x, y, P, P*7);
+      ctx.fillStyle = "#d94a3a"; ctx.fillRect(x - P, y - P*2, P*3, P*2); ctx.fillStyle = "#ffb020"; ctx.fillRect(x - (fl === 1 ? P : 0), y - P*3, P*2, P*2);
+      ctx.fillStyle = "#fff0b0"; ctx.fillRect(x + (fl === 2 ? P : 0), y - P*4 - (fl === 0 ? P : 0), P, P);
+      ctx.globalCompositeOperation = "lighter"; const R = P*26*(1 + tr2), g3 = ctx.createRadialGradient(x, y - P*2, 0, x, y - P*2, R);
+      g3.addColorStop(0, "rgba(255,170,60,.32)"); g3.addColorStop(1, "rgba(255,170,60,0)"); ctx.fillStyle = g3; ctx.fillRect(x - R, y - P*2 - R, R*2, R*2); ctx.globalCompositeOperation = "source-over";
+      if (anima) for (let k = 0; k < 3; k++) { const t = (clock*.9 + k/3 + j*.37) % 1; ctx.globalAlpha = 1 - t; ctx.fillStyle = "#ffb020"; ctx.fillRect(snap(x + Math.sin(t*9 + k)*P*2), snap(y - P*4 - t*P*16), Math.max(2, P >> 1), Math.max(2, P >> 1)); }
+      ctx.globalAlpha = 1; });
+    // pó flutuando no ar
+    if (anima) { ctx.fillStyle = "#f5e9d6"; for (let i = 0; i < 18; i++) { const x = (h(i, 331)*W + Math.sin(clock*.4 + i)*30 + W) % W, y = ((h(i, 332)*H - clock*(6 + h(i, 333)*10)) % H + H) % H;
+      ctx.globalAlpha = .12 + .2*Math.abs(Math.sin(clock*.8 + i)); ctx.fillRect(snap(x), snap(y), Math.max(2, P >> 1), Math.max(2, P >> 1)); } ctx.globalAlpha = 1; }
+    ctx.restore();
+  }
 
   /* ---------- saída dos painéis: um "fantasma" some no lugar (a lógica do jogo não espera nada) ---------- */
   const visto = new Map();
@@ -4293,7 +4539,9 @@ var V10C = (function () {
   ];
   /* ---------- relíquias ao lado do túnel: brilham de perto e dão moedas quando o bicho passa (1 vez por dia cada) ---------- */
   const prof = k => 150 + 230 * k + Math.floor(h(k, 71) * 110);
-  const tipoDe = k => { const li = Math.min(TIPOS.length - 1, layerAt(prof(k))), l = TIPOS[li]; return { t: l[Math.floor(h(k, 72) * l.length) % l.length], li }; };
+  // nossas 11 camadas → as 7 listas de relíquias: Terra, Pedra, Fósseis, Cavernas, Rio, Gelo, Cristais, Magma, Rocha-mãe, Núcleo, Outro lado
+  const TIPO_DA = [0, 1, 1, 2, 2, 3, 2, 4, 5, 6, 6], FIM_REL = 10000;   // no Outro lado (céu) não tem relíquia
+  const tipoDe = k => { const li = TIPO_DA[layerAt(prof(k))] ?? 6, l = TIPOS[li]; return { t: l[Math.floor(h(k, 72) * l.length) % l.length], li }; };
   const valor = k => 2 + tipoDe(k).li + Math.floor(h(k, 73) * 3);
   const CH10 = "digV10", vistos = new Set(), fx = [];
   const TETO = 60;   // no máximo 60 moedas de relíquia por dia
@@ -4304,7 +4552,7 @@ var V10C = (function () {
   function tique(dt) {
     const d = moleD;
     if (!started) { vistos.clear(); dAnt = d; return; }
-    if (vale() && d > dAnt) for (let k = Math.max(0, Math.floor((dAnt - 260) / 230) - 1); prof(k) <= d; k++) { const m = prof(k); if (m <= dAnt || vistos.has(k)) continue;
+    if (vale() && d > dAnt) for (let k = Math.max(0, Math.floor((dAnt - 260) / 230) - 1); prof(k) <= d; k++) { const m = prof(k); if (m <= dAnt || vistos.has(k) || m >= FIM_REL) continue;
       vistos.add(k); const info = tipoDe(k), nome = info.t[CFG.lang === "pt" ? 2 : 3], C = moleCenter();
       if (typeof hoje !== "undefined" && S10.dia !== hoje) { S10.dia = hoje; S10.pagas = []; S10.soma = 0; }
       let txt = nome;
@@ -4331,7 +4579,7 @@ var V10C = (function () {
         const x = gx * g2 + h(gx, gy + 40) * (g2 - 40), y = gy * g2 + h(gx + 9, gy) * (g2 - 20), m = y / MPX - SURF; if (m < 12 || m > 470 || Math.abs(x - cx0) < SPX * 14) continue;
         for (let s = 0; s < 8; s++) { ctx.fillStyle = s === 7 ? "#f2b6c0" : s % 2 ? "#e89aa8" : "#c96a7c"; ctx.fillRect(Math.round(x + s * c), Math.round(y + Math.round(Math.sin(clock * 3 + s * .9 + gx * 3 + gy) * 1.6) * c), c, c); } } }
     // relíquias que ainda não foram pegas nesta cavada
-    for (let k = Math.max(0, Math.floor((m0 - 260) / 230) - 1); prof(k) < m1 + 40; k++) { const m = prof(k); if (m < m0 - 40 || vistos.has(k) || m <= moleD) continue;
+    for (let k = Math.max(0, Math.floor((m0 - 260) / 230) - 1); prof(k) < m1 + 40; k++) { const m = prof(k); if (m < m0 - 40 || vistos.has(k) || m <= moleD || m >= FIM_REL) continue;
       const info = tipoDe(k), cr = celR(), [sw, shh] = tam(info.t[0], cr), wy = wyOf(m), x = snap(tunnelXs(wy) - SPX * 12 - PX * 5) - sw, y = Math.round(wy - shh / 2), perto = Math.max(0, 1 - Math.abs(m - moleD) / 160);
       if (anim) { ctx.globalCompositeOperation = "lighter"; const a = .1 + .08 * Math.sin(clock * 3 + k) + perto * .3, r = Math.max(sw, shh) * (1 + perto * .5), gl = ctx.createRadialGradient(x + sw / 2, y + shh / 2, 1, x + sw / 2, y + shh / 2, r);
         gl.addColorStop(0, "rgba(255,226,140," + a.toFixed(2) + ")"); gl.addColorStop(1, "rgba(255,226,140,0)"); ctx.fillStyle = gl; ctx.fillRect(x + sw / 2 - r, y + shh / 2 - r, r * 2, r * 2); ctx.globalCompositeOperation = "source-over"; }
@@ -4349,7 +4597,7 @@ var V10C = (function () {
     const r = rng(ci * 911 + 5), n = W < 700 ? 1 : 3, meio = W / 2, folga = SPX * 18;
     for (let i = 0; i < n; i++) { const x = PX * 6 + r() * (W - PX * 40), y = 30 + r() * (CH - 110), wy = ci * CH + y, m = wy / MPX - SURF, q = r();
       if (m < 60 || Math.abs(x - meio) < folga || Math.abs(x + 60 - meio) < folga) continue;
-      const li = Math.min(TIPOS.length - 1, layerIdx(m, x)); if (li === 0) continue;
+      const lc = layerIdx(m, x); if (lc === 0 || lc >= 10) continue; const li = TIPO_DA[lc];
       const l = TIPOS[li].filter(t => t[0] !== "bau"), t = l[Math.floor(q * l.length) % l.length];
       if (li === 4) { g.fillStyle = "#0e0a0c"; for (let b = 0; b < 26; b++) g.fillRect(snap(x + (h(b, ci + i) - .5) * PX * 16), Math.round(y + (h(b + 9, ci + i) - .2) * PX * 12), PX * 2, PX);      // obsidiana rachada com brilho laranja
         g.fillStyle = "#ff8a3a"; for (let b = 0; b < 7; b++) g.fillRect(snap(x + (h(b + 30, ci + i) - .5) * PX * 14), Math.round(y + (h(b + 40, ci + i) - .2) * PX * 10), PX, Math.max(1, PX >> 1)); }

@@ -454,10 +454,6 @@
   body.v7arena .seat.me .mnd::before { content:""; position:absolute; left:-10px; right:-10px; bottom:-7px; height:18px; border-radius:50%; background:radial-gradient(ellipse, #ffd257aa, #ffd25700 70%); animation:v7ouro 1.5s ease-in-out infinite alternate; }
   @keyframes v7ouro { from { opacity:.55; } to { opacity:1; } }
   body.v7arena .seat.on { z-index:4; }   /* quem está com a vez nunca fica atrás do vizinho */
-  body.v7arena #den::before { left:37%; right:37%; top:45%; height:12%; }
-  body.v7arena #najaC { position:absolute; left:50%; top:50%; margin:0; z-index:3; transition:translate .12s ease-out; filter:drop-shadow(0 3px 0 #0008); }
-  body.v7arena #najaC.shk { animation:v7sway var(--spd, 1s) ease-in-out infinite alternate; }
-  body.v7arena #najaC:not(.shk) { animation:v7resp 2.2s ease-in-out infinite alternate; }
   @keyframes v7sway { from { rotate:-6deg; } to { rotate:6deg; } }
   @keyframes v7resp { from { rotate:-1.5deg; } to { rotate:2deg; } }
   #v7olho { position:absolute; width:18px; height:18px; margin:-9px 0 0 -9px; border-radius:50%; pointer-events:none; z-index:4; opacity:0; transition:opacity .4s, scale .4s;
@@ -2124,6 +2120,7 @@ function oTela(r){
   // a naja olha pra quem está com ela e cresce/agita conforme o relógio secreto avança
   const a = ang(Math.max(0, ord.indexOf(g.turn))), nj = $("najaC"), heat = g.heat || 0;
   nj.style.scale = Math.cos(a) < -.1 ? "-1 1" : "1 1"; nj.style.width = `calc(var(--ds, 300px) * ${(30 + heat*5) / 100})`;
+  nj.style.transform = `rotate(${(4 + 9*Math.abs(Math.cos(a)) + heat*2).toFixed(1)}deg)`;   // aponta: inclina pro lado pra onde está olhando (o espelho já vira o lado)
   nj.style.top = `calc(var(--dh, 300px) * .015 - var(--ds, 300px) * ${(30 + heat*5) / 200})`;   // a base da naja fica sempre no meio do buraco (no PC e no celular)
   nj.style.setProperty("--spd", [1.1, .7, .4, .18][heat] + "s"); nj.classList.toggle("shk", g.phase === "go");
   if (g.phase === "bite" && ON.bitR !== g.round) { ON.bitR = g.round; const s = DEN ? DEN.s : 300;   // o bote
@@ -3662,6 +3659,7 @@ var V7 = (function () {
     const den = el("den"), nj = el("najaC"), g = r && r.game;
     if (!g || mode !== "online" || !document.body.classList.contains("toca")) return;
     if (!arenaOn) { arenaOn = true; document.body.classList.add("v7arena"); }
+    return;   // 24/11: a naja fica NO MEIO, crescendo, se agitando e apontando pra quem está com a vez (pedido do Christopher); o resto daqui não roda
     if (olho.parentNode !== den) den.appendChild(olho);
     const dr = den.getBoundingClientRect(), seats = [...den.querySelectorAll(".seat")];
     // roda mais larga (até 35%), sem deixar ninguém sair da tela
@@ -3703,7 +3701,7 @@ var V7 = (function () {
   const layoutDen0 = layoutDen;                                                        // o chão, as runas e as rachaduras acompanham o tamanho da roda
   layoutDen = function () { layoutDen0();
     try { const k = DEN ? [DEN.s, DEN.w, DEN.h, DEN.cy, innerWidth, innerHeight].join() : "";
-      if (k && k !== denAss && !el("toca").classList.contains("hide")) { denAss = k; caverna();
+      if (k && k !== denAss && !el("toca").classList.contains("hide")) { denAss = k;
         if (mode === "online" && ON && ON.room && ON.room.game) requestAnimationFrame(() => { try { if (mode === "online" && ON && ON.room) oTela(ON.room); } catch (e) {} }); } } catch (e) {} };
 
   /* ---------- 5) a caverna: arcos de rocha em camadas, estalactites, cristais, runas em volta do poço, ossos, moedas, rachaduras ---------- */
@@ -3765,7 +3763,8 @@ var V7 = (function () {
     [13, 87].forEach(lx => { for (let k = 0; k < 3; k++) { const i = document.createElement("i"); i.className = "v7fag"; i.style.left = lx + "%"; i.style.setProperty("--dx", ((k - 1) * 12) + "px"); i.style.animationDelay = (k * .63) + "s"; toca.appendChild(i); } });
   }
   const drawToca0 = drawToca;
-  drawToca = function () { try { caverna(); } catch (e) { console.error("v7 caverna", e); drawToca0(); } };
+  // 24/11: o Christopher escolheu a NOSSA toca (arena de pedra, tochas, cachoeira); a caverna() fica guardada
+  void drawToca0;
 
   /* ---------- 6) régua lateral: termômetro das camadas com o SEU bicho deslizando e os metros ao lado ---------- */
   const term = document.createElement("div"); term.id = "v7term"; term.setAttribute("aria-hidden", "true");

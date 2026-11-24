@@ -144,6 +144,16 @@
   #najaC { width:30%; image-rendering:pixelated; transform-origin:50% 90%; transition:translate .16s ease-out; }
   #najaC.shk { animation:cshake var(--spd, 1s) steps(2) infinite; }
   @keyframes cshake { 50% { rotate:-7deg; } }
+  /* 24/11: cena de CATEGORIA NOVA na Naja Party (pedido do Christopher) */
+  #cena { position:fixed; inset:0; z-index:30; display:grid; place-content:center; justify-items:center; gap:16px; text-align:center; padding:16px; background:rgba(8,5,4,.84); pointer-events:none; }
+  #cena .cenaN { font-family:var(--display); color:var(--gold); font-size:clamp(30px, 7vw, 60px); letter-spacing:5px; line-height:1.1; text-shadow:0 4px 0 #000, 0 0 22px #ffb34777; }
+  #cena .cenaL { width:min(320px, 70vw); height:4px; background:repeating-linear-gradient(90deg, var(--gold) 0 8px, transparent 8px 14px); opacity:.7; }
+  #cena .cenaQ { font-family:var(--display); color:var(--cream); font-size:clamp(15px, 3.2vw, 24px); letter-spacing:2px; line-height:1.45; max-width:min(700px, 92vw); min-height:2.9em; text-shadow:0 3px 0 #000; }
+  #cena.vai { animation:cenaIn .25s ease-out both; } #cena.vai .cenaN { animation:cenaPop .55s cubic-bezier(.2,1.4,.4,1) both; } #cena.vai .cenaL { animation:cenaLin .5s .15s ease-out both; }
+  #cena.sai { animation:cenaOut .3s ease-in both; }
+  @keyframes cenaIn { from { opacity:0; } to { opacity:1; } } @keyframes cenaOut { to { opacity:0; } }
+  @keyframes cenaPop { from { transform:scale(2.4); opacity:0; } to { transform:scale(1); opacity:1; } } @keyframes cenaLin { from { transform:scaleX(0); } to { transform:scaleX(1); } }
+  @media (prefers-reduced-motion:reduce) { #cena.vai, #cena.vai .cenaN, #cena.vai .cenaL, #cena.sai { animation:none; } }
   .seat { position:absolute; transform:translate(-50%,-50%); width:96px; text-align:center; font-family:var(--af); font-size:calc(var(--fs) * .8); color:var(--cream); text-shadow:0 2px 0 #000; overflow-wrap:anywhere; }
   .seat .av { width:46px; height:46px; margin:0 auto 4px; background:var(--panel2); border:3px solid var(--line); display:grid; place-items:center; font-family:var(--display); font-size:20px; box-shadow:3px 3px 0 #000a; }
   .seat.on { color:var(--gold); }
@@ -750,6 +760,7 @@
   <div id="oMsg" class="pmsg" aria-live="polite"></div>
   <div class="row"><button class="btn ghost" id="oLeaveB" type="button" data-t="oLeave">◀ LEAVE</button><button class="btn lava" id="oStartB" type="button" data-t="oStart">START ▼</button></div>
 </div>
+<div id="cena" class="hide" role="status" aria-live="polite"><div class="cenaN"></div><div class="cenaL"></div><div class="cenaQ"></div></div>
 <div id="den" class="hide" aria-hidden="true"><canvas id="najaC"></canvas></div>
 <form id="pbar" class="hide" autocomplete="off">
   <div id="pTurn" aria-live="polite"></div>
@@ -848,7 +859,7 @@ const STR = {
     d_vel1:"one-answer questions (math, capitals, symbols): only the first to get it right scores.",
     d_vel2:"one-answer questions: everyone answers and scores by speed order (1st scores the most).",
     t_contas:"🧮 Math", t_mix:"🎲 Mixed (math, capitals, symbols)",
-    oAgain:"↻ PLAY AGAIN", oWaitLeader:"waiting for the leader…", oWinner:"🏆 {a} WINS!", oDraw:"🤝 DRAW!", rPts:"{n} pts", najaOut:"OUT", useLife:"❤ USE A LIFE", usedLife:"{a} used a life ❤", fio:"BY A THREAD", newCat:"NEW CATEGORY!",
+    oAgain:"↻ PLAY AGAIN", oWaitLeader:"waiting for the leader…", oWinner:"🏆 {a} WINS!", oDraw:"🤝 DRAW!", rPts:"{n} pts", najaOut:"OUT", useLife:"❤ USE A LIFE", usedLife:"{a} used a life ❤", fio:"BY A THREAD", catN:"CATEGORY {n}", newCat:"NEW CATEGORY!",
     cRound:"RACE", cOut:"OUT OF LIVES · watch the race", cEnd:"time's up! waiting for everyone…", rSpect:"you're watching this match",
     vRound:"SPEED · {a}/{b}", vHint:"▼ only one answer · be fast ▼", vWrong:"not that · try again", vYou:"✓ you got it in {s} s",
     vAns:"answer: {a}", vNoOne:"nobody got it", voltou:"↻ BACK", voltouHint:"▼ this one's back · no repeated answers ▼",
@@ -907,7 +918,7 @@ const STR = {
     d_vel1:"perguntas de uma resposta só (contas, capitais, símbolos): só o primeiro que acertar pontua.",
     d_vel2:"perguntas de uma resposta só: todo mundo responde e pontua pela ordem de velocidade (o 1º ganha mais).",
     t_contas:"🧮 Contas", t_mix:"🎲 Misturadas (contas, capitais, símbolos)",
-    oAgain:"↻ JOGAR DE NOVO", oWaitLeader:"esperando o líder…", oWinner:"🏆 {a} VENCEU!", oDraw:"🤝 EMPATE!", rPts:"{n} pts", najaOut:"FORA", useLife:"❤ USAR VIDA", usedLife:"{a} usou uma vida ❤", fio:"POR UM FIO", newCat:"CATEGORIA NOVA!",
+    oAgain:"↻ JOGAR DE NOVO", oWaitLeader:"esperando o líder…", oWinner:"🏆 {a} VENCEU!", oDraw:"🤝 EMPATE!", rPts:"{n} pts", najaOut:"FORA", useLife:"❤ USAR VIDA", usedLife:"{a} usou uma vida ❤", fio:"POR UM FIO", catN:"CATEGORIA {n}", newCat:"CATEGORIA NOVA!",
     cRound:"CORRIDA", cOut:"SEM VIDAS · acompanhe a corrida", cEnd:"acabou! esperando todo mundo…", rSpect:"você está assistindo essa partida",
     vRound:"VELOCIDADE · {a}/{b}", vHint:"▼ uma resposta só · seja rápido ▼", vWrong:"não é isso · tenta de novo", vYou:"✓ você acertou em {s} s",
     vAns:"resposta: {a}", vNoOne:"ninguém acertou", voltou:"↻ VOLTOU", voltouHint:"▼ essa voltou · não vale repetir resposta ▼",
@@ -1812,15 +1823,29 @@ function oTick(){
     const sai = vid > 0 && nb >= vid;   // levou todos os botes que valiam = está fora
     FB.update(oGame(), { phase:"bite", bit:quem, ["bites/" + quem]:nb, ...(sai ? { ["out/" + quem]:true } : {}) });
     return setTimeout(() => oRodada(quem), 4200); }
-  const heat = Math.min(3, f*4 | 0); if (heat !== (g.heat || 0)) FB.update(oGame(), { heat });   // a naja fica mais agitada
+  const heat = Math.max(0, Math.min(3, f*4 | 0)); if (heat !== (g.heat || 0)) FB.update(oGame(), { heat });   // a naja fica mais agitada
 }
 // rodada nova: categoria nova e a naja começa com o VIZINHO de quem tomou o bote (pra não punir a mesma pessoa de cara)
+// 24/11: cena de CATEGORIA NOVA (todo celular mostra; o relógio do líder espera CENA_MS)
+const CENA_MS = 2600;
+function oCena(n, Q){
+  const c = $("cena"), qe = c.querySelector(".cenaQ"), txt = Q ? qTxt(Q) : "", id = (ON.cenaId || 0) + 1; ON.cenaId = id; ON.cenaAte = performance.now() + CENA_MS;
+  c.querySelector(".cenaN").textContent = tr("catN", { n }); qe.textContent = ""; c.classList.remove("vai", "sai"); show("cena", true); void c.offsetWidth; c.classList.add("vai");
+  try { SOM.conta(false); } catch (e) {}
+  if (REDUZ) qe.textContent = txt;
+  else { const passo = Math.max(16, Math.min(55, 1150 / Math.max(1, txt.length))); let i = 0;   // a pergunta se escreve letra por letra
+    const escreve = () => { if (!ON || ON.cenaId !== id) return; i++; qe.textContent = txt.slice(0, i); if (i < txt.length) setTimeout(escreve, passo); };
+    setTimeout(escreve, 480); }
+  setTimeout(() => { if (ON && ON.cenaId === id) c.classList.add("sai"); }, CENA_MS - 300);
+  setTimeout(() => { if (!ON || ON.cenaId !== id) return; show("cena", false); c.classList.remove("vai", "sai"); ON.cenaAte = 0;
+    try { SOM.conta(true); } catch (e) {} if (ON.room && mode === "online") oTela(ON.room); }, CENA_MS);
+}
 function oRodada(quem){
   if (!ON || ON.host !== ON.uid || !ON.room || !ON.room.game) return;
   const g = ON.room.game, vivos = najaVivos(g);
   if (g.order.length > 1 && vivos.length <= 1) return FB.update(oGame(), { phase:"fim", vence:vivos[0] || null });
   quem = oProx(g, quem);
-  oMarca(ON.room.live); oRelogio();
+  oMarca(ON.room.live); oRelogio(); ON.t0 += CENA_MS;   // o relógio só começa depois da cena de categoria nova
   FB.update(oGame(), { turn:quem, q:oSorteia(), round:g.round + 1, phase:"go", heat:0, used:null, fb:null, bit:null, fio:null, qStart:quem, voltas:0, gastou:null });
 }
 // a naja vai pra "prox": vê se é hora de trocar a categoria (sem bote e sem tirar vida)
@@ -1831,7 +1856,7 @@ function oPassa(g, prox, upd, gastouAgora){
   let qs = g.qStart, voltas = g.voltas || 0;
   if (!qs || !pl[qs] || (g.out || {})[qs]) { qs = prox; voltas = 0; upd.qStart = prox; }   // quem começou saiu: conta a partir de agora
   else if (prox === qs) voltas++;
-  if (gastou[prox] || voltas >= 2) Object.assign(upd, { q:oSorteia(), used:null, gastou:null, voltas:0, qStart:prox });
+  if (gastou[prox] || voltas >= 2) { Object.assign(upd, { q:oSorteia(), used:null, gastou:null, voltas:0, qStart:prox }); ON.t0 = performance.now() + CENA_MS; }   // categoria nova: relógio depois da cena
   else { upd.voltas = voltas; if (gastouAgora) upd["gastou/" + gastouAgora] = true; }
   return upd;
 }
@@ -1887,6 +1912,7 @@ function oPartida(r){
 function oEntraNaToca(){
   ["oLobby","oSetup","tools","cfg","menu","title","titleBtns","pEnd"].forEach(id => show(id, false));
   document.body.classList.add("party", "toca"); show("oQuit", true);
+  ON.catN = 1; ON.qAt = null; ON.cenaAte = 0; ON.cenaId = (ON.cenaId || 0) + 1;   // partida nova: começa na categoria 1
   drawToca(); show("toca", true); mode = "online"; oTela(ON.room);
 }
 /* ----- 3A: a toca da naja: arena de pedra no fundo da caverna, com luz de tocha em degraus (pixel art) ----- */
@@ -2100,7 +2126,7 @@ function oTela(r){
   show("qp", true); show("den", true); show("pbar", g.phase === "go"); show("oBoom", false);   // bote sem texto: só a naja avançando, a tela piscando e o som
   if (ON.rodada !== g.round) { ON.rodada = g.round; $("pMsg").textContent = ""; }
   $("pTurn").innerHTML = minha ? tr("oYou") : tr("oTurn", { a:esc(nm(g.turn)) });
-  inp.disabled = false; $("bPass").disabled = !minha;   // dá pra ir escrevendo fora da vez; enviar, só na vez
+  const naCena = (ON.cenaAte || 0) > performance.now(); inp.disabled = naCena; $("bPass").disabled = !minha || naCena;   // dá pra ir escrevendo fora da vez; enviar, só na vez
   if (ON.qAt !== g.q) { if (ON.qAt) inp.value = ""; }   // categoria nova = campo limpo
   { const vd = (g.cfg && g.cfg.vidas) || 0; show("bVida", minha && vd > 0 && ((g.bites || {})[eu] || 0) < vd); $("bVida").disabled = !minha; }   // só com vidas e se ainda tiver ❤
   if (minha && ON.vezAnt !== eu) { vib([70, 40, 70]);   // a naja chegou em você: o celular avisa
@@ -2118,6 +2144,7 @@ function oTela(r){
     else { ON.bad = fb.u; ON.badT = performance.now() + 900; setTimeout(() => ON && ON.room && mode === "online" && oTela(ON.room), 950);
       m.className = ""; m.textContent = fb.u !== eu ? "" : fb.k === "rep" ? tr("rep2", { name:fb.v }) : tr("wrong2", { v:fb.v });
       if (fb.u === eu) { SOM.erro(); vib(40); const b = $("pbar"); b.classList.remove("shake"); void b.offsetWidth; b.classList.add("shake"); inp.select(); } } }
+  if (ON.qAt && ON.qAt !== g.q && g.phase === "go") { ON.catN = (ON.catN || 1) + 1; oCena(ON.catN, Q); }   // 24/11: cena "CATEGORIA N"
   if (ON.qAt !== g.q) { if (ON.qAt && ON.rodQ === g.round) { const m = $("pMsg"); m.textContent += (m.textContent ? " · " : "") + tr("newCat"); } ON.qAt = g.q; ON.rodQ = g.round; }   // trocou a categoria no meio da rodada
   // a roda: cada jogador é uma toupeira no seu montinho; VOCÊ sempre embaixo, na frente
   // meia-lua: VOCÊ embaixo, na frente; os outros num arco por cima, seguindo o sentido horário
@@ -2202,7 +2229,7 @@ $("oTipoSel").onchange = e => { oCfg().tipo = e.target.value; oCfgMuda(); };
 function oLimpaCena(lobby = true){
   if (ON) { ON.jogo = false; ON.velR = null; ON.velResR = null; ON.fimR = null; ON.velFim = null; ON.velPrim = null; ON.fimMandado = null; }
   race = false; RACE = null; free = false; comp = false;
-  ["toca","qp","bar","den","pbar","oRank","vRes","cdown","card","hud","oQuit","oBoom","bSurface","oFim","end","bSkip"].forEach(id => show(id, false));
+  ["toca","qp","bar","den","pbar","oRank","vRes","cdown","card","hud","oQuit","oBoom","bSurface","oFim","end","bSkip","cena"].forEach(id => show(id, false));
   document.body.classList.remove("party", "toca", "fim"); $("bar").classList.remove("pula");
   const qh = $("qp").querySelector(".qh"); if (qh) qh.textContent = tr("hint");
   tw = null; lines = null; chip = null; happy = false; score = 0; log = []; moleD = -SURF; mode = "title";

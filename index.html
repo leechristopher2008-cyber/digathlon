@@ -1128,14 +1128,17 @@ function palavrasDe(txt){ const w = String(txt).toLowerCase().normalize("NFD").r
   for (let i = 0; i < w.length - 1; i++) { out.add(w[i] + w[i + 1]); if (i < w.length - 2) out.add(w[i] + w[i + 1] + w[i + 2]); } return out; }
 // o título da página tem que ser o que a pessoa digitou (com erro pequeno de digitação), não só "parecido"
 function tituloBate(titulo, t){ const a = normKey(titulo), b = normKey(String(t).replace(ARTIGO, "")); if (!a || !b) return false;
-  if (a === b) return true; const tol = tolera(Math.min(a.length, b.length), false); return tol > 0 && Math.abs(a.length - b.length) <= tol && dist(a, b) <= tol; }
+  if (a === b) return true;
+  // 24/11: o título pode ter um complemento depois do nome ("Filolau de Crotona", "Tales de Mileto"): vale se as primeiras palavras forem o que a pessoa digitou
+  const tw = String(titulo).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").split(/[^a-z0-9]+/).filter(Boolean), nw = String(t).replace(ARTIGO, "").trim().split(/\s+/).length;
+  if (b.length >= 4 && tw.length > nw) { const ini = normKey(tw.slice(0, nw).join(" ")), tl = tolera(Math.min(ini.length, b.length), false); if (ini === b || (tl > 0 && Math.abs(ini.length - b.length) <= tl && dist(ini, b) <= tl)) return true; } const tol = tolera(Math.min(a.length, b.length), false); return tol > 0 && Math.abs(a.length - b.length) <= tol && dist(a, b) <= tol; }
 async function viaWiki(Q, t){
   if (!Q.kw || typeof fetch !== "function") return null;
   const kt = normKey(t); if (Q.kw.some(g => g.some(w => w === kt || w + "s" === kt || w === kt + "s"))) return { ok:false };   // a própria categoria ("cão" pra raça de cachorro) não vale
   let falou = false;
   for (const l of CFG.lang === "pt" ? ["pt", "en"] : ["en", "pt"]) {
     try {
-      const u = `https://${l}.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&generator=search&gsrlimit=4&gsrsearch=${encodeURIComponent(t)}&prop=extracts&exintro=1&explaintext=1&exsentences=3`;
+      const u = `https://${l}.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&generator=search&gsrlimit=4&gsrsearch=${encodeURIComponent(t)}&prop=extracts&exintro=1&explaintext=1&exchars=700`;
       const ac = new AbortController(), tm = setTimeout(() => ac.abort(), 7000);
       const j = await (await fetch(u, { signal:ac.signal })).json(); clearTimeout(tm); falou = true;
       const pags = Object.values((j && j.query && j.query.pages) || {}).sort((a, b) => (a.index || 0) - (b.index || 0));
@@ -1195,8 +1198,10 @@ const wyOf = gd => (gd + SURF) * MPX;   // profundidade do jogo (m) -> y no mund
 function normKey(s){ return s.toLowerCase().replace(/\+\+/g, "pp").replace(/#/g, "sharp").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\(.*?\)/g, "").replace(/[^a-z0-9]/g, ""); }
 function dist(a, b){ const m = [...Array(b.length + 1).keys()]; for (let i = 1; i <= a.length; i++) { let prev = m[0]; m[0] = i;
   for (let j = 1; j <= b.length; j++) { const t = m[j]; m[j] = Math.min(m[j] + 1, m[j-1] + 1, prev + (a[i-1] === b[j-1] ? 0 : 1)); prev = t; } } return m[b.length]; }
-// erro de digitação aceito: nome difícil (~) até 1 a cada 4 letras; nome de 7+ letras 1 erro, de 12+ letras 2; nome curto tem que estar certo
-const tolera = (n, dificil) => dificil ? Math.max(1, Math.floor(n / 4)) : n >= 12 ? 2 : n >= 7 ? 1 : 0;
+// erro de digitação aceito (24/11, pedido do Christopher: nome difícil de lembrar ganha colher de chá, nome fácil é rígido)
+// LENDÁRIA/ULTRA ou nome difícil (~): até 1 erro a cada 3 letras (no máximo 3) · ÉPICA/MÍTICA: 1 erro a partir de 5 letras, 2 a partir de 10
+// COMUM/RARA: 1 erro com 7+ letras, 2 com 12+; nome curto tem que estar certo
+const tolera = (n, dificil, tier = 0) => dificil || tier >= 4 ? Math.min(3, Math.max(1, Math.floor(n / 3))) : tier >= 2 ? (n >= 10 ? 2 : n >= 5 ? 1 : 0) : n >= 12 ? 2 : n >= 7 ? 1 : 0;
 const ARTIGO = /^(o|a|os|as|um|uma|the|an)\s+/;
 // formas aceitas do que foi digitado: sem artigo ("o tatu") e no singular ("minhocas", "leões", "animais")
 function variantes(input){
@@ -1214,7 +1219,7 @@ function acha(input, Q){
   for (const v of vs) { const r = Q.lista.find(a => a.chaves.includes(v)); if (r) return r; }
   const g = vs[0]; if (g.length < 4 || Q.exata) return null;
   let best = null, bd = 99, duvida = false;
-  for (const a of Q.lista) for (const k of a.chaves) { const t = tolera(k.length, a.dificil); if (!t || Math.abs(k.length - g.length) > t) continue;
+  for (const a of Q.lista) for (const k of a.chaves) { const t = tolera(k.length, a.dificil, a.tier); if (!t || Math.abs(k.length - g.length) > t) continue;
     const d = dist(g, k); if (d > t) continue;
     if (d < bd) { bd = d; best = a; duvida = false; } else if (d === bd && best !== a) duvida = true; }
   return best && !duvida ? best : null;
@@ -1797,7 +1802,7 @@ const najaVivos = g => g.order.filter(u => (ON.room.players || {})[u] && !(g.out
 function oProx(g, from){ const o = g.order, pl = ON.room.players || {}, i = o.indexOf(from);
   for (let k = 1; k <= o.length; k++) { const u = o[(i + k) % o.length]; if (pl[u] && !(g.out || {})[u]) return u; } return from; }
 function oTick(){
-  if (!ON || ON.host !== ON.uid || !ON.room || !ON.room.game || ON.biting) return;
+  if (!ON || ON.host !== ON.uid || !ON.room || !ON.room.game || ON.biting || ON.julgando) return;   // conferindo na Wikipédia: o relógio espera
   const g = ON.room.game, pl = ON.room.players || {};
   if (g.phase !== "go") return;
   if (g.order.length > 1 && najaVivos(g).length <= 1) return FB.update(oGame(), { phase:"fim", vence:najaVivos(g)[0] || null });   // sobrou um: venceu
@@ -1841,9 +1846,19 @@ function oUsaVida(g){
   FB.update(oGame(), oPassa(g, prox, { turn:prox, heat:0, ["bites/" + u]:nb, fb:{ u, k:"vida", n }, ...(nb >= vid ? { fio:{ u, de:prox } } : {}) }, u));
 }
 // o juiz confere a resposta de quem está com a naja
-function oJulga(g, v){
+async function oJulga(g, v){
   if (v === VIDA_T) return oUsaVida(g);
-  const used = g.used || [], Q = getQ(g.q), n = ((g.fb || {}).n || 0) + 1; let r = Q ? confere(v, Q, new Set()) : { tipo:"erro" };
+  if (ON.julgando) { ON.pend = v; return; }   // ainda conferindo a anterior na Wikipédia: confere esta depois
+  let used = g.used || []; const Q = getQ(g.q); let r = Q ? confere(v, Q, new Set()) : { tipo:"erro" };
+  if (r.tipo === "erro" && Q && podeConferir(Q)) {   // 24/11: não está na lista: confere online (igual à cavada); o relógio do bote para enquanto isso
+    const t0 = performance.now(), turno = g.turn; ON.julgando = true; let c = null;
+    try { c = await confereOnline(Q, v); } catch (e) {}
+    if (!ON) return; ON.julgando = false; ON.t0 += performance.now() - t0;
+    const g2 = ON.room && ON.room.game; if (!g2 || g2.turn !== turno || g2.phase !== "go" || g2.q !== g.q) return;   // a vez mudou enquanto conferia
+    g = g2; if (c && c.ok) r = { tipo:"ok", r:c.a };
+    if (ON.pend !== undefined && !(c && c.ok)) { const p = ON.pend; ON.pend = undefined; return oJulga(g, p); } ON.pend = undefined;
+  }
+  used = g.used || []; const n = ((g.fb || {}).n || 0) + 1;
   if (r.tipo === "ok" && used.some(u => normKey(u.n) === normKey(r.r.nome))) r = { tipo:"rep", r:r.r };   // já foi dita nesta rodada
   if (r.tipo === "vazio") return;
   if (r.tipo === "ok") { oRelogio();   // passou: relógio cheio pro próximo

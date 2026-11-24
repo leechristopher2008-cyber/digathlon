@@ -1734,6 +1734,7 @@ async function oEntra(code, name, criar){
     const eu = oRef(`${code}/players/${uid}`);
     await FB.set(eu, { name, joined:Date.now() }); FB.onDisconnect(eu).remove();   // fechou a aba = sai da sala
     const lv = oRef(`${code}/live/${uid}`); await FB.set(lv, { t:"", s:0 }); FB.onDisconnect(lv).remove();
+    { const vs = vistasLe().slice(-VISTAS_SOBE).join(","); if (vs) FB.update(eu, { vistas:vs }).catch(() => {}); }   // 24/11: as perguntas que este celular já viu vão pra sala
     ON = { code, uid, host:null, seen:{} };
     ON.vigia = setInterval(oVigia, 2000);   // confere se o líder ainda está vivo (sumiu = outro assume)
     history.replaceState(null, "", "?sala=" + code);
@@ -1793,20 +1794,27 @@ const VEZ_S = 25, ERRO_S = 3;
 // a pergunta viaja pelo banco como CÓDIGO (ex.: fronteira_afg), então todo celular vê a mesma
 // só o líder sorteia: tira de um "saco" (não repete pergunta na partida) e pula pergunta com menos de MIN_RESP respostas,
 // senão as respostas acabam com 6-8 jogadores
-const USOU_K = "digNajaUsou", USOU_MAX = 900;   // perguntas já jogadas na Naja Party (guardadas no celular do líder)
+// perguntas que ESTE celular já viu na Naja Party (de um dia pro outro), da mais antiga pra mais nova
+const VISTAS_K = "digNajaVistas", VISTAS_MAX = 900, VISTAS_SOBE = 400;
+function vistasLe(){ try { const v = JSON.parse(localStorage.getItem(VISTAS_K) || localStorage.getItem("digNajaUsou") || "[]"); return Array.isArray(v) ? v.filter(x => typeof x === "string" && /^[\w-]{1,40}$/.test(x)) : []; } catch (e) { return []; } }
+function vistasAnota(id){ if (!id) return; const v = vistasLe().filter(x => x !== id); v.push(id); try { localStorage.setItem(VISTAS_K, JSON.stringify(v.slice(-VISTAS_MAX))); } catch (e) {} }
 const MIN_RESP = 20, O_TEMAS = ["all","geek","cultura","bichos","geo","ciencia","comida","brasil"];
 function oSorteia(){
   const tema = ON.tema || "all", fonte0 = () => pool().filter(d => (d.fam !== "palavras" || d.pad.lang === CFG.lang) && (tema === "all" || d.tags.includes(tema))),
     fonte = () => { const f = fonte0(), sem = f.filter(d => !/_\dl_/.test(d.id)); return sem.length >= 30 ? sem : f; };
-  // 24/11: o celular do líder LEMBRA as perguntas jogadas (de um dia pro outro), senão toda noite voltavam as mesmas.
-  // Só repete quando acabarem as novas do tema escolhido; aí aquele tema recomeça do zero.
-  if (!ON.usou) { let ant = []; try { ant = JSON.parse(localStorage.getItem(USOU_K) || "[]"); } catch (e) {} ON.usou = new Set(Array.isArray(ant) ? ant.filter(x => typeof x === "string") : []); }
-  const grava = () => { try { localStorage.setItem(USOU_K, JSON.stringify([...ON.usou].slice(-USOU_MAX))); } catch (e) {} };
+  // 24/11: cada celular lembra as perguntas que viu (vistasLe) e manda pra sala ao entrar (players/ID/vistas).
+  // O líder junta tudo: primeiro as que NINGUÉM da sala viu; acabaram = volta pela que saiu HÁ MAIS TEMPO pra todo mundo.
+  ON.usou = ON.usou || new Set();   // nesta partida nunca repete
+  const idade = new Map(), listas = [vistasLe()];   // idade = quantas perguntas atrás a pessoa viu (0 = a última); vale a mais recente entre todos
+  Object.values((ON.room && ON.room.players) || {}).forEach(pl => { if (pl && typeof pl.vistas === "string") listas.push(pl.vistas.split(",")); });
+  listas.forEach(l => l.forEach((id, i) => { const a = l.length - 1 - i; if (!idade.has(id) || a < idade.get(id)) idade.set(id, a); }));
+  const serve = d => !ON.usou.has(d.id) && (getQ(d.id) || { lista:[] }).lista.length >= MIN_RESP;
   for (let k = 0; k < 3000; k++) {
-    if (!ON.saco || !ON.saco.length) { const f = fonte(); let novas = f.filter(d => !ON.usou.has(d.id) && (getQ(d.id) || { lista:[] }).lista.length >= MIN_RESP);
-      if (novas.length < 8) { f.forEach(d => ON.usou.delete(d.id)); grava(); novas = f; }   // acabaram as novas deste tema: recomeça
-      ON.saco = misturaFamilias(novas); }
-    const id = ON.saco.pop(), Q = getQ(id); if (Q && Q.lista.length >= MIN_RESP && !ON.usou.has(id)) { ON.usou.delete(id); ON.usou.add(id); grava(); return id; } }
+    if (!ON.saco || !ON.saco.length) { const f = fonte().filter(serve), novas = f.filter(d => !idade.has(d.id));
+      if (novas.length >= 8) ON.saco = misturaFamilias(novas);
+      else { const velhas = f.filter(d => idade.has(d.id)).sort((x, y) => idade.get(y.id) - idade.get(x.id));   // a mais antiga primeiro
+        ON.saco = [...velhas.slice(0, Math.max(8, Math.ceil(velhas.length * .3))).map(d => d.id).reverse(), ...embaralha(novas.map(d => d.id))]; if (!ON.saco.length) ON.saco = misturaFamilias(fonte()); } }   // tira do fim: primeiro as novas, depois a mais antiga
+    const id = ON.saco.pop(), Q = getQ(id); if (Q && Q.lista.length >= MIN_RESP && !ON.usou.has(id)) { ON.usou.add(id); return id; } }
   const p = fonte(); return p[Math.random()*p.length | 0].id; }
 function oRelogio(seg){ const g = ON.room && ON.room.game; ON.t0 = performance.now(); ON.dur = (seg || (g && g.cfg && g.cfg.tempo) || VEZ_S)*1000; ON.biting = false; oGarante(); }
 // o juiz (celular do líder) confere tudo a cada 250 ms, em qualquer modo
@@ -2150,6 +2158,7 @@ function oTela(r){
     else { ON.bad = fb.u; ON.badT = performance.now() + 900; setTimeout(() => ON && ON.room && mode === "online" && oTela(ON.room), 950);
       m.className = ""; m.textContent = fb.u !== eu ? "" : fb.k === "rep" ? tr("rep2", { name:fb.v }) : tr("wrong2", { v:fb.v });
       if (fb.u === eu) { SOM.erro(); vib(40); const b = $("pbar"); b.classList.remove("shake"); void b.offsetWidth; b.classList.add("shake"); inp.select(); } } }
+  if (ON.qAt !== g.q && g.q) vistasAnota(g.q);   // 24/11: este celular viu esta pergunta
   if (ON.qAt && ON.qAt !== g.q && g.phase === "go") { ON.catN = (ON.catN || 1) + 1; oCena(ON.catN, Q); }   // 24/11: cena "CATEGORIA N"
   if (ON.qAt !== g.q) { if (ON.qAt && ON.rodQ === g.round) { const m = $("pMsg"); m.textContent += (m.textContent ? " · " : "") + tr("newCat"); } ON.qAt = g.q; ON.rodQ = g.round; }   // trocou a categoria no meio da rodada
   // a roda: cada jogador é uma toupeira no seu montinho; VOCÊ sempre embaixo, na frente

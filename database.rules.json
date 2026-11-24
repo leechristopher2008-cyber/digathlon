@@ -34,6 +34,9 @@
             "joined": {
               ".validate": "newData.isNumber()"
             },
+            "vistas": {
+              ".validate": "newData.isString() && newData.val().length <= 8000"
+            },
             "$other": {
               ".validate": false
             }

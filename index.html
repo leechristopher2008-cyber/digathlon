@@ -818,6 +818,7 @@
 
 
 <script src="dados.js"></script>
+<script src="dados-extra.js"></script>   <!-- 24/11: perguntas novas (BANCO3), separadas do dados.js -->
 <script>
 /* ================= IDIOMA (EN padrão / PT) ================= */
 const STR = {
@@ -995,7 +996,7 @@ const ELEM_G = [
 ];
 // descritores: o que existe (barato). fam = família pra montar a cavada do dia com variedade
 const DESC = [];
-BANCO.concat(typeof BANCO2 === "undefined" ? [] : BANCO2).forEach(p => DESC.push({ id:p.id, tags:p.tags || [], q:p.q, en:p.en || null, fam:"curada", fonte:p }));
+BANCO.concat(typeof BANCO2 === "undefined" ? [] : BANCO2, typeof BANCO3 === "undefined" ? [] : BANCO3).forEach(p => DESC.push({ id:p.id, tags:p.tags || [], q:p.q, en:p.en || null, fam:"curada", fonte:p }));
 ELEM_G.forEach(([id, q, en]) => DESC.push({ id, tags:["ciencia"], q, en, fam:"curada", elem:true }));
 if (typeof GERADAS !== "undefined") GERADAS.forEach(p => DESC.push({ id:p.id, tags:p.tags || [], q:p.q, en:p.en || null, fam:/^(cidades|mundo)_/.test(p.id) ? "cidades" : "geo", fonte:p }));
 if (typeof PADROES !== "undefined") PADROES.forEach(p => DESC.push({ id:p.id, tags:p.tags || ["palavras"], q:p.q, en:p.en || null, fam:"palavras", pad:p }));
@@ -1798,7 +1799,7 @@ const VEZ_S = 25, ERRO_S = 3;
 const VISTAS_K = "digNajaVistas", VISTAS_MAX = 900, VISTAS_SOBE = 400;
 function vistasLe(){ try { const v = JSON.parse(localStorage.getItem(VISTAS_K) || localStorage.getItem("digNajaUsou") || "[]"); return Array.isArray(v) ? v.filter(x => typeof x === "string" && /^[\w-]{1,40}$/.test(x)) : []; } catch (e) { return []; } }
 function vistasAnota(id){ if (!id) return; const v = vistasLe().filter(x => x !== id); v.push(id); try { localStorage.setItem(VISTAS_K, JSON.stringify(v.slice(-VISTAS_MAX))); } catch (e) {} }
-const MIN_RESP = 20, O_TEMAS = ["all","geek","cultura","bichos","geo","ciencia","comida","brasil"];
+const MIN_RESP = 20, O_TEMAS = ["all","geek","cultura","bichos","geo","ciencia","comida","coisas","brasil"];   // 25/11: + coisas. "esporte" volta quando o lote de esporte entrar (hoje só 7 perguntas)
 function oSorteia(){
   const tema = ON.tema || "all", fonte0 = () => pool().filter(d => (d.fam !== "palavras" || d.pad.lang === CFG.lang) && (tema === "all" || d.tags.includes(tema))),
     fonte = () => { const f = fonte0(), sem = f.filter(d => !/_\dl_/.test(d.id)); return sem.length >= 30 ? sem : f; };
